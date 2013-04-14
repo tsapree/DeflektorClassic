@@ -2,6 +2,7 @@ package pro.oneredpixel.deflektorclassic;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.view.Menu;
 import android.widget.ImageView;
@@ -14,6 +15,7 @@ public class MainActivity extends Activity {
 	
 	ImageView iv;
     Bitmap bm=null;
+    Sprite spr;
 	
 	//коэффициенты шага луча
 	int angleNodeSteps[][]={
@@ -45,22 +47,26 @@ public class MainActivity extends Activity {
 		
 		bm=Bitmap.createBitmap(field_width*16, field_height*16, Bitmap.Config.ARGB_8888);
 		
+		spr=new Sprite(R.drawable.defsprites);
+		
+		
 		nodes=new int[field_width*4][field_height*4];
 		for (int i=0;i<field_width*4;i++)
 			for (int j=0;j<field_height*4;j++) {
 				nodes[i][j]=0;
 				bm.setPixel(i*4, j*4, 0xFF00FF00);
 			}
-
+		
 		nodes[10][20]=0x101;
 		nodes[11][18]=0x103;
 		nodes[13][16]=0x110;
+		nodes[11][14]=0x200;
 		
-		drawbeam (10,24,0);
-		drawbeam (11,24,1);
-		drawbeam (12,24,2);
-		drawbeam (13,24,3);
-		drawbeam (14,24,4);
+		putMirror(2,5,4);
+		putMirror(4,5,22);
+		putLaser(2,7,0);
+		//drawbeam (10,24,0);
+
 		
 		iv.setImageBitmap(bm);
 		
@@ -73,6 +79,18 @@ public class MainActivity extends Activity {
 		return true;
 	}
 
+	//angle=0..31
+	void putMirror(int x, int y, int angle) {
+		nodes[x*4+2][y*4+2]=0x100+(angle&0x1f);
+		spr.putRegion(bm, x*16, y*16, 16, 16, (angle&7)*16, ((angle>>3)&1)*16);
+	}
+	
+	//angle=0..3
+	void putLaser(int x,int y, int angle) {
+		spr.putRegion(bm, x*16, y*16, 16, 16, ((angle&3)*16), 4*16);
+		drawbeam(x*4+2+angleNodeSteps[angle*4][0],y*4+2+angleNodeSteps[angle*4][1],(angle&3)*4);
+	}
+	
 	void drawbeam(int beam_x, int beam_y, int beam_angle) {
 		
 		int new_beam_x;
@@ -147,5 +165,29 @@ public class MainActivity extends Activity {
 			bitmap.setPixel(x2, y2, colour1);
 		};
 	};
+	
+	class Sprite {
+		int width=0;
+		int height=0;
+		int data[]=null;
+		
+		Sprite (int res_id) {
+			Bitmap b=BitmapFactory.decodeResource(getResources(), res_id);
+			if (b!=null) { 
+				width = b.getWidth();
+				height = b.getHeight();
+				data = new int[width*height];
+				b.getPixels(data, 0, width, 0, 0, width, height);
+			};
+		};
+		
+		//x,y,sx,sy - space in bitmap to put sprite in,
+		//bx,by - coordinates in sprite where begins region
+		void putRegion(Bitmap bitmap, int x, int y, int sx, int sy, int bx, int by) {
+			if (width>0 && height>0 && data!=null) {
+				bitmap.setPixels(data, by*width+bx, width, x, y, sx, sy);
+			};
+		};
+	}
 
 }
