@@ -12,6 +12,28 @@ public class MainActivity extends Activity {
 	final int field_width = 15;
 	final int field_height = 9;
 	int nodes[][];
+	int field[];
+	
+	final int FLD_NULL = 0;
+	final int FLD_LASER_GUN = 0x0100;
+	final int FLD_RECEIVER = 0x0200;
+	final int FLD_MIRROR = 0x0300;
+	final int FLD_WARPBOX = 0x0400;			//(teleport) warpbox will connect you with next warpbox
+	final int FLD_CELL = 0x500;
+	final int FLD_MINE = 0x600;				//Mine causes overload and increases overload meter
+	final int FLD_WALL_A = 0x700;			//reflects laser
+	final int FLD_WALL_B = 0x800;			//stops laser
+	final int FLD_PRISM = 0x900;			//prism turns laser at random
+	final int FLD_SLIT_A = 0xa00;			//reflects laser if angle is different - желтые
+	final int FLD_SLIT_B = 0xb00;			//if the angle is different the laser will stop - голубые
+	
+	final int FLD_AUTOROTATING = 0x2000;	//autorotate
+	final int FLD_ERASEONEND = 0x4000;		//kill this brick when all cells burned off
+	
+	final int NODE_NULL = 0;
+	final int NODE_MIRROR = 0x100;
+	final int NODE_BLOCK = 0x200;
+	
 	
 	ImageView iv;
     Bitmap bm=null;
@@ -54,17 +76,134 @@ public class MainActivity extends Activity {
 		for (int i=0;i<field_width*4;i++)
 			for (int j=0;j<field_height*4;j++) {
 				nodes[i][j]=0;
-				bm.setPixel(i*4, j*4, 0xFF00FF00);
 			}
 		
-		nodes[10][20]=0x101;
-		nodes[11][18]=0x103;
-		nodes[13][16]=0x110;
-		nodes[11][14]=0x200;
+		field=new int[field_width*field_height];
 		
-		putMirror(2,5,4);
-		putMirror(4,5,22);
-		putLaser(2,7,0);
+		field[0+0*field_width]=FLD_MIRROR|6;
+		field[2+2*field_width]=FLD_MIRROR|FLD_AUTOROTATING;
+		field[2+5*field_width]=FLD_MIRROR;
+		field[0+7*field_width]=FLD_MIRROR|12;
+		field[8+0*field_width]=FLD_MIRROR;
+		field[8+8*field_width]=FLD_MIRROR;
+		field[14+3*field_width]=FLD_MIRROR;
+		field[14+5*field_width]=FLD_MIRROR;
+		
+		
+		field[1+1*field_width]=FLD_CELL;
+		field[1+2*field_width]=FLD_CELL;
+		field[1+3*field_width]=FLD_CELL;
+		field[2+1*field_width]=FLD_CELL;
+		field[2+3*field_width]=FLD_CELL;
+		field[3+1*field_width]=FLD_CELL;
+		field[3+2*field_width]=FLD_CELL;
+		field[3+3*field_width]=FLD_CELL;
+		
+		field[5+0*field_width]=FLD_CELL;
+		field[6+0*field_width]=FLD_CELL;
+		field[5+1*field_width]=FLD_CELL;
+		field[6+1*field_width]=FLD_CELL;
+		field[11+0*field_width]=FLD_CELL;
+		field[12+0*field_width]=FLD_CELL;
+		field[11+1*field_width]=FLD_CELL;
+		field[9+4*field_width]=FLD_CELL;
+		field[10+7*field_width]=FLD_CELL;
+		field[10+8*field_width]=FLD_CELL;
+		field[12+7*field_width]=FLD_CELL;
+		
+		field[11+6*field_width]=FLD_MINE;
+		field[11+7*field_width]=FLD_MINE;
+		
+		field[5+2*field_width]=FLD_PRISM;
+		
+		field[7+4*field_width]=FLD_SLIT_A|4;
+		field[10+0*field_width]=FLD_SLIT_B|7;
+		field[12+2*field_width]=FLD_SLIT_B|7;
+		field[12+6*field_width]=FLD_SLIT_B|7;
+		
+		field[10+3*field_width]=FLD_WARPBOX|1;
+		field[14+7*field_width]=FLD_WARPBOX|1;
+		
+		field[4+0*field_width]=FLD_WALL_B|0x0a;
+		field[4+1*field_width]=FLD_WALL_B|0x0a;
+		field[4+2*field_width]=FLD_WALL_B|0x0f;
+		field[4+3*field_width]=FLD_WALL_B|0x0f;
+		field[4+4*field_width]=FLD_WALL_B|0x0f;
+		field[1+4*field_width]=FLD_WALL_B|0x0c;
+		field[2+4*field_width]=FLD_WALL_B|0x0c;
+		field[3+4*field_width]=FLD_WALL_B|0x0c;
+		
+		field[2+8*field_width]=FLD_WALL_A|0x0a;
+		field[4+8*field_width]=FLD_WALL_A|0x05;
+		field[4+7*field_width]=FLD_WALL_A|0x05;
+		field[6+2*field_width]=FLD_WALL_A|0x0c;
+		field[7+2*field_width]=FLD_WALL_A|0x0c;
+		field[7+1*field_width]=FLD_WALL_A|0x05;
+		field[7+0*field_width]=FLD_WALL_A|0x05;
+		field[13+0*field_width]=FLD_WALL_A|0x05;
+		field[14+0*field_width]=FLD_WALL_A|0x0b;
+		field[14+1*field_width]=FLD_WALL_A|0x05;
+		field[14+8*field_width]=FLD_WALL_A|0x02;
+		field[13+8*field_width]=FLD_WALL_A|0x03;
+		field[12+8*field_width]=FLD_WALL_A|0x03;
+		field[9+8*field_width]=FLD_WALL_A|0x05;
+		field[9+7*field_width]=FLD_WALL_A|0x0d;
+		
+		field[3+7*field_width]=FLD_LASER_GUN|3;
+		field[3+8*field_width]=FLD_RECEIVER|1;
+		
+		int f_angle;
+		for (int i=0;i<field_width;i++) 
+			for (int j=0;j<field_height;j++) {
+				f_angle=field[j*field_width+i]&0x1f;
+				switch (field[j*field_width+i]&0xf00) {
+				case FLD_NULL:
+					putNull(i,j);
+					break;
+				case FLD_LASER_GUN:
+					putLaser(i,j,f_angle);
+					break;
+				case FLD_RECEIVER:
+					putReceiver(i,j,f_angle);
+					break;
+				case FLD_MIRROR:
+					putMirror(i,j,f_angle);
+					break;
+				case FLD_WARPBOX:
+					putWarpbox(i,j,f_angle);
+					break;
+				case FLD_CELL:
+					putCell(i,j);
+					break;
+				case FLD_MINE:
+					putMine(i,j);
+					break;
+				case FLD_WALL_A:
+					putWallA(i,j,f_angle);
+					break;
+				case FLD_WALL_B:
+					putWallB(i,j,f_angle);
+					break;
+				case FLD_PRISM:
+					putPrism(i,j);
+					break;
+				case FLD_SLIT_A:
+					putSlitA(i,j,f_angle);
+					break;
+				case FLD_SLIT_B:
+					putSlitB(i,j,f_angle);
+					break;
+				}
+			};
+		
+		//nodes[10][20]=NODE_MIRROR|0x01;
+		//nodes[11][18]=NODE_MIRROR|0x03;
+		//nodes[13][16]=NODE_MIRROR|0x10;
+		//nodes[11][14]=NODE_BLOCK |0x00;
+		
+		//putMirror(2,5,4);
+		//putMirror(4,5,22);
+		//putLaser(2,7,0);
 		//drawbeam (10,24,0);
 
 		
@@ -81,7 +220,7 @@ public class MainActivity extends Activity {
 
 	//angle=0..31
 	void putMirror(int x, int y, int angle) {
-		nodes[x*4+2][y*4+2]=0x100+(angle&0x1f);
+		nodes[x*4+2][y*4+2]=NODE_MIRROR+(angle&0x1f);
 		spr.putRegion(bm, x*16, y*16, 16, 16, (angle&7)*16, ((angle>>3)&1)*16);
 	}
 	
@@ -89,6 +228,63 @@ public class MainActivity extends Activity {
 	void putLaser(int x,int y, int angle) {
 		spr.putRegion(bm, x*16, y*16, 16, 16, ((angle&3)*16), 4*16);
 		drawbeam(x*4+2+angleNodeSteps[angle*4][0],y*4+2+angleNodeSteps[angle*4][1],(angle&3)*4);
+	}
+	
+	void putReceiver(int x,int y, int angle) {
+		spr.putRegion(bm, x*16, y*16, 16, 16, (((angle&3)+4)*16), 4*16);
+	}
+	
+	void putCell(int x, int y) {
+		spr.putRegion(bm, x*16, y*16, 16, 16, 0, 5*16);
+	}
+	
+	void putMine(int x, int y) {
+		spr.putRegion(bm, x*16, y*16, 16, 16, 16, 5*16);
+	}
+	
+	void putPrism(int x, int y) {
+		spr.putRegion(bm, x*16, y*16, 16, 16, 6*16, 5*16);
+	}
+	
+	void putNull(int x, int y) {
+		spr.putRegion(bm, x*16, y*16, 8, 8, 7*16, 5*16+8);
+		spr.putRegion(bm, x*16+8, y*16, 8, 8, 7*16, 5*16+8);
+		spr.putRegion(bm, x*16, y*16+8, 8, 8, 7*16, 5*16+8);
+		spr.putRegion(bm, x*16+8, y*16+8, 8, 8, 7*16, 5*16+8);
+	}
+	
+	void putWarpbox(int x, int y, int type) {
+		spr.putRegion(bm, x*16, y*16, 16, 16, (((type&3)+2)*16), 5*16);
+	}
+	
+	void putSlitA(int x, int y, int angle) {
+		spr.putRegion(bm, x*16, y*16, 16, 16, ((angle&7)*16), 3*16);
+	}
+
+	void putSlitB(int x, int y, int angle) {
+		spr.putRegion(bm, x*16, y*16, 16, 16, ((angle&7)*16), 2*16);
+	}
+	
+	void putWallA(int x, int y, int type) {
+		if ((type&8)!=0)	spr.putRegion(bm, x*16, y*16, 8, 8, 7*16+8, 5*16);
+		else				spr.putRegion(bm, x*16, y*16, 8, 8, 7*16, 5*16+8);
+		if ((type&4)!=0)	spr.putRegion(bm, x*16+8, y*16, 8, 8, 7*16+8, 5*16);
+		else				spr.putRegion(bm, x*16+8, y*16, 8, 8, 7*16, 5*16+8);
+		if ((type&2)!=0)	spr.putRegion(bm, x*16, y*16+8, 8, 8, 7*16+8, 5*16);
+		else				spr.putRegion(bm, x*16, y*16+8, 8, 8, 7*16, 5*16+8);
+		if ((type&1)!=0)	spr.putRegion(bm, x*16+8, y*16+8, 8, 8, 7*16+8, 5*16);
+		else				spr.putRegion(bm, x*16+8, y*16+8, 8, 8, 7*16, 5*16+8);
+	}
+	
+	void putWallB(int x, int y, int type) {
+		if ((type&8)!=0)	spr.putRegion(bm, x*16, y*16, 8, 8, 7*16, 5*16);
+		else				spr.putRegion(bm, x*16, y*16, 8, 8, 7*16, 5*16+8);
+		if ((type&4)!=0)	spr.putRegion(bm, x*16+8, y*16, 8, 8, 7*16, 5*16);
+		else				spr.putRegion(bm, x*16+8, y*16, 8, 8, 7*16, 5*16+8);
+		if ((type&2)!=0)	spr.putRegion(bm, x*16, y*16+8, 8, 8, 7*16, 5*16);
+		else				spr.putRegion(bm, x*16, y*16+8, 8, 8, 7*16, 5*16+8);
+		if ((type&1)!=0)	spr.putRegion(bm, x*16+8, y*16+8, 8, 8, 7*16, 5*16);
+		else				spr.putRegion(bm, x*16+8, y*16+8, 8, 8, 7*16, 5*16+8);
 	}
 	
 	void drawbeam(int beam_x, int beam_y, int beam_angle) {
@@ -120,7 +316,7 @@ public class MainActivity extends Activity {
 			new_beam_x = beam_x+angleNodeSteps[new_beam_angle][0];
 			new_beam_y = beam_y+angleNodeSteps[new_beam_angle][1];
 			if (new_beam_x>=field_width*4 || new_beam_x<0 || new_beam_y>=field_height*4 || new_beam_y<0) endBeam=true;
-			else drawline (bm,beam_x*4,beam_y*4,new_beam_x*4,new_beam_y*4,0xFF000000);
+			else drawline (bm,beam_x*4,beam_y*4,new_beam_x*4,new_beam_y*4,0xFFFFFFFF);
 				
 			beam_x = new_beam_x;
 			beam_y = new_beam_y;
