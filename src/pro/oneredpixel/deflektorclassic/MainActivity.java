@@ -30,13 +30,15 @@ public class MainActivity extends Activity implements OnClickListener, OnTouchLi
 	final int FLD_PRISM = 0x900;			//prism turns laser at random
 	final int FLD_SLIT_A = 0xa00;			//reflects laser if angle is different - желтые
 	final int FLD_SLIT_B = 0xb00;			//if the angle is different the laser will stop - голубые
+	final int FLD_EXPLODE = 0xc00;			//взрыв CELL/WALL/MINE при прожигании-при завершении уровня
 	
 	final int FLD_AUTOROTATING = 0x2000;	//autorotate
-	final int FLD_ERASEONEND = 0x4000;		//kill this brick when all cells burned off
+	final int FLD_EXPLODEONEND = 0x4000;		//kill this brick when all cells burned off
 	
 	final int NODE_NULL = 0;
 	final int NODE_MIRROR = 0x100;
 	final int NODE_BLOCK = 0x200;
+	final int NODE_CELL = 0x300;
 	
 	
 	ImageView iv;
@@ -139,7 +141,7 @@ public class MainActivity extends Activity implements OnClickListener, OnTouchLi
 		field[3+4*field_width]=FLD_WALL_B|0x0c;
 		
 		field[2+8*field_width]=FLD_WALL_A|0x0a;
-		field[4+8*field_width]=FLD_WALL_A|0x05;
+		field[4+8*field_width]=FLD_WALL_A|0x05|FLD_EXPLODEONEND;
 		field[4+7*field_width]=FLD_WALL_A|0x05;
 		field[6+2*field_width]=FLD_WALL_A|0x0c;
 		field[7+2*field_width]=FLD_WALL_A|0x0c;
@@ -157,8 +159,8 @@ public class MainActivity extends Activity implements OnClickListener, OnTouchLi
 		field[3+7*field_width]=FLD_LASER_GUN|3;
 		field[3+8*field_width]=FLD_RECEIVER|1;
 		
-		animateField();
 		drawField();
+		animateField();
 		
 		//nodes[10][20]=NODE_MIRROR|0x01;
 		//nodes[11][18]=NODE_MIRROR|0x03;
@@ -187,11 +189,22 @@ public class MainActivity extends Activity implements OnClickListener, OnTouchLi
 	
 	void animateField(int x, int y) {
 		int f=0;
+		boolean needToExplodeBarrier=true;
 		for (int i=0;i<field_width;i++) 
 			for (int j=0;j<field_height;j++) {
 				f=field[j*field_width+i];
-				if (((f&FLD_AUTOROTATING)!=0) && ((x!=i) || (y!=j)) ) rotateThing(i,j); 
-			}
+				if (((f&FLD_AUTOROTATING)!=0) && ((x!=i) || (y!=j)) ) rotateThing(i,j);
+				if ((f&0xf00)==FLD_EXPLODE) {
+					f++;
+					if ((f&0xf)>4) f=FLD_NULL;
+					else needToExplodeBarrier = false;
+					field[j*field_width+i]=f;
+				};
+				if ((f&0xF00)==FLD_CELL) needToExplodeBarrier = false;
+			};
+		if (needToExplodeBarrier)
+			for (int i=0;i<field_width*field_height;i++)
+				if ((field[i]&FLD_EXPLODEONEND)!=0) field[i]=FLD_EXPLODE;
 	}
 	
 	void rotateThing(int x, int y) {
@@ -251,6 +264,10 @@ public class MainActivity extends Activity implements OnClickListener, OnTouchLi
 				case FLD_SLIT_B:
 					putSlitB(i,j,f_angle);
 					break;
+				case FLD_EXPLODE:
+					spr.putRegion(bm, i*16, j*16, 16, 16, ((f_angle&7)*16), 6*16);
+					if ((f_angle&7)>2) nodes[i*4+2][j*4+2]=NODE_NULL;
+					break;
 				}
 			};
 			drawBeam(beam_x,beam_y,beam_angle);
@@ -272,6 +289,7 @@ public class MainActivity extends Activity implements OnClickListener, OnTouchLi
 	}
 	
 	void putCell(int x, int y) {
+		nodes[x*4+2][y*4+2]=NODE_CELL;
 		spr.putRegion(bm, x*16, y*16, 16, 16, 0, 5*16);
 	}
 	
@@ -333,12 +351,23 @@ public class MainActivity extends Activity implements OnClickListener, OnTouchLi
 			
 			new_beam_angle=beam_angle;
 			
+			
+			final int NODE_NULL = 0;
+			final int NODE_MIRROR = 0x100;
+			final int NODE_BLOCK = 0x200;
+			final int NODE_CELL = 0x300;
+			
 			switch (node_id) {
-			case 0: break;
-			case 1: //mirror node - отражает луч
+			case NODE_NULL>>8: break;
+			case NODE_MIRROR>>8: //mirror node - отражает луч
 				new_beam_angle =((node_angle+node_angle-beam_angle-beam_angle)>>1)&0xf;
 				break;
-			case 2: //extinguish node - поглощает луч
+			case NODE_BLOCK>>8: //extinguish node - поглощает луч
+				endBeam=true;
+				continue;
+			case NODE_CELL>>8:
+				nodes[beam_x][beam_y]=NODE_BLOCK;
+				field[(beam_x>>2)+((beam_y>>2)*field_width)]=FLD_EXPLODE;
 				endBeam=true;
 				continue;
 			};
@@ -431,8 +460,8 @@ public class MainActivity extends Activity implements OnClickListener, OnTouchLi
 			if ((f&0xFF00)==FLD_MIRROR) {
 				rotateThing(x,y);
 			};
-			animateField();
 			drawField();
+			animateField();
 			iv.invalidate();
 			return true;
 		}
