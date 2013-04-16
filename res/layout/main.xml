@@ -13,11 +13,15 @@
 
     <ImageView
         android:id="@+id/iv1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="fill_parent"
+        android:layout_height="288dp"
+        android:layout_alignParentBottom="false"
         android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="false"
         android:layout_alignParentTop="true"
+        android:adjustViewBounds="true"
         android:contentDescription="pic"
+        android:scaleType="fitXY"
         android:src="@drawable/ic_launcher" />
 
 </RelativeLayout>

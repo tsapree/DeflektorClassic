@@ -5,9 +5,13 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.view.Menu;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.View.OnTouchListener;
 import android.widget.ImageView;
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements OnClickListener, OnTouchListener {
 
 	final int field_width = 15;
 	final int field_height = 9;
@@ -65,7 +69,8 @@ public class MainActivity extends Activity {
 		setContentView(R.layout.main);
 		
 		iv=(ImageView) findViewById(R.id.iv1);
-        //iv.setOnClickListener(this);
+        iv.setOnClickListener(this);
+        iv.setOnTouchListener(this);
 		
 		bm=Bitmap.createBitmap(field_width*16, field_height*16, Bitmap.Config.ARGB_8888);
 		
@@ -116,8 +121,8 @@ public class MainActivity extends Activity {
 		
 		field[5+2*field_width]=FLD_PRISM;
 		
-		field[7+4*field_width]=FLD_SLIT_A|4;
-		field[10+0*field_width]=FLD_SLIT_B|7;
+		field[7+4*field_width]=FLD_SLIT_A|4|FLD_AUTOROTATING;
+		field[10+0*field_width]=FLD_SLIT_B|7|FLD_AUTOROTATING;
 		field[12+2*field_width]=FLD_SLIT_B|7;
 		field[12+6*field_width]=FLD_SLIT_B|7;
 		
@@ -152,16 +157,69 @@ public class MainActivity extends Activity {
 		field[3+7*field_width]=FLD_LASER_GUN|3;
 		field[3+8*field_width]=FLD_RECEIVER|1;
 		
+		animateField();
+		drawField();
+		
+		//nodes[10][20]=NODE_MIRROR|0x01;
+		//nodes[11][18]=NODE_MIRROR|0x03;
+		//nodes[13][16]=NODE_MIRROR|0x10;
+		//nodes[11][14]=NODE_BLOCK |0x00;
+		
+		//putMirror(2,5,4);
+		//putMirror(4,5,22);
+		//putLaser(2,7,0);
+		//drawbeam (10,24,0);
+		
+		iv.setImageBitmap(bm);
+		
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		// Inflate the menu; this adds items to the action bar if it is present.
+		getMenuInflater().inflate(R.menu.main, menu);
+		return true;
+	}
+	
+	void animateField() {
+		animateField(-1,-1);
+	}
+	
+	void animateField(int x, int y) {
+		int f=0;
+		for (int i=0;i<field_width;i++) 
+			for (int j=0;j<field_height;j++) {
+				f=field[j*field_width+i];
+				if (((f&FLD_AUTOROTATING)!=0) && ((x!=i) || (y!=j)) ) rotateThing(i,j); 
+			}
+	}
+	
+	void rotateThing(int x, int y) {
+		int f=field[y*field_width+x];
+		field[y*field_width+x]=(++f)&0xFFFFFF1F;
+	}
+	
+	void drawField() {
 		int f_angle;
+		int beam_x=0;
+		int beam_y=0;
+		int beam_angle=0;
 		for (int i=0;i<field_width;i++) 
 			for (int j=0;j<field_height;j++) {
 				f_angle=field[j*field_width+i]&0x1f;
 				switch (field[j*field_width+i]&0xf00) {
 				case FLD_NULL:
-					putNull(i,j);
+					spr.putRegion(bm, i*16, j*16, 8, 8, 7*16, 5*16+8);
+					spr.putRegion(bm, i*16+8, j*16, 8, 8, 7*16, 5*16+8);
+					spr.putRegion(bm, i*16, j*16+8, 8, 8, 7*16, 5*16+8);
+					spr.putRegion(bm, i*16+8, j*16+8, 8, 8, 7*16, 5*16+8);
 					break;
 				case FLD_LASER_GUN:
 					putLaser(i,j,f_angle);
+					spr.putRegion(bm, i*16, j*16, 16, 16, ((f_angle&3)*16), 4*16);
+					beam_x=i*4+2+angleNodeSteps[f_angle*4][0];
+					beam_y=j*4+2+angleNodeSteps[f_angle*4][1];
+					beam_angle=(f_angle&3)*4;
 					break;
 				case FLD_RECEIVER:
 					putReceiver(i,j,f_angle);
@@ -195,28 +253,8 @@ public class MainActivity extends Activity {
 					break;
 				}
 			};
-		
-		//nodes[10][20]=NODE_MIRROR|0x01;
-		//nodes[11][18]=NODE_MIRROR|0x03;
-		//nodes[13][16]=NODE_MIRROR|0x10;
-		//nodes[11][14]=NODE_BLOCK |0x00;
-		
-		//putMirror(2,5,4);
-		//putMirror(4,5,22);
-		//putLaser(2,7,0);
-		//drawbeam (10,24,0);
-
-		
-		iv.setImageBitmap(bm);
-		
-	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.main, menu);
-		return true;
-	}
+			drawBeam(beam_x,beam_y,beam_angle);
+	};
 
 	//angle=0..31
 	void putMirror(int x, int y, int angle) {
@@ -226,8 +264,7 @@ public class MainActivity extends Activity {
 	
 	//angle=0..3
 	void putLaser(int x,int y, int angle) {
-		spr.putRegion(bm, x*16, y*16, 16, 16, ((angle&3)*16), 4*16);
-		drawbeam(x*4+2+angleNodeSteps[angle*4][0],y*4+2+angleNodeSteps[angle*4][1],(angle&3)*4);
+
 	}
 	
 	void putReceiver(int x,int y, int angle) {
@@ -244,13 +281,6 @@ public class MainActivity extends Activity {
 	
 	void putPrism(int x, int y) {
 		spr.putRegion(bm, x*16, y*16, 16, 16, 6*16, 5*16);
-	}
-	
-	void putNull(int x, int y) {
-		spr.putRegion(bm, x*16, y*16, 8, 8, 7*16, 5*16+8);
-		spr.putRegion(bm, x*16+8, y*16, 8, 8, 7*16, 5*16+8);
-		spr.putRegion(bm, x*16, y*16+8, 8, 8, 7*16, 5*16+8);
-		spr.putRegion(bm, x*16+8, y*16+8, 8, 8, 7*16, 5*16+8);
 	}
 	
 	void putWarpbox(int x, int y, int type) {
@@ -287,7 +317,7 @@ public class MainActivity extends Activity {
 		else				spr.putRegion(bm, x*16+8, y*16+8, 8, 8, 7*16, 5*16+8);
 	}
 	
-	void drawbeam(int beam_x, int beam_y, int beam_angle) {
+	void drawBeam(int beam_x, int beam_y, int beam_angle) {
 		
 		int new_beam_x;
 		int new_beam_y;
@@ -384,6 +414,29 @@ public class MainActivity extends Activity {
 				bitmap.setPixels(data, by*width+bx, width, x, y, sx, sy);
 			};
 		};
+	}
+
+	@Override
+	public void onClick(View arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public boolean onTouch(View arg0, MotionEvent ev) {
+		if (ev.getAction()==MotionEvent.ACTION_DOWN) {
+			int x = (int)(ev.getX()/(arg0.getWidth()/field_width));
+			int y = (int)(ev.getY()/(arg0.getHeight()/field_height));
+			int f=field[y*field_width+x];
+			if ((f&0xFF00)==FLD_MIRROR) {
+				rotateThing(x,y);
+			};
+			animateField();
+			drawField();
+			iv.invalidate();
+			return true;
+		}
+		return false;
 	}
 
 }
