@@ -15,7 +15,6 @@ public class MainActivity extends Activity implements OnClickListener, OnTouchLi
 
 	final int field_width = 15;
 	final int field_height = 9;
-	int nodes[][];
 	int field[];
 	
 	final int FLD_NULL = 0;
@@ -34,11 +33,6 @@ public class MainActivity extends Activity implements OnClickListener, OnTouchLi
 	
 	final int FLD_AUTOROTATING = 0x2000;	//autorotate
 	final int FLD_EXPLODEONEND = 0x4000;		//kill this brick when all cells burned off
-	
-	final int NODE_NULL = 0;
-	final int NODE_MIRROR = 0x100;
-	final int NODE_BLOCK = 0x200;
-	final int NODE_CELL = 0x300;
 	
 	
 	ImageView iv;
@@ -78,12 +72,6 @@ public class MainActivity extends Activity implements OnClickListener, OnTouchLi
 		
 		spr=new Sprite(R.drawable.defsprites);
 		
-		
-		nodes=new int[field_width*4][field_height*4];
-		for (int i=0;i<field_width*4;i++)
-			for (int j=0;j<field_height*4;j++) {
-				nodes[i][j]=0;
-			}
 		
 		field=new int[field_width*field_height];
 		
@@ -162,16 +150,6 @@ public class MainActivity extends Activity implements OnClickListener, OnTouchLi
 		drawField();
 		animateField();
 		
-		//nodes[10][20]=NODE_MIRROR|0x01;
-		//nodes[11][18]=NODE_MIRROR|0x03;
-		//nodes[13][16]=NODE_MIRROR|0x10;
-		//nodes[11][14]=NODE_BLOCK |0x00;
-		
-		//putMirror(2,5,4);
-		//putMirror(4,5,22);
-		//putLaser(2,7,0);
-		//drawbeam (10,24,0);
-		
 		iv.setImageBitmap(bm);
 		
 	}
@@ -182,7 +160,7 @@ public class MainActivity extends Activity implements OnClickListener, OnTouchLi
 		getMenuInflater().inflate(R.menu.main, menu);
 		return true;
 	}
-	
+
 	void animateField() {
 		animateField(-1,-1);
 	}
@@ -217,6 +195,7 @@ public class MainActivity extends Activity implements OnClickListener, OnTouchLi
 		int beam_x=0;
 		int beam_y=0;
 		int beam_angle=0;
+
 		for (int i=0;i<field_width;i++) 
 			for (int j=0;j<field_height;j++) {
 				f_angle=field[j*field_width+i]&0x1f;
@@ -266,7 +245,6 @@ public class MainActivity extends Activity implements OnClickListener, OnTouchLi
 					break;
 				case FLD_EXPLODE:
 					spr.putRegion(bm, i*16, j*16, 16, 16, ((f_angle&7)*16), 6*16);
-					if ((f_angle&7)>2) nodes[i*4+2][j*4+2]=NODE_NULL;
 					break;
 				}
 			};
@@ -275,7 +253,6 @@ public class MainActivity extends Activity implements OnClickListener, OnTouchLi
 
 	//angle=0..31
 	void putMirror(int x, int y, int angle) {
-		nodes[x*4+2][y*4+2]=NODE_MIRROR+(angle&0x1f);
 		spr.putRegion(bm, x*16, y*16, 16, 16, (angle&7)*16, ((angle>>3)&1)*16);
 	}
 	
@@ -289,7 +266,6 @@ public class MainActivity extends Activity implements OnClickListener, OnTouchLi
 	}
 	
 	void putCell(int x, int y) {
-		nodes[x*4+2][y*4+2]=NODE_CELL;
 		spr.putRegion(bm, x*16, y*16, 16, 16, 0, 5*16);
 	}
 	
@@ -340,37 +316,64 @@ public class MainActivity extends Activity implements OnClickListener, OnTouchLi
 		int new_beam_x;
 		int new_beam_y;
 		int new_beam_angle;
-		int node, node_id, node_angle;
 		boolean endBeam=false;
 		
 		while (!endBeam) {
 			
-			node=nodes[beam_x][beam_y];
-			node_id=node>>8;
-			node_angle=nodes[beam_x][beam_y]&0x1f;				//node_angle - угол поворота зеркала, 0-31.
+			int sx=beam_x&3;
+			int sy=beam_y&3;
+			int fx=beam_x/4;
+			int fy=beam_y/4;
+			int f=field[fx+fy*field_width];
+			int f_angle=f&0x1f;
 			
 			new_beam_angle=beam_angle;
 			
-			
-			final int NODE_NULL = 0;
-			final int NODE_MIRROR = 0x100;
-			final int NODE_BLOCK = 0x200;
-			final int NODE_CELL = 0x300;
-			
-			switch (node_id) {
-			case NODE_NULL>>8: break;
-			case NODE_MIRROR>>8: //mirror node - отражает луч
-				new_beam_angle =((node_angle+node_angle-beam_angle-beam_angle)>>1)&0xf;
-				break;
-			case NODE_BLOCK>>8: //extinguish node - поглощает луч
-				endBeam=true;
-				continue;
-			case NODE_CELL>>8:
-				nodes[beam_x][beam_y]=NODE_BLOCK;
-				field[(beam_x>>2)+((beam_y>>2)*field_width)]=FLD_EXPLODE;
-				endBeam=true;
-				continue;
-			};
+			if ((sx==2) && (sy==2)) {
+				switch (f&0x0f00) {
+				case FLD_NULL:
+					break;
+				case FLD_LASER_GUN:
+					//TODO: нужно включить перегруз
+					endBeam=true;
+					continue;
+				case FLD_RECEIVER:
+					break;
+				case FLD_MIRROR:
+					new_beam_angle =(((f_angle<<1)-beam_angle-beam_angle)>>1)&0xf;
+					break;
+				case FLD_WARPBOX:
+					for (int i=0;i<field.length;i++) {
+						if ( ((field[i]&0x0f00)==FLD_WARPBOX) && (i!=(fx+fy*field_width))) {
+							beam_y=(i/field_width)*4+2;
+							beam_x=(i-(((int)(beam_y/4))*field_width))*4+2;
+							break;
+						};
+					};
+					break;
+				case FLD_CELL:
+					field[fx+fy*field_width]=FLD_EXPLODE;
+					endBeam=true;
+					continue;
+				case FLD_MINE:
+					break;
+				case FLD_WALL_A:
+					break;
+				case FLD_WALL_B:
+					break;
+				case FLD_PRISM:
+					new_beam_angle= (((beam_angle+1)&0xc)-4+((int)((8*Math.random())+0.5)))&0xf;//;
+					break;
+				case FLD_SLIT_A:
+					break;
+				case FLD_SLIT_B:
+					break;
+				case FLD_EXPLODE:
+					if (f_angle>2) break;
+					endBeam=true;
+					continue;
+				}
+			}
 			
 			new_beam_x = beam_x+angleNodeSteps[new_beam_angle][0];
 			new_beam_y = beam_y+angleNodeSteps[new_beam_angle][1];
