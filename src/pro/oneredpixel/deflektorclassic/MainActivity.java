@@ -329,6 +329,7 @@ public class MainActivity extends Activity implements OnClickListener, OnTouchLi
 			
 			new_beam_angle=beam_angle;
 			
+			//проверка на пересечение луча с центром препятствия
 			if ((sx==2) && (sy==2)) {
 				switch (f&0x0f00) {
 				case FLD_NULL:
@@ -384,6 +385,7 @@ public class MainActivity extends Activity implements OnClickListener, OnTouchLi
 				continue;
 			};
 
+			//проверка на пересечение с границей препятствия (стены, фильтры).
 			int mp_beam_x = (beam_x+beam_x+angleNodeSteps[new_beam_angle][0])/2;
 			int mp_beam_y = (beam_y+beam_y+angleNodeSteps[new_beam_angle][1])/2; 	
 			
@@ -396,9 +398,18 @@ public class MainActivity extends Activity implements OnClickListener, OnTouchLi
 					beam_angle=(4*2-beam_angle)&0xf;
 				continue;
 			case FLD_WALL_B:
-				
-				endBeam=true;
-				continue;
+				int crd=((mp_beam_x>>1)&1)+((mp_beam_y)&2);
+				if ((crd==0) && ((f1&8)!=0)) {	endBeam=true;	continue; };
+				if ((crd==1) && ((f1&4)!=0)) {	endBeam=true;	continue; };
+				if ((crd==2) && ((f1&2)!=0)) {	endBeam=true;	continue; };
+				if ((crd==3) && ((f1&1)!=0)) {	endBeam=true;	continue; };
+				//(mp_beam_x>1)&1 - координата внутри квадрата 0..1
+				//(mp_beam_y)&2 - координата внутри квадрата 0..1
+				//0,0 && 8
+				//0,1 && 4
+				//1,0 && 2
+				//1,1 && 1
+				break;
 			case FLD_SLIT_A:
 				if ((f1&7)!=(beam_angle&7)) {
 					if ((beam_x&3)==0)
