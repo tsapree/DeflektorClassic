@@ -83,7 +83,7 @@ public class MainActivity extends Activity implements OnClickListener, OnTouchLi
 		field[8+8*field_width]=FLD_MIRROR;
 		field[14+3*field_width]=FLD_MIRROR;
 		field[14+5*field_width]=FLD_MIRROR;
-		
+
 		
 		field[1+1*field_width]=FLD_CELL;
 		field[1+2*field_width]=FLD_CELL;
@@ -356,7 +356,9 @@ public class MainActivity extends Activity implements OnClickListener, OnTouchLi
 					endBeam=true;
 					continue;
 				case FLD_MINE:
-					break;
+					//TODO: нужно включить перегруз
+					endBeam=true;
+					continue;
 				case FLD_WALL_A:
 					break;
 				case FLD_WALL_B:
@@ -364,10 +366,10 @@ public class MainActivity extends Activity implements OnClickListener, OnTouchLi
 				case FLD_PRISM:
 					new_beam_angle= (((beam_angle+1)&0xc)-4+((int)((8*Math.random())+0.5)))&0xf;//;
 					break;
-				case FLD_SLIT_A:
-					break;
-				case FLD_SLIT_B:
-					break;
+				//case FLD_SLIT_A:
+				//	break;
+				//case FLD_SLIT_B:
+				//	break;
 				case FLD_EXPLODE:
 					if (f_angle>2) break;
 					endBeam=true;
@@ -377,8 +379,43 @@ public class MainActivity extends Activity implements OnClickListener, OnTouchLi
 			
 			new_beam_x = beam_x+angleNodeSteps[new_beam_angle][0];
 			new_beam_y = beam_y+angleNodeSteps[new_beam_angle][1];
-			if (new_beam_x>=field_width*4 || new_beam_x<0 || new_beam_y>=field_height*4 || new_beam_y<0) endBeam=true;
-			else drawline (bm,beam_x*4,beam_y*4,new_beam_x*4,new_beam_y*4,0xFFFFFFFF);
+			if (new_beam_x>=field_width*4 || new_beam_x<0 || new_beam_y>=field_height*4 || new_beam_y<0) {
+				endBeam=true;
+				continue;
+			};
+
+			int mp_beam_x = (beam_x+beam_x+angleNodeSteps[new_beam_angle][0])/2;
+			int mp_beam_y = (beam_y+beam_y+angleNodeSteps[new_beam_angle][1])/2; 	
+			
+			int f1=field[(mp_beam_x/4)+(mp_beam_y/4)*field_width];
+			switch (f1&0x0F00) {
+			case FLD_WALL_A:
+				if ((beam_x&3)==0)
+					beam_angle=(0-beam_angle)&0xf;
+				if ((beam_y&3)==0)
+					beam_angle=(4*2-beam_angle)&0xf;
+				continue;
+			case FLD_WALL_B:
+				endBeam=true;
+				continue;
+			case FLD_SLIT_A:
+				if ((f1&7)!=(beam_angle&7)) {
+					if ((beam_x&3)==0)
+						beam_angle=(0-beam_angle)&0xf;
+					if ((beam_y&3)==0)
+						beam_angle=(4*2-beam_angle)&0xf;
+					continue;
+				};
+				break;
+			case FLD_SLIT_B:
+				if ((f1&7)!=(beam_angle&7)) {
+					endBeam=true;
+					continue;
+				};
+				break;
+			}
+			
+			drawline (bm,beam_x*4,beam_y*4,new_beam_x*4,new_beam_y*4,0xFFFFFFFF);
 				
 			beam_x = new_beam_x;
 			beam_y = new_beam_y;
