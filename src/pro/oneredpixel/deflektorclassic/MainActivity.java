@@ -344,7 +344,7 @@ public class MainActivity extends Activity implements OnClickListener, OnTouchLi
 					break;
 				case FLD_WARPBOX:
 					for (int i=0;i<field.length;i++) {
-						if ( ((field[i]&0x0f00)==FLD_WARPBOX) && (i!=(fx+fy*field_width))) {
+						if ( (field[i]==f) && (i!=(fx+fy*field_width))) {
 							beam_y=(i/field_width)*4+2;
 							beam_x=(i-(((int)(beam_y/4))*field_width))*4+2;
 							break;
@@ -359,10 +359,10 @@ public class MainActivity extends Activity implements OnClickListener, OnTouchLi
 					//TODO: нужно включить перегруз
 					endBeam=true;
 					continue;
-				case FLD_WALL_A:
-					break;
-				case FLD_WALL_B:
-					break;
+				//case FLD_WALL_A:
+				//	break;
+				//case FLD_WALL_B:
+				//	break;
 				case FLD_PRISM:
 					new_beam_angle= (((beam_angle+1)&0xc)-4+((int)((8*Math.random())+0.5)))&0xf;//;
 					break;
@@ -396,6 +396,7 @@ public class MainActivity extends Activity implements OnClickListener, OnTouchLi
 					beam_angle=(4*2-beam_angle)&0xf;
 				continue;
 			case FLD_WALL_B:
+				
 				endBeam=true;
 				continue;
 			case FLD_SLIT_A:
