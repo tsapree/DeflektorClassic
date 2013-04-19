@@ -313,6 +313,7 @@ public class MainActivity extends Activity implements OnClickListener, OnTouchLi
 	
 	void drawBeam(int beam_x, int beam_y, int beam_angle) {
 		
+		/*
 		int new_beam_x;
 		int new_beam_y;
 		int new_beam_angle;
@@ -389,13 +390,103 @@ public class MainActivity extends Activity implements OnClickListener, OnTouchLi
 			int mp_beam_x = (beam_x+beam_x+angleNodeSteps[new_beam_angle][0])/2;
 			int mp_beam_y = (beam_y+beam_y+angleNodeSteps[new_beam_angle][1])/2; 	
 			
+			
+			
+			
 			int f1=field[(mp_beam_x/4)+(mp_beam_y/4)*field_width];
 			switch (f1&0x0F00) {
 			case FLD_WALL_A:
-				if ((beam_x&3)==0)
-					beam_angle=(0-beam_angle)&0xf;
-				if ((beam_y&3)==0)
-					beam_angle=(4*2-beam_angle)&0xf;
+				int wall_angle=-1;
+				final int wall_a_angle_matrix[]={
+						//x,y;u&3==0 true=1, false=0;walls	u
+					-1,	//0,0,0,0000	не изменять траекторию
+					2,	//0,0,0,0001	2
+					6,	//0,0,0,0010	6
+					4,	//0,0,0,0011	4
+					6,	//0,0,0,0100	6
+					0,	//0,0,0,0101	0
+					2,	//0,0,0,0110	2
+					2,	//0,0,0,0111	2
+					2,	//0,0,0,1000	2
+					6,	//0,0,0,1001	6
+					0,	//0,0,0,1010	0
+					6,	//0,0,0,1011	6
+					4,	//0,0,0,1100	4
+					6,	//0,0,0,1101	6
+					2,	//0,0,0,1110	2
+					-1,	//0,0,0,1111	закончить прорисовку (пока не менять угол)
+					-1,	//0,0,1,0000	не изменять траекторию
+					-1,	//0,0,1,0001	не изменять траекторию
+					-1,	//0,0,1,0010	изменять траекторию
+					4,	//0,0,1,0011	4
+					-1,	//0,0,1,0100	не изменять траекторию
+					0,	//0,0,1,0101	0
+					-1,	//0,0,1,0110	не изменять траекторию
+					2,	//0,0,1,0111	2
+					-1,	//0,0,1,1000	не изменять траекторию
+					-1,	//0,0,1,1001	не изменять траекторию
+					0,	//0,0,1,1010	0
+					6,	//0,0,1,1011	6
+					4,	//0,0,1,1100	4
+					6,	//0,0,1,1101	6
+					2,	//0,0,1,1110	2
+					-1	//0,0,1,1111	закончить прорисовку (пока не менять угол)					
+				};
+				int wallsAround=f&0xF;
+				int wallUP=0;
+				int wallUPLEFT=0;
+				int wallLEFT=0;
+				
+				//получение информации о возможных стенах вверху, слева-вверху, слева.
+				if (fx>0) wallLEFT=field[fx-1+fy*field_width];
+				if ((fx>0) && (fy>0)) wallUPLEFT=field[fx-1+(fy-1)*field_width];
+				if (fy>0) wallUP=field[fx+(fy-1)*field_width];
+				
+				if ((wallLEFT&0xF00)!=	FLD_WALL_A) wallLEFT=0;		else wallLEFT&=0xf;
+				if ((wallUPLEFT&0xF00)!=FLD_WALL_A) wallUPLEFT=0;	else wallUPLEFT&=0xf;
+				if ((wallUP&0xF00)!=FLD_WALL_A)		wallUP=0;		else wallUP&=0xf;
+				
+				
+				if ((beam_y&2)==0) {
+					//половина верхнего:
+					wallsAround = (wallsAround>>2) | ((wallUP<<2)&0xC0);
+					wallUP = wallUP>>2;
+					wallLEFT = (wallLEFT>>2) | ((wallUPLEFT<<2)&0xC0);
+					wallUPLEFT = wallUPLEFT>>2;
+				};
+				
+				if ((beam_x&2)==0) {
+					//половина левого:
+					wallsAround = ((wallsAround >>1) &5 ) | ((wallLEFT &5) <<1);
+				};
+				
+				if (((beam_x&1)+(beam_y&1))==0) {
+					wall_angle=wall_a_angle_matrix[( ((beam_angle&3)==0)?0:16 )|(wallsAround&0xF)];
+				} else {
+
+				//	1,0,x,x0x0	не изменять траекторию
+				//	1,0,x,x0x1	4
+				//	1,0,x,x1x0	4
+				//	1,0,x,x1x1	остановить прорисовку	
+				if ((beam_x&1)==1) switch (wallsAround&0x5) {
+					case 1: case 4: wall_angle=4; break;
+					case 5: endBeam=true; 
+					};
+					
+				//0,1,x,xx00	не изменять траекторию
+				//0,1,x,xx01	0
+				//0,1,x,xx10	0
+				//0,1,x,xx11	остановить прорисовку
+				if ((beam_y&1)==1) switch (wallsAround&0x3) {
+					case 1: case 2: wall_angle=0; break;
+					case 3: endBeam=true; 
+					};
+					
+				};
+				
+				if (wall_angle>=0) beam_angle=(wall_angle*2-beam_angle)&0xf;
+				else break;
+				
 				continue;
 			case FLD_WALL_B:
 				int crd=((mp_beam_x>>1)&1)+((mp_beam_y)&2);
@@ -433,7 +524,215 @@ public class MainActivity extends Activity implements OnClickListener, OnTouchLi
 			beam_y = new_beam_y;
 			beam_angle = new_beam_angle;
 			
+			
+			
 		}
+		*/
+		
+		
+		int new_beam_x;
+		int new_beam_y;
+		//int new_beam_angle;
+		boolean endBeam=false;
+		
+		while (!endBeam) {
+
+			new_beam_x = beam_x+angleNodeSteps[beam_angle][0];
+			new_beam_y = beam_y+angleNodeSteps[beam_angle][1];
+			if (new_beam_x>=field_width*4 || new_beam_x<0 || new_beam_y>=field_height*4 || new_beam_y<0) {
+				endBeam=true;
+				continue;
+			};
+			
+			drawline (bm,beam_x*4,beam_y*4,new_beam_x*4,new_beam_y*4,0xFFFFFFFF);
+			
+			beam_x = new_beam_x;
+			beam_y = new_beam_y;
+			
+			int sx=beam_x&3;
+			int sy=beam_y&3;
+			int fx=beam_x/4;
+			int fy=beam_y/4;
+			int f=field[fx+fy*field_width];
+			int f_angle=f&0x1f;
+			
+			
+			//проверка на пересечение луча с центром препятствия
+			if ((sx==2) && (sy==2)) {
+				switch (f&0x0f00) {
+				case FLD_LASER_GUN:
+					//TODO: нужно включить перегруз
+					endBeam=true;
+					continue;
+				case FLD_RECEIVER:
+					break;
+				case FLD_MIRROR:
+					beam_angle =(((f_angle<<1)-beam_angle-beam_angle)>>1)&0xf;
+					break;
+				case FLD_WARPBOX:
+					for (int i=0;i<field.length;i++) {
+						if ( (field[i]==f) && (i!=(fx+fy*field_width))) {
+							beam_y=(i/field_width)*4+2;
+							beam_x=(i-(((int)(beam_y/4))*field_width))*4+2;
+							break;
+						};
+					};
+					break;
+				case FLD_CELL:
+					field[fx+fy*field_width]=FLD_EXPLODE;
+					endBeam=true;
+					continue;
+				case FLD_MINE:
+					//TODO: нужно включить перегруз
+					endBeam=true;
+					continue;
+				case FLD_PRISM:
+					beam_angle= (((beam_angle+1)&0xc)-4+((int)((8*Math.random())+0.5)))&0xf;//;
+					break;
+				case FLD_EXPLODE:
+					if (f_angle>2) break;
+					endBeam=true;
+					continue;
+				}
+			}
+
+			//проверка на пересечение с границей препятствия (стены, фильтры).
+			int mp_beam_x = (beam_x+beam_x+angleNodeSteps[beam_angle][0])/2;
+			int mp_beam_y = (beam_y+beam_y+angleNodeSteps[beam_angle][1])/2; 	
+			
+			
+			int f1=field[(mp_beam_x/4)+(mp_beam_y/4)*field_width];
+			switch (f1&0x0F00) {
+			case FLD_WALL_A:
+				int wall_angle=-1;
+				final int wall_a_angle_matrix[]={
+						//x,y;u&3==0 true=1, false=0;walls	u
+					-1,	//0,0,0,0000	не изменять траекторию
+					2,	//0,0,0,0001	2
+					6,	//0,0,0,0010	6
+					4,	//0,0,0,0011	4
+					6,	//0,0,0,0100	6
+					0,	//0,0,0,0101	0
+					2,	//0,0,0,0110	2
+					2,	//0,0,0,0111	2
+					2,	//0,0,0,1000	2
+					6,	//0,0,0,1001	6
+					0,	//0,0,0,1010	0
+					6,	//0,0,0,1011	6
+					4,	//0,0,0,1100	4
+					6,	//0,0,0,1101	6
+					2,	//0,0,0,1110	2
+					-1,	//0,0,0,1111	закончить прорисовку (пока не менять угол)
+					-1,	//0,0,1,0000	не изменять траекторию
+					-1,	//0,0,1,0001	не изменять траекторию
+					-1,	//0,0,1,0010	изменять траекторию
+					4,	//0,0,1,0011	4
+					-1,	//0,0,1,0100	не изменять траекторию
+					0,	//0,0,1,0101	0
+					-1,	//0,0,1,0110	не изменять траекторию
+					-2,	//0,0,1,0111	2
+					-1,	//0,0,1,1000	не изменять траекторию
+					-1,	//0,0,1,1001	не изменять траекторию
+					0,	//0,0,1,1010	0
+					-2,	//0,0,1,1011	6
+					4,	//0,0,1,1100	4
+					-2,	//0,0,1,1101	6
+					-2,	//0,0,1,1110	2
+					-1	//0,0,1,1111	закончить прорисовку (пока не менять угол)					
+				};
+				int wallsAround=f;
+				int wallUP=0;
+				int wallUPLEFT=0;
+				int wallLEFT=0;
+				
+				//получение информации о возможных стенах вверху, слева-вверху, слева.
+				if (fx>0) wallLEFT=field[fx-1+fy*field_width];
+				if ((fx>0) && (fy>0)) wallUPLEFT=field[fx-1+(fy-1)*field_width];
+				if (fy>0) wallUP=field[fx+(fy-1)*field_width];
+				
+				if ((wallsAround&0xF00)!=	FLD_WALL_A) wallsAround=0;	else wallsAround&=0xf;
+				if ((wallLEFT&0xF00)!=		FLD_WALL_A) wallLEFT=0;		else wallLEFT&=0xf;
+				if ((wallUPLEFT&0xF00)!=	FLD_WALL_A) wallUPLEFT=0;	else wallUPLEFT&=0xf;
+				if ((wallUP&0xF00)!=		FLD_WALL_A)	wallUP=0;		else wallUP&=0xf;
+				
+				
+				if ((beam_y&2)==0) {
+					//половина верхнего:
+					wallsAround = (wallsAround>>2) | ((wallUP<<2)&0xC);
+					wallUP = wallUP>>2;
+					wallLEFT = (wallLEFT>>2) | ((wallUPLEFT<<2)&0xC);
+					wallUPLEFT = wallUPLEFT>>2;
+				};
+				
+				if ((beam_x&2)==0) {
+					//половина левого:
+					wallsAround = ((wallsAround >>1) &5 ) | ((wallLEFT &5) <<1);
+				};
+				
+				if (((beam_x&1)+(beam_y&1))==0) {
+					wall_angle=wall_a_angle_matrix[( ((beam_angle&3)==0)?16:0 )|(wallsAround&0xF)];
+				} else {
+
+				//	1,0,x,x0x0	не изменять траекторию
+				//	1,0,x,x0x1	4
+				//	1,0,x,x1x0	4
+				//	1,0,x,x1x1	остановить прорисовку	
+				if ((beam_x&1)==1) switch (wallsAround&0x5) {
+					case 1: case 4: wall_angle=4; break;
+					case 5: endBeam=true; 
+					};
+					
+				//0,1,x,xx00	не изменять траекторию
+				//0,1,x,xx01	0
+				//0,1,x,xx10	0
+				//0,1,x,xx11	остановить прорисовку
+				if ((beam_y&1)==1) switch (wallsAround&0x3) {
+					case 1: case 2: wall_angle=0; break;
+					case 3: endBeam=true; 
+					};
+					
+				};
+				
+				if (wall_angle>=0) beam_angle=(wall_angle*2-beam_angle)&0xf;
+				else if (wall_angle==-1) break;
+				else if (wall_angle==-2) { beam_angle=(beam_angle+8)&0xf; break; };
+				
+				continue;
+			case FLD_WALL_B:
+				int crd=((mp_beam_x>>1)&1)+((mp_beam_y)&2);
+				if ((crd==0) && ((f1&8)!=0)) {	endBeam=true;	continue; };
+				if ((crd==1) && ((f1&4)!=0)) {	endBeam=true;	continue; };
+				if ((crd==2) && ((f1&2)!=0)) {	endBeam=true;	continue; };
+				if ((crd==3) && ((f1&1)!=0)) {	endBeam=true;	continue; };
+				//(mp_beam_x>1)&1 - координата внутри квадрата 0..1
+				//(mp_beam_y)&2 - координата внутри квадрата 0..1
+				//0,0 && 8
+				//0,1 && 4
+				//1,0 && 2
+				//1,1 && 1
+				break;
+			case FLD_SLIT_A:
+				if ((f1&7)!=(beam_angle&7)) {
+					if ((beam_x&3)==0)
+						beam_angle=(0-beam_angle)&0xf;
+					if ((beam_y&3)==0)
+						beam_angle=(4*2-beam_angle)&0xf;
+					continue;
+				};
+				break;
+			case FLD_SLIT_B:
+				if ((f1&7)!=(beam_angle&7)) {
+					endBeam=true;
+					continue;
+				};
+				break;
+			}
+			
+		}
+		
+		
+		
+		
 	};
 	
 	void drawline(Bitmap bitmap, int x1, int y1, int x2, int y2, int colour1)
