@@ -334,8 +334,9 @@ public class Deflektor {
 				continue;
 			};
 			
-			drawline (bm,beamX*4,beamY*4,newBeamX*4,newBeamY*4,0xFFFFFFFF);
-			
+			drawSpriteLine(beamX, beamY, newBeamX, newBeamY);
+			//drawline (bm,beamX*4,beamY*4,newBeamX*4,newBeamY*4,0xFFFFFFFF);
+						
 			beamX = newBeamX;
 			beamY = newBeamY;
 			
@@ -530,6 +531,28 @@ public class Deflektor {
 		
 	};
 	
+	void drawSpriteLine(int x0, int y0, int x1, int y1) {
+		int lx0, lx1, ly0, ly1;
+		if (x0<x1) { lx0=x0; lx1=x1; ly0=y0; ly1=y1;  }
+		else { lx0=x1; lx1=x0; ly0=y1; ly1=y0;  };
+		int sx=lx1-lx0;
+		int sy=ly1-ly0;
+		if (sx==0 && sy==-2) spr.putRegionSafe(bm, lx0*4-4, ly0*4-8, 8, 8, 0*8, 14*8);
+		if (sx==1 && sy==-2 && ((lx0&1)==0)) spr.putRegionSafe(bm, lx0*4-4, ly0*4-8, 16, 8, 1*8, 15*8);
+		if (sx==1 && sy==-2 && ((lx0&1)==1)) spr.putRegionSafe(bm, lx0*4-4, ly0*4-8, 16, 8, 1*8+4, 14*8);
+		if (sx==2 && sy==-2) spr.putRegionSafe(bm, lx0*4-4, ly0*4-12, 16, 16, 24, 112);
+		if (sx==2 && sy==-1 && ((ly0&1)==0)) spr.putRegionSafe(bm, lx0*4, ly0*4-4, 16, 8, 40, 120);
+		if (sx==2 && sy==-1 && ((ly0&1)==1)) spr.putRegionSafe(bm, lx0*4-8, ly0*4-8, 16, 8, 40, 112);
+		if (sx==2 && sy==0) spr.putRegionSafe(bm, lx0*4, ly0*4-4, 8, 8, 56, 112);
+		if (sx==2 && sy==1 && ((ly0&1)==0)) spr.putRegionSafe(bm, lx0*4, ly0*4-4, 16, 8, 64, 112);
+		if (sx==2 && sy==1 && ((ly0&1)==1)) spr.putRegionSafe(bm, lx0*4-8, ly0*4, 16, 8, 64, 120);
+		if (sx==2 && sy==2) spr.putRegionSafe(bm, lx0*4-4, ly0*4-4, 16, 16, 80, 112);
+		if (sx==1 && sy==2 && ((lx0&1)==0)) spr.putRegionSafe(bm, lx0*4-4, ly0*4, 16, 8, 96, 112);
+		if (sx==1 && sy==2 && ((lx0&1)==1)) spr.putRegionSafe(bm, lx0*4-4, ly0*4, 16, 8, 100, 120);
+		
+		
+	}
+	
 	void drawline(Bitmap bitmap, int x1, int y1, int x2, int y2, int colour1)
 	{
 		int x0;
@@ -602,6 +625,21 @@ public class Deflektor {
 				bitmap.setPixels(data, by*width+bx, width, x, y, sx, sy);
 			};
 		};
+		
+		//x,y,sx,sy - space in bitmap to put sprite in,
+		//bx,by - coordinates in sprite where begins region
+		void putRegionSafe(Bitmap bitmap, int x, int y, int sx, int sy, int bx, int by) {
+			int bmWidth = bitmap.getWidth();
+			int bmHeight = bitmap.getHeight();
+			if (x<0) { bx=bx-x; sx=sx+x; x=0; };
+			if (y<0) { 	by=by-y; sy=sy+y; y=0; };
+			if ((x+sx) >= bmWidth) { sx = sx-(x+sx-bmWidth+1); };
+			if ((y+sy) >= bmHeight) { sy = sy-(y+sy-bmHeight+1); };
+			if (width>0 && height>0 && bx>0 && by>0 && sx>0 && sy>0 && data!=null) {
+				bitmap.setPixels(data, by*width+bx, width, x, y, sx, sy);
+			};
+		};
+		
 	}
 
 	
