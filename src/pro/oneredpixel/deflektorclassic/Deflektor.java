@@ -190,22 +190,34 @@ public class Deflektor {
 		int beam_y=0;
 		int beam_angle=0;
 
+		//clear field by null-sprite;
+		for (int i=0;i<field_width;i++) 
+			for (int j=0;j<field_height;j++) {
+				int f=field[j*field_width+i];
+				f_angle = f&0x1f;
+				if ((f&0xf00)==FLD_LASER_GUN) {
+					beam_x=i*4+2+angleNodeSteps[f_angle*4][0];
+					beam_y=j*4+2+angleNodeSteps[f_angle*4][1];
+					beam_angle=(f_angle&3)*4;					
+				} else if ((f&0xf00)==FLD_RECEIVER) {
+					
+				};
+				spr.putRegion(bm, i*16, j*16, 8, 8, 7*16, 5*16+8);
+				spr.putRegion(bm, i*16+8, j*16, 8, 8, 7*16, 5*16+8);
+				spr.putRegion(bm, i*16, j*16+8, 8, 8, 7*16, 5*16+8);
+				spr.putRegion(bm, i*16+8, j*16+8, 8, 8, 7*16, 5*16+8);
+			};
+		
+		drawBeam(beam_x,beam_y,beam_angle);
+			
 		for (int i=0;i<field_width;i++) 
 			for (int j=0;j<field_height;j++) {
 				f_angle=field[j*field_width+i]&0x1f;
 				switch (field[j*field_width+i]&0xf00) {
 				case FLD_NULL:
-					spr.putRegion(bm, i*16, j*16, 8, 8, 7*16, 5*16+8);
-					spr.putRegion(bm, i*16+8, j*16, 8, 8, 7*16, 5*16+8);
-					spr.putRegion(bm, i*16, j*16+8, 8, 8, 7*16, 5*16+8);
-					spr.putRegion(bm, i*16+8, j*16+8, 8, 8, 7*16, 5*16+8);
 					break;
 				case FLD_LASER_GUN:
-					putLaser(i,j,f_angle);
 					spr.putRegion(bm, i*16, j*16, 16, 16, ((f_angle&3)*16), 4*16);
-					beam_x=i*4+2+angleNodeSteps[f_angle*4][0];
-					beam_y=j*4+2+angleNodeSteps[f_angle*4][1];
-					beam_angle=(f_angle&3)*4;
 					break;
 				case FLD_RECEIVER:
 					putReceiver(i,j,f_angle);
@@ -242,7 +254,7 @@ public class Deflektor {
 					break;
 				}
 			};
-			drawBeam(beam_x,beam_y,beam_angle);
+			
 	};
 
 	//angle=0..31
@@ -285,24 +297,24 @@ public class Deflektor {
 	
 	void putWallA(int x, int y, int type) {
 		if ((type&8)!=0)	spr.putRegion(bm, x*16, y*16, 8, 8, 7*16+8, 5*16);
-		else				spr.putRegion(bm, x*16, y*16, 8, 8, 7*16, 5*16+8);
+		//else				spr.putRegion(bm, x*16, y*16, 8, 8, 7*16, 5*16+8);
 		if ((type&4)!=0)	spr.putRegion(bm, x*16+8, y*16, 8, 8, 7*16+8, 5*16);
-		else				spr.putRegion(bm, x*16+8, y*16, 8, 8, 7*16, 5*16+8);
+		//else				spr.putRegion(bm, x*16+8, y*16, 8, 8, 7*16, 5*16+8);
 		if ((type&2)!=0)	spr.putRegion(bm, x*16, y*16+8, 8, 8, 7*16+8, 5*16);
-		else				spr.putRegion(bm, x*16, y*16+8, 8, 8, 7*16, 5*16+8);
+		//else				spr.putRegion(bm, x*16, y*16+8, 8, 8, 7*16, 5*16+8);
 		if ((type&1)!=0)	spr.putRegion(bm, x*16+8, y*16+8, 8, 8, 7*16+8, 5*16);
-		else				spr.putRegion(bm, x*16+8, y*16+8, 8, 8, 7*16, 5*16+8);
+		//else				spr.putRegion(bm, x*16+8, y*16+8, 8, 8, 7*16, 5*16+8);
 	}
 	
 	void putWallB(int x, int y, int type) {
 		if ((type&8)!=0)	spr.putRegion(bm, x*16, y*16, 8, 8, 7*16, 5*16);
-		else				spr.putRegion(bm, x*16, y*16, 8, 8, 7*16, 5*16+8);
+		//else				spr.putRegion(bm, x*16, y*16, 8, 8, 7*16, 5*16+8);
 		if ((type&4)!=0)	spr.putRegion(bm, x*16+8, y*16, 8, 8, 7*16, 5*16);
-		else				spr.putRegion(bm, x*16+8, y*16, 8, 8, 7*16, 5*16+8);
+		//else				spr.putRegion(bm, x*16+8, y*16, 8, 8, 7*16, 5*16+8);
 		if ((type&2)!=0)	spr.putRegion(bm, x*16, y*16+8, 8, 8, 7*16, 5*16);
-		else				spr.putRegion(bm, x*16, y*16+8, 8, 8, 7*16, 5*16+8);
+		//else				spr.putRegion(bm, x*16, y*16+8, 8, 8, 7*16, 5*16+8);
 		if ((type&1)!=0)	spr.putRegion(bm, x*16+8, y*16+8, 8, 8, 7*16, 5*16);
-		else				spr.putRegion(bm, x*16+8, y*16+8, 8, 8, 7*16, 5*16+8);
+		//else				spr.putRegion(bm, x*16+8, y*16+8, 8, 8, 7*16, 5*16+8);
 	}
 	
 	void drawBeam(int beamX, int beamY, int beamAngle) {
