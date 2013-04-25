@@ -46,6 +46,7 @@ public class MainActivity extends Activity implements OnClickListener, OnTouchLi
 		def.t.unlink();
 		if (killThreadsOnDestroyActivity) {
 			def.t.destroy();
+			System.exit(0);	//terminate all threads and application
 		}
 
     }

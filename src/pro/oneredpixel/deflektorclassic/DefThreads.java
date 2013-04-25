@@ -30,26 +30,29 @@ public class DefThreads {
 		shutThreads=false;
 		h = new Handler() {
 		    public void handleMessage(android.os.Message msg) {
-		    	try {
-		    		//сведение вероятности падения при повороте экрана к минимуму
-					while (activity==null) 
-						TimeUnit.MILLISECONDS.sleep(200);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				};
-		    	switch (msg.what) {
-	    		case DACT_GFXUPDATE:
-	    			Bitmap b=Deflektor.getInstance().bm;
-	    			if (activity.bmcheck!=b) {
-	    				activity.iv.setImageBitmap(b);
-	    				activity.bmcheck=b;
-	    			}
-	    			activity.iv.invalidate();
-	    			break;
-		    	case DACT_TOAST:
-		    		Toast.makeText(activity, (String)msg.obj, Toast.LENGTH_LONG).show();
-		    		break;
-		    	}
+		    	if (activity==null) {
+			    	try {
+			    		//сведение вероятности падения при повороте экрана к минимуму
+						while (activity==null && (g!=null)) 
+							TimeUnit.MILLISECONDS.sleep(200);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					};
+		    	} else {
+		    		switch (msg.what) {
+	    			case DACT_GFXUPDATE:
+		    			Bitmap b=Deflektor.getInstance().bm;
+		    			if (activity.bmcheck!=b) {
+		    				activity.iv.setImageBitmap(b);
+		    				activity.bmcheck=b;
+		    			}
+		    			activity.iv.invalidate();
+		    			break;
+			    	case DACT_TOAST:
+			    		Toast.makeText(activity, (String)msg.obj, Toast.LENGTH_LONG).show();
+			    		break;
+			    	}
+		    	};
 		    };
 		};
 	
