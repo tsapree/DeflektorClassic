@@ -1,12 +1,112 @@
 package pro.oneredpixel.deflektorclassic;
 
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 
-public class Deflektor {
+import com.badlogic.gdx.ApplicationListener;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.graphics.GL10;
+import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector3;
 
-	private static Deflektor deflektor_instance;
+public class Deflektor implements ApplicationListener {
 	
+	Texture spritesImage;
+	//Texture bucketImage;
+	Sound dropSound;
+	Music rainMusic;
+	
+	Rectangle bucket;
+	OrthographicCamera camera;
+	SpriteBatch batch;
+	
+	int screenWidth;
+	int screenHeight;
+	   
+	@Override
+	public void create() {
+		// load the images for the droplet and the bucket, 48x48 pixels each
+		spritesImage = new Texture(Gdx.files.internal("sprites.png"));
+		//bucketImage = new Texture(Gdx.files.internal("bucket.png"));
+		  
+		// load the drop sound effect and the rain background "music"
+		//dropSound = Gdx.audio.newSound(Gdx.files.internal("drop.wav"));
+		//rainMusic = Gdx.audio.newMusic(Gdx.files.internal("rain.mp3"));
+		  
+		// start the playback of the background music immediately
+		//rainMusic.setLooping(true);
+		//rainMusic.play();
+		
+		camera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		
+		batch = new SpriteBatch();
+		
+		initGame();
+
+	   }
+
+	
+	@Override
+	public void dispose() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void pause() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void render() {
+		// TODO Auto-generated method stub
+		Gdx.gl.glClearColor(0, 0, 0.2f, 1);
+		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
+		
+		camera.update();
+		
+		screenWidth = Gdx.graphics.getWidth();
+		screenHeight = Gdx.graphics.getHeight();
+		
+		batch.setProjectionMatrix(camera.combined);
+		batch.begin();
+		//batch.draw(spritesImage, bucket.x, bucket.y);
+		//batch.draw(spritesImage, 16, 16, 4*16, 3*16, 16,16);
+		//batch.draw(spritesImage, 16, 16, 32,64, 4*16, 3*16, 16,32,false,false);
+		drawField();
+		animateField();
+		batch.end();
+		
+		// process user input
+		if(Gdx.input.isTouched()) {
+			//Vector3 touchPos = new Vector3();
+			//touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
+			//camera.unproject(touchPos);
+			touch(Gdx.input.getX()/16/2, Gdx.input.getY()/16/2);
+		}
+
+
+	}
+
+	@Override
+	public void resize(int arg0, int arg1) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void resume() {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	/// game ///
 	public final static int field_width = 15;
 	public final static int field_height = 9;
 	int field[];
@@ -28,10 +128,8 @@ public class Deflektor {
 	final int FLD_AUTOROTATING = 0x2000;	//autorotate
 	final int FLD_EXPLODEONEND = 0x4000;		//kill this brick when all cells burned off
 	
-    Sprite spr;
+    Sprite spr_old;
     Bitmap bm=null;
-    DefThreads t;
-    static DeflektorApp dApp;
 	
 	//коэффициенты шага луча
 	int angleNodeSteps[][]={
@@ -53,29 +151,14 @@ public class Deflektor {
 		{-1,-2},//15
 	};
 	
-	private Deflektor() {
-		create();
-	};
-
-	public static Deflektor getInstance() {
-		return deflektor_instance;
-	}
-	
-	public static void initInstance(DeflektorApp a) {
-		if (deflektor_instance == null) {
-			dApp = a;
-			deflektor_instance = new Deflektor();
-		}
-	}
-
-	public void create() {
+	public void initGame() {
 		
-		t = new DefThreads();
-		t.create();
+		//t = new DefThreads();
+		//t.create();
 		
 		
-		bm=Bitmap.createBitmap(Deflektor.field_width*16, Deflektor.field_height*16, Bitmap.Config.ARGB_8888);
-		spr=new Sprite(R.drawable.defsprites);
+		//bm=Bitmap.createBitmap(Deflektor.field_width*16, Deflektor.field_height*16, Bitmap.Config.ARGB_8888);
+		//spr=new Sprite(R.drawable.defsprites);
 		
 		field=new int[field_width*field_height];
 		
@@ -150,9 +233,7 @@ public class Deflektor {
 		
 		field[3+7*field_width]=FLD_LASER_GUN|3;
 		field[3+8*field_width]=FLD_RECEIVER|1;
-		
-		//drawField();
-		//animateField();
+
 	}
 	
 	void animateField() {
@@ -184,6 +265,14 @@ public class Deflektor {
 		field[y*field_width+x]=(++f)&0xFFFFFF1F;
 	}
 	
+	void spr_putRegion(int x, int y, int srcWidth, int srcHeight, int srcX, int srcY) {
+		batch.draw(spritesImage, x*2, screenHeight-y*2-srcHeight*2, srcWidth*2,srcHeight*2, srcX, srcY, srcWidth,srcHeight,false,false);
+	};
+	
+	void spr_putRegionSafe(int x, int y, int srcWidth, int srcHeight, int srcX, int srcY) {
+		batch.draw(spritesImage, x*2, screenHeight-y*2-srcHeight*2, srcWidth*2,srcHeight*2, srcX, srcY, srcWidth,srcHeight,false,false);
+	};
+	
 	void drawField() {
 		int f_angle;
 		int beam_x=0;
@@ -202,10 +291,10 @@ public class Deflektor {
 				} else if ((f&0xf00)==FLD_RECEIVER) {
 					
 				};
-				spr.putRegion(bm, i*16, j*16, 8, 8, 7*16, 5*16+8);
-				spr.putRegion(bm, i*16+8, j*16, 8, 8, 7*16, 5*16+8);
-				spr.putRegion(bm, i*16, j*16+8, 8, 8, 7*16, 5*16+8);
-				spr.putRegion(bm, i*16+8, j*16+8, 8, 8, 7*16, 5*16+8);
+				spr_putRegion( i*16, j*16, 8, 8, 7*16, 5*16+8);
+				spr_putRegion( i*16+8, j*16, 8, 8, 7*16, 5*16+8);
+				spr_putRegion( i*16, j*16+8, 8, 8, 7*16, 5*16+8);
+				spr_putRegion( i*16+8, j*16+8, 8, 8, 7*16, 5*16+8);
 			};
 		
 		drawBeam(beam_x,beam_y,beam_angle);
@@ -217,7 +306,7 @@ public class Deflektor {
 				case FLD_NULL:
 					break;
 				case FLD_LASER_GUN:
-					spr.putRegion(bm, i*16, j*16, 16, 16, ((f_angle&3)*16), 4*16);
+					spr_putRegion( i*16, j*16, 16, 16, ((f_angle&3)*16), 4*16);
 					break;
 				case FLD_RECEIVER:
 					putReceiver(i,j,f_angle);
@@ -250,7 +339,7 @@ public class Deflektor {
 					putSlitB(i,j,f_angle);
 					break;
 				case FLD_EXPLODE:
-					spr.putRegion(bm, i*16, j*16, 16, 16, ((f_angle&7)*16), 6*16);
+					spr_putRegion( i*16, j*16, 16, 16, ((f_angle&7)*16), 6*16);
 					break;
 				}
 			};
@@ -259,7 +348,7 @@ public class Deflektor {
 
 	//angle=0..31
 	void putMirror(int x, int y, int angle) {
-		spr.putRegion(bm, x*16, y*16, 16, 16, (angle&7)*16, ((angle>>3)&1)*16);
+		spr_putRegion( x*16, y*16, 16, 16, (angle&7)*16, ((angle>>3)&1)*16);
 	}
 	
 	//angle=0..3
@@ -268,53 +357,53 @@ public class Deflektor {
 	}
 	
 	void putReceiver(int x,int y, int angle) {
-		spr.putRegion(bm, x*16, y*16, 16, 16, (((angle&3)+4)*16), 4*16);
+		spr_putRegion( x*16, y*16, 16, 16, (((angle&3)+4)*16), 4*16);
 	}
 	
 	void putCell(int x, int y) {
-		spr.putRegion(bm, x*16, y*16, 16, 16, 0, 5*16);
+		spr_putRegion( x*16, y*16, 16, 16, 0, 5*16);
 	}
 	
 	void putMine(int x, int y) {
-		spr.putRegion(bm, x*16, y*16, 16, 16, 16, 5*16);
+		spr_putRegion( x*16, y*16, 16, 16, 16, 5*16);
 	}
 	
 	void putPrism(int x, int y) {
-		spr.putRegion(bm, x*16, y*16, 16, 16, 6*16, 5*16);
+		spr_putRegion( x*16, y*16, 16, 16, 6*16, 5*16);
 	}
 	
 	void putWarpbox(int x, int y, int type) {
-		spr.putRegion(bm, x*16, y*16, 16, 16, (((type&3)+2)*16), 5*16);
+		spr_putRegion( x*16, y*16, 16, 16, (((type&3)+2)*16), 5*16);
 	}
 	
 	void putSlitA(int x, int y, int angle) {
-		spr.putRegion(bm, x*16, y*16, 16, 16, ((angle&7)*16), 3*16);
+		spr_putRegion( x*16, y*16, 16, 16, ((angle&7)*16), 3*16);
 	}
 
 	void putSlitB(int x, int y, int angle) {
-		spr.putRegion(bm, x*16, y*16, 16, 16, ((angle&7)*16), 2*16);
+		spr_putRegion( x*16, y*16, 16, 16, ((angle&7)*16), 2*16);
 	}
 	
 	void putWallA(int x, int y, int type) {
-		if ((type&8)!=0)	spr.putRegion(bm, x*16, y*16, 8, 8, 7*16+8, 5*16);
-		//else				spr.putRegion(bm, x*16, y*16, 8, 8, 7*16, 5*16+8);
-		if ((type&4)!=0)	spr.putRegion(bm, x*16+8, y*16, 8, 8, 7*16+8, 5*16);
-		//else				spr.putRegion(bm, x*16+8, y*16, 8, 8, 7*16, 5*16+8);
-		if ((type&2)!=0)	spr.putRegion(bm, x*16, y*16+8, 8, 8, 7*16+8, 5*16);
-		//else				spr.putRegion(bm, x*16, y*16+8, 8, 8, 7*16, 5*16+8);
-		if ((type&1)!=0)	spr.putRegion(bm, x*16+8, y*16+8, 8, 8, 7*16+8, 5*16);
-		//else				spr.putRegion(bm, x*16+8, y*16+8, 8, 8, 7*16, 5*16+8);
+		if ((type&8)!=0)	spr_putRegion( x*16, y*16, 8, 8, 7*16+8, 5*16);
+		//else				spr_putRegion( x*16, y*16, 8, 8, 7*16, 5*16+8);
+		if ((type&4)!=0)	spr_putRegion( x*16+8, y*16, 8, 8, 7*16+8, 5*16);
+		//else				spr_putRegion( x*16+8, y*16, 8, 8, 7*16, 5*16+8);
+		if ((type&2)!=0)	spr_putRegion( x*16, y*16+8, 8, 8, 7*16+8, 5*16);
+		//else				spr_putRegion( x*16, y*16+8, 8, 8, 7*16, 5*16+8);
+		if ((type&1)!=0)	spr_putRegion( x*16+8, y*16+8, 8, 8, 7*16+8, 5*16);
+		//else				spr_putRegion( x*16+8, y*16+8, 8, 8, 7*16, 5*16+8);
 	}
 	
 	void putWallB(int x, int y, int type) {
-		if ((type&8)!=0)	spr.putRegion(bm, x*16, y*16, 8, 8, 7*16, 5*16);
-		//else				spr.putRegion(bm, x*16, y*16, 8, 8, 7*16, 5*16+8);
-		if ((type&4)!=0)	spr.putRegion(bm, x*16+8, y*16, 8, 8, 7*16, 5*16);
-		//else				spr.putRegion(bm, x*16+8, y*16, 8, 8, 7*16, 5*16+8);
-		if ((type&2)!=0)	spr.putRegion(bm, x*16, y*16+8, 8, 8, 7*16, 5*16);
-		//else				spr.putRegion(bm, x*16, y*16+8, 8, 8, 7*16, 5*16+8);
-		if ((type&1)!=0)	spr.putRegion(bm, x*16+8, y*16+8, 8, 8, 7*16, 5*16);
-		//else				spr.putRegion(bm, x*16+8, y*16+8, 8, 8, 7*16, 5*16+8);
+		if ((type&8)!=0)	spr_putRegion( x*16, y*16, 8, 8, 7*16, 5*16);
+		//else				spr_putRegion( x*16, y*16, 8, 8, 7*16, 5*16+8);
+		if ((type&4)!=0)	spr_putRegion( x*16+8, y*16, 8, 8, 7*16, 5*16);
+		//else				spr_putRegion( x*16+8, y*16, 8, 8, 7*16, 5*16+8);
+		if ((type&2)!=0)	spr_putRegion( x*16, y*16+8, 8, 8, 7*16, 5*16);
+		//else				spr_putRegion( x*16, y*16+8, 8, 8, 7*16, 5*16+8);
+		if ((type&1)!=0)	spr_putRegion( x*16+8, y*16+8, 8, 8, 7*16, 5*16);
+		//else				spr_putRegion( x*16+8, y*16+8, 8, 8, 7*16, 5*16+8);
 	}
 	
 	void drawBeam(int beamX, int beamY, int beamAngle) {
@@ -538,19 +627,19 @@ public class Deflektor {
 		else { lx0=x1; lx1=x0; ly0=y1; ly1=y0;  };
 		int sx=lx1-lx0;
 		int sy=ly1-ly0;
-		if (sx==0 && sy==-2)					spr.putRegionSafe(bm, lx0*4-4, ly0*4-8, 8, 8, 0, 112);
-		if (sx==1 && sy==-2 && ((lx0&1)==0))	spr.putRegionSafe(bm, lx0*4-4, ly0*4-8, 16, 8, 8, 120);
-		if (sx==1 && sy==-2 && ((lx0&1)==1))	spr.putRegionSafe(bm, lx0*4-4, ly0*4-8, 16, 8, 12, 112);
-		if (sx==2 && sy==-2)					spr.putRegionSafe(bm, lx0*4-4, ly0*4-12, 16, 16, 24, 112);
-		if (sx==2 && sy==-1 && ((ly0&1)==0))	spr.putRegionSafe(bm, lx0*4,   ly0*4-4, 16, 8, 40, 120);
-		if (sx==2 && sy==-1 && ((ly0&1)==1))	spr.putRegionSafe(bm, lx0*4-8, ly0*4-8, 16, 8, 40, 112);
-		if (sx==2 && sy==0)						spr.putRegionSafe(bm, lx0*4,   ly0*4-4, 8, 8, 56, 112);
-		if (sx==2 && sy==1 && ((ly0&1)==0))		spr.putRegionSafe(bm, lx0*4,   ly0*4-4, 16, 8, 64, 112);
-		if (sx==2 && sy==1 && ((ly0&1)==1)) 	spr.putRegionSafe(bm, lx0*4-8, ly0*4, 16, 8, 64, 120);
-		if (sx==2 && sy==2)						spr.putRegionSafe(bm, lx0*4-4, ly0*4-4, 16, 16, 80, 112);
-		if (sx==1 && sy==2 && ((lx0&1)==0))		spr.putRegionSafe(bm, lx0*4-4, ly0*4, 16, 8, 96, 112);
-		if (sx==1 && sy==2 && ((lx0&1)==1))		spr.putRegionSafe(bm, lx0*4-4, ly0*4, 16, 8, 100, 120);
-		if (sx==0 && sy==2)						spr.putRegionSafe(bm, lx0*4-4, ly0*4, 8, 8, 0, 112);
+		if (sx==0 && sy==-2)					spr_putRegionSafe( lx0*4-4, ly0*4-8, 8, 8, 0, 112);
+		if (sx==1 && sy==-2 && ((lx0&1)==0))	spr_putRegionSafe( lx0*4-4, ly0*4-8, 16, 8, 8, 120);
+		if (sx==1 && sy==-2 && ((lx0&1)==1))	spr_putRegionSafe( lx0*4-4, ly0*4-8, 16, 8, 12, 112);
+		if (sx==2 && sy==-2)					spr_putRegionSafe( lx0*4-4, ly0*4-12, 16, 16, 24, 112);
+		if (sx==2 && sy==-1 && ((ly0&1)==0))	spr_putRegionSafe( lx0*4,   ly0*4-4, 16, 8, 40, 120);
+		if (sx==2 && sy==-1 && ((ly0&1)==1))	spr_putRegionSafe( lx0*4-8, ly0*4-8, 16, 8, 40, 112);
+		if (sx==2 && sy==0)						spr_putRegionSafe( lx0*4,   ly0*4-4, 8, 8, 56, 112);
+		if (sx==2 && sy==1 && ((ly0&1)==0))		spr_putRegionSafe( lx0*4,   ly0*4-4, 16, 8, 64, 112);
+		if (sx==2 && sy==1 && ((ly0&1)==1)) 	spr_putRegionSafe( lx0*4-8, ly0*4, 16, 8, 64, 120);
+		if (sx==2 && sy==2)						spr_putRegionSafe( lx0*4-4, ly0*4-4, 16, 16, 80, 112);
+		if (sx==1 && sy==2 && ((lx0&1)==0))		spr_putRegionSafe( lx0*4-4, ly0*4, 16, 8, 96, 112);
+		if (sx==1 && sy==2 && ((lx0&1)==1))		spr_putRegionSafe( lx0*4-4, ly0*4, 16, 8, 100, 120);
+		if (sx==0 && sy==2)						spr_putRegionSafe( lx0*4-4, ly0*4, 8, 8, 0, 112);
 		
 		
 	}
@@ -601,17 +690,13 @@ public class Deflektor {
 		//animateField();
 	};
 	
-	public Bitmap getBitmap() {
-		return bm;
-	}
-	
 	class Sprite {
 		int width=0;
 		int height=0;
 		int data[]=null;
 		
 		Sprite (int res_id) {
-			Bitmap b=BitmapFactory.decodeResource(dApp.getResources(), res_id);
+			Bitmap b = null ;//=BitmapFactory.decodeResource(dApp.getResources(), res_id);
 			if (b!=null) { 
 				width = b.getWidth();
 				height = b.getHeight();
@@ -650,4 +735,6 @@ public class Deflektor {
 		animateField();
 		return true;
 	}
+
+
 }
