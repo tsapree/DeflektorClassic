@@ -28,6 +28,12 @@ public class Deflektor implements ApplicationListener {
 	
 	int screenWidth;
 	int screenHeight;
+	int sprSize = 8;
+	int sprScale=1;
+	int winX;
+	int winY;
+	int winWidth;
+	int winHeight;
 	
 	final int BEAMSTATE_NORMAL = 0;
 	final int BEAMSTATE_OVERHEAT = 1;
@@ -120,6 +126,19 @@ public class Deflektor implements ApplicationListener {
 		
 		screenWidth = Gdx.graphics.getWidth();
 		screenHeight = Gdx.graphics.getHeight();
+		
+		sprSize = Math.min(screenWidth/field_width, screenHeight/(field_height+1));
+		sprScale = sprSize/8/2;
+		sprSize = sprSize/sprScale/2;
+		
+		//sprScale =1;
+		//sprSize=8;
+		
+		winWidth = field_width*sprSize*2*sprScale;
+		winHeight = (field_height+1)*sprSize*2*sprScale;
+		
+		winX = (screenWidth-winWidth)/2;
+		winY = (screenHeight-winHeight)/2;		
 
 		switch (appState) {
 		case APPSTATE_STARTED:
@@ -178,7 +197,10 @@ public class Deflektor implements ApplicationListener {
 				//Vector3 touchPos = new Vector3();
 				//touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
 				//camera.unproject(touchPos);
-				touch(Gdx.input.getX()/16/2, Gdx.input.getY()/16/2);
+				int x = Gdx.input.getX()-winX;
+				int y = Gdx.input.getY()-winY;
+				if (x>=0 && x<winWidth && y>=0 && y<winHeight)
+					touch(x/(sprSize*2)/sprScale, y/(sprSize*2)/sprScale);
 			}
 			break;
 		};
@@ -354,15 +376,15 @@ public class Deflektor implements ApplicationListener {
 	}
 
 	void menu_putRegion(int x, int y, int srcWidth, int srcHeight, int srcX, int srcY) {
-		batch.draw(menuImage, x*2, screenHeight-y*2-srcHeight*2, srcWidth*2,srcHeight*2, srcX, srcY, srcWidth,srcHeight,false,false);
+		batch.draw(menuImage, winX+x*sprScale, screenHeight-winY-y*sprScale-srcHeight*sprScale, srcWidth*sprScale,srcHeight*sprScale, srcX, srcY, srcWidth,srcHeight,false,false);
 	};
 	
 	void spr_putRegion(int x, int y, int srcWidth, int srcHeight, int srcX, int srcY) {
-		batch.draw(spritesImage, x*2, screenHeight-y*2-srcHeight*2, srcWidth*2,srcHeight*2, srcX, srcY, srcWidth,srcHeight,false,false);
+		batch.draw(spritesImage, winX+x*sprScale, screenHeight-winY-y*sprScale-srcHeight*sprScale, srcWidth*sprScale,srcHeight*sprScale, srcX, srcY, srcWidth,srcHeight,false,false);
 	};
 	
 	void spr_putRegionSafe(int x, int y, int srcWidth, int srcHeight, int srcX, int srcY) {
-		batch.draw(spritesImage, x*2, screenHeight-y*2-srcHeight*2, srcWidth*2,srcHeight*2, srcX, srcY, srcWidth,srcHeight,false,false);
+		batch.draw(spritesImage, winX+x*sprScale, screenHeight-winY-y*sprScale-srcHeight*sprScale, srcWidth*sprScale,srcHeight*sprScale, srcX, srcY, srcWidth,srcHeight,false,false);
 	};
 	
 	void drawField() {
@@ -732,6 +754,7 @@ public class Deflektor implements ApplicationListener {
 	}
 	
 	void touch(int x, int y) {
+		if (x<0 || x>= field_width || y< 0 || y>=field_height) return;
 		int f=field[y*field_width+x];
 		if ((f&0xFF00)==FLD_MIRROR) {
 			rotateThing(x,y);
