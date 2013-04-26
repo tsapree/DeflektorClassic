@@ -192,7 +192,7 @@ public class Deflektor implements ApplicationListener {
 			batch.end();
 			
 			// check if we need to create a new raindrop
-			if(TimeUtils.nanoTime() - lastFrameTime > 50000000) {
+			if(TimeUtils.nanoTime() - lastFrameTime > 100000000) {
 				animateField();
 			} else break;
 			lastFrameTime = TimeUtils.nanoTime();
@@ -292,7 +292,7 @@ public class Deflektor implements ApplicationListener {
 		beamState = BEAMSTATE_NORMAL;
 		gameState = GAMESTATE_ACCUMULATING_ENERGY;
 		energy=0;
-		overheat=50;
+		overheat=0;
 		
 		field=new int[field_width*field_height];
 		
@@ -395,7 +395,7 @@ public class Deflektor implements ApplicationListener {
 			energy--;
 			if (energy<=0) gotoAppState(APPSTATE_MENU);
 			
-			if (beamState==BEAMSTATE_OVERHEAT) overheat+=overheatSteps/64;
+			if (beamState==BEAMSTATE_OVERHEAT) overheat+=overheatSteps/128;
 			else if (beamState==BEAMSTATE_BOMB) overheat+=overheatSteps/20;
 			else overheat-=overheatSteps/128;
 			if (overheat <=0) overheat =0;
