@@ -1,7 +1,5 @@
 package pro.oneredpixel.deflektorclassic;
 
-import android.graphics.Bitmap;
-
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
@@ -10,43 +8,74 @@ import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.math.Vector3;
 
 public class Deflektor implements ApplicationListener {
 	
 	Texture spritesImage;
-	//Texture bucketImage;
-	Sound dropSound;
-	Music rainMusic;
+	Texture menuImage;
+	Sound burnCellSound;
+	Sound burnBombSound;
+	Sound exitOpenSound;
+	Sound laserFillInSound;
+	Sound laserOverheatSound;
+	Sound laserReadySound;
+	Sound levelCompletedSound;
+	Sound transferEnergySound;
+	Music music;
 	
-	Rectangle bucket;
 	OrthographicCamera camera;
 	SpriteBatch batch;
 	
 	int screenWidth;
 	int screenHeight;
+	
+	final int BEAMSTATE_NORMAL = 0;
+	final int BEAMSTATE_OVERHEAT = 1;
+	final int BEAMSTATE_BOMB = 2;
+	int beamState;
+	int prevBeamState;
+
+	final int APPSTATE_STARTED = 0;
+	final int APPSTATE_LOADING = 1;
+	final int APPSTATE_MENU = 2;
+	final int APPSTATE_SELECTLEVEL = 3;
+	final int APPSTATE_GAME = 4;
+	int appState = 0;
+	
+	boolean soundEnabled = true;
 	   
 	@Override
 	public void create() {
 		// load the images for the droplet and the bucket, 48x48 pixels each
 		spritesImage = new Texture(Gdx.files.internal("sprites.png"));
-		//bucketImage = new Texture(Gdx.files.internal("bucket.png"));
+		menuImage = new Texture(Gdx.files.internal("menu.png"));
 		  
 		// load the drop sound effect and the rain background "music"
-		//dropSound = Gdx.audio.newSound(Gdx.files.internal("drop.wav"));
-		//rainMusic = Gdx.audio.newMusic(Gdx.files.internal("rain.mp3"));
+		burnCellSound = Gdx.audio.newSound(Gdx.files.internal("burn-cell.wav"));
+		burnBombSound = Gdx.audio.newSound(Gdx.files.internal("burn-bomb.wav"));
+		//burnBombSound.loop();
+		exitOpenSound = Gdx.audio.newSound(Gdx.files.internal("exit-open.wav"));
+		laserFillInSound = Gdx.audio.newSound(Gdx.files.internal("laser-fill-in.wav"));
+		//laserFillInSound.loop();
+		laserOverheatSound = Gdx.audio.newSound(Gdx.files.internal("laser-overheat.wav"));
+		//laserOverheatSound.loop();
+		laserReadySound = Gdx.audio.newSound(Gdx.files.internal("laser-ready.wav"));
+		levelCompletedSound = Gdx.audio.newSound(Gdx.files.internal("level-completed.wav"));
+		transferEnergySound = Gdx.audio.newSound(Gdx.files.internal("transfer-energy.wav"));
+		//transferEnergySound.loop();
+
+		//burnBombSound.setLooping(,);
+		music = Gdx.audio.newMusic(Gdx.files.internal("zxmusic.ogg"));
 		  
 		// start the playback of the background music immediately
-		//rainMusic.setLooping(true);
-		//rainMusic.play();
+		music.setLooping(true);
 		
 		camera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		
 		batch = new SpriteBatch();
 		
-		initGame();
+		gotoAppState(APPSTATE_STARTED);
 
 	   }
 
@@ -62,10 +91,28 @@ public class Deflektor implements ApplicationListener {
 		// TODO Auto-generated method stub
 		
 	}
+	
+	void gotoAppState(int newState) {
+		switch (newState) {
+		case APPSTATE_STARTED:
+			break;
+		case APPSTATE_LOADING:
+			break;
+		case APPSTATE_MENU:
+			if (soundEnabled) music.play();
+			break;
+		case APPSTATE_SELECTLEVEL:
+			break;
+		case APPSTATE_GAME:
+			music.stop();
+			initGame();
+			break;
+		};
+		appState = newState;
+	}
 
 	@Override
 	public void render() {
-		// TODO Auto-generated method stub
 		Gdx.gl.glClearColor(0, 0, 0.2f, 1);
 		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 		
@@ -73,23 +120,68 @@ public class Deflektor implements ApplicationListener {
 		
 		screenWidth = Gdx.graphics.getWidth();
 		screenHeight = Gdx.graphics.getHeight();
-		
-		batch.setProjectionMatrix(camera.combined);
-		batch.begin();
-		//batch.draw(spritesImage, bucket.x, bucket.y);
-		//batch.draw(spritesImage, 16, 16, 4*16, 3*16, 16,16);
-		//batch.draw(spritesImage, 16, 16, 32,64, 4*16, 3*16, 16,32,false,false);
-		drawField();
-		animateField();
-		batch.end();
-		
-		// process user input
-		if(Gdx.input.isTouched()) {
-			//Vector3 touchPos = new Vector3();
-			//touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
-			//camera.unproject(touchPos);
-			touch(Gdx.input.getX()/16/2, Gdx.input.getY()/16/2);
-		}
+
+		switch (appState) {
+		case APPSTATE_STARTED:
+			gotoAppState(APPSTATE_MENU);
+			break;
+		case APPSTATE_LOADING:
+			break;
+		case APPSTATE_MENU:
+			batch.setProjectionMatrix(camera.combined);
+			batch.begin();
+			menu_putRegion(240/2-128/2, 8, 128, 16, 0, 56);
+			menu_putRegion(240/2-96/2, 64, 96, 24, 0, 32);
+			menu_putRegion(240/2-80/2, 128, 80, 24, 0, 72);
+			batch.end();
+			// process user input
+			if(Gdx.input.isTouched()) {
+				gotoAppState(APPSTATE_GAME);
+				//Vector3 touchPos = new Vector3();
+				//touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
+				//camera.unproject(touchPos);
+				//touch(Gdx.input.getX()/16/2, Gdx.input.getY()/16/2);
+			}
+			break;
+		case APPSTATE_SELECTLEVEL:
+			break;
+		case APPSTATE_GAME:
+			//game
+			prevBeamState = beamState;
+			
+			batch.setProjectionMatrix(camera.combined);
+			batch.begin();
+			drawField();
+			batch.end();
+			
+			animateField();		
+			switch (beamState) {
+			case BEAMSTATE_NORMAL:
+				laserOverheatSound.stop();
+				burnBombSound.stop();
+				break;
+			case BEAMSTATE_OVERHEAT:
+				if (beamState!=prevBeamState) {
+					burnBombSound.stop();
+					laserOverheatSound.loop();
+				}
+				break;
+			case BEAMSTATE_BOMB:
+				if (beamState!=prevBeamState) {
+					laserOverheatSound.stop();
+					burnBombSound.loop();
+				}
+				break;
+			};
+			// process user input
+			if(Gdx.input.isTouched()) {
+				//Vector3 touchPos = new Vector3();
+				//touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
+				//camera.unproject(touchPos);
+				touch(Gdx.input.getX()/16/2, Gdx.input.getY()/16/2);
+			}
+			break;
+		};
 
 
 	}
@@ -128,9 +220,6 @@ public class Deflektor implements ApplicationListener {
 	final int FLD_AUTOROTATING = 0x2000;	//autorotate
 	final int FLD_EXPLODEONEND = 0x4000;		//kill this brick when all cells burned off
 	
-    Sprite spr_old;
-    Bitmap bm=null;
-	
 	//коэффициенты шага луча
 	int angleNodeSteps[][]={
 		{0,-2}, //0
@@ -153,12 +242,7 @@ public class Deflektor implements ApplicationListener {
 	
 	public void initGame() {
 		
-		//t = new DefThreads();
-		//t.create();
-		
-		
-		//bm=Bitmap.createBitmap(Deflektor.field_width*16, Deflektor.field_height*16, Bitmap.Config.ARGB_8888);
-		//spr=new Sprite(R.drawable.defsprites);
+		beamState = BEAMSTATE_NORMAL;
 		
 		field=new int[field_width*field_height];
 		
@@ -243,10 +327,12 @@ public class Deflektor implements ApplicationListener {
 	void animateField(int x, int y) {
 		int f=0;
 		boolean needToExplodeBarrier=true;
+		boolean barrierFound = false;
 		for (int i=0;i<field_width;i++) 
 			for (int j=0;j<field_height;j++) {
 				f=field[j*field_width+i];
 				if (((f&FLD_AUTOROTATING)!=0) && ((x!=i) || (y!=j)) ) rotateThing(i,j);
+				if ((f&FLD_EXPLODEONEND)!=0) barrierFound = true;
 				if ((f&0xf00)==FLD_EXPLODE) {
 					f++;
 					if ((f&0xf)>4) f=FLD_NULL;
@@ -255,15 +341,21 @@ public class Deflektor implements ApplicationListener {
 				};
 				if ((f&0xF00)==FLD_CELL) needToExplodeBarrier = false;
 			};
-		if (needToExplodeBarrier)
+		if (needToExplodeBarrier && barrierFound) {
+			exitOpenSound.play();
 			for (int i=0;i<field_width*field_height;i++)
 				if ((field[i]&FLD_EXPLODEONEND)!=0) field[i]=FLD_EXPLODE;
+		};
 	}
 	
 	void rotateThing(int x, int y) {
 		int f=field[y*field_width+x];
 		field[y*field_width+x]=(++f)&0xFFFFFF1F;
 	}
+
+	void menu_putRegion(int x, int y, int srcWidth, int srcHeight, int srcX, int srcY) {
+		batch.draw(menuImage, x*2, screenHeight-y*2-srcHeight*2, srcWidth*2,srcHeight*2, srcX, srcY, srcWidth,srcHeight,false,false);
+	};
 	
 	void spr_putRegion(int x, int y, int srcWidth, int srcHeight, int srcX, int srcY) {
 		batch.draw(spritesImage, x*2, screenHeight-y*2-srcHeight*2, srcWidth*2,srcHeight*2, srcX, srcY, srcWidth,srcHeight,false,false);
@@ -386,24 +478,16 @@ public class Deflektor implements ApplicationListener {
 	
 	void putWallA(int x, int y, int type) {
 		if ((type&8)!=0)	spr_putRegion( x*16, y*16, 8, 8, 7*16+8, 5*16);
-		//else				spr_putRegion( x*16, y*16, 8, 8, 7*16, 5*16+8);
 		if ((type&4)!=0)	spr_putRegion( x*16+8, y*16, 8, 8, 7*16+8, 5*16);
-		//else				spr_putRegion( x*16+8, y*16, 8, 8, 7*16, 5*16+8);
 		if ((type&2)!=0)	spr_putRegion( x*16, y*16+8, 8, 8, 7*16+8, 5*16);
-		//else				spr_putRegion( x*16, y*16+8, 8, 8, 7*16, 5*16+8);
 		if ((type&1)!=0)	spr_putRegion( x*16+8, y*16+8, 8, 8, 7*16+8, 5*16);
-		//else				spr_putRegion( x*16+8, y*16+8, 8, 8, 7*16, 5*16+8);
 	}
 	
 	void putWallB(int x, int y, int type) {
 		if ((type&8)!=0)	spr_putRegion( x*16, y*16, 8, 8, 7*16, 5*16);
-		//else				spr_putRegion( x*16, y*16, 8, 8, 7*16, 5*16+8);
 		if ((type&4)!=0)	spr_putRegion( x*16+8, y*16, 8, 8, 7*16, 5*16);
-		//else				spr_putRegion( x*16+8, y*16, 8, 8, 7*16, 5*16+8);
 		if ((type&2)!=0)	spr_putRegion( x*16, y*16+8, 8, 8, 7*16, 5*16);
-		//else				spr_putRegion( x*16, y*16+8, 8, 8, 7*16, 5*16+8);
 		if ((type&1)!=0)	spr_putRegion( x*16+8, y*16+8, 8, 8, 7*16, 5*16);
-		//else				spr_putRegion( x*16+8, y*16+8, 8, 8, 7*16, 5*16+8);
 	}
 	
 	void drawBeam(int beamX, int beamY, int beamAngle) {
@@ -412,6 +496,8 @@ public class Deflektor implements ApplicationListener {
 		int newBeamY;
 		int oldBeamAngle;
 		boolean endBeam=false;
+		
+		beamState = BEAMSTATE_NORMAL;
 		
 		while (!endBeam) {
 
@@ -423,9 +509,7 @@ public class Deflektor implements ApplicationListener {
 				continue;
 			};
 			
-			//drawline (bm,beamX*4,beamY*4,newBeamX*4,newBeamY*4,0xFFFFFFFF);
 			drawSpriteLine(beamX, beamY, newBeamX, newBeamY);
-			
 						
 			beamX = newBeamX;
 			beamY = newBeamY;
@@ -442,7 +526,6 @@ public class Deflektor implements ApplicationListener {
 			if ((sx==2) && (sy==2)) {
 				switch (f&0x0f00) {
 				case FLD_LASER_GUN:
-					//TODO: нужно включить перегруз
 					endBeam=true;
 					continue;
 				case FLD_RECEIVER:
@@ -461,10 +544,11 @@ public class Deflektor implements ApplicationListener {
 					break;
 				case FLD_CELL:
 					field[fx+fy*field_width]=FLD_EXPLODE;
+					burnCellSound.play();
 					endBeam=true;
 					continue;
 				case FLD_MINE:
-					//TODO: нужно включить перегруз
+					beamState = BEAMSTATE_BOMB;
 					endBeam=true;
 					continue;
 				case FLD_PRISM:
@@ -612,7 +696,10 @@ public class Deflektor implements ApplicationListener {
 				break;
 			}
 			//Если отражение пошло в обратную сторону
-			if (Math.abs(beamAngle-oldBeamAngle)==8) endBeam=true;			
+			if (Math.abs(beamAngle-oldBeamAngle)==8) {
+				endBeam=true;
+				beamState = BEAMSTATE_OVERHEAT;
+			}
 			
 		}
 		
@@ -644,43 +731,6 @@ public class Deflektor implements ApplicationListener {
 		
 	}
 	
-	void drawline(Bitmap bitmap, int x1, int y1, int x2, int y2, int colour1)
-	{
-		int x0;
-		int y0;
-		int sx = Math.abs(x2-x1);
-		int sy = Math.abs(y2-y1);
-		int zx = ((x2>x1)?1:(-1));
-		int zy = ((y2>y1)?1:(-1));
-		int err=0;
-		
-		if (sx>=sy) {
-			y0=y1;
-			for (x0=x1; x0!=x2; x0+=zx) {
-				bitmap.setPixel(x0, y0, colour1);
-				err+=sy;
-				if (2*err >= sx) {
-					y0+=zy;
-					err-=sx;
-				};
-			};
-			//исправление глюка с неотображением последнего пискеля.
-			bitmap.setPixel(x2, y2, colour1);
-		} else if (sy>sx) {
-			x0=x1;
-			for (y0=y1; y0!=y2; y0+=zy) {
-				bitmap.setPixel(x0, y0, colour1);
-				err+=sx;
-				if (2*err >= sy) {
-					x0+=zx;
-					err-=sy;
-				};
-			};
-			//исправление глюка с неотображением последнего пискеля.
-			bitmap.setPixel(x2, y2, colour1);
-		};
-	};
-	
 	void touch(int x, int y) {
 		int f=field[y*field_width+x];
 		if ((f&0xFF00)==FLD_MIRROR) {
@@ -689,52 +739,5 @@ public class Deflektor implements ApplicationListener {
 		//drawField();
 		//animateField();
 	};
-	
-	class Sprite {
-		int width=0;
-		int height=0;
-		int data[]=null;
-		
-		Sprite (int res_id) {
-			Bitmap b = null ;//=BitmapFactory.decodeResource(dApp.getResources(), res_id);
-			if (b!=null) { 
-				width = b.getWidth();
-				height = b.getHeight();
-				data = new int[width*height];
-				b.getPixels(data, 0, width, 0, 0, width, height);
-			};
-		};
-		
-		//x,y,sx,sy - space in bitmap to put sprite in,
-		//bx,by - coordinates in sprite where begins region
-		void putRegion(Bitmap bitmap, int x, int y, int sx, int sy, int bx, int by) {
-			if (width>0 && height>0 && data!=null) {
-				bitmap.setPixels(data, by*width+bx, width, x, y, sx, sy);
-			};
-		};
-		
-		//x,y,sx,sy - space in bitmap to put sprite in,
-		//bx,by - coordinates in sprite where begins region
-		void putRegionSafe(Bitmap bitmap, int x, int y, int sx, int sy, int bx, int by) {
-			int bmWidth = bitmap.getWidth();
-			int bmHeight = bitmap.getHeight();
-			if (x<0) { bx=bx-x; sx=sx+x; x=0; };
-			if (y<0) { 	by=by-y; sy=sy+y; y=0; };
-			if ((x+sx) >= bmWidth) { sx = sx-(x+sx-bmWidth+1); };
-			if ((y+sy) >= bmHeight) { sy = sy-(y+sy-bmHeight+1); };
-			if (width>0 && height>0 && sx>0 && sy>0 && data!=null) {
-				bitmap.setPixels(data, by*width+bx, width, x, y, sx, sy);
-			};
-		};
-		
-	}
-
-	
-	boolean DoPeriodGfxTask() {
-		drawField();
-		animateField();
-		return true;
-	}
-
 
 }
