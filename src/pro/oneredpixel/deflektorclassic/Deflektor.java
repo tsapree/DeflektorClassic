@@ -2,12 +2,14 @@ package pro.oneredpixel.deflektorclassic;
 
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.utils.TimeUtils;
 
 public class Deflektor implements ApplicationListener {
 	
@@ -47,6 +49,19 @@ public class Deflektor implements ApplicationListener {
 	final int APPSTATE_SELECTLEVEL = 3;
 	final int APPSTATE_GAME = 4;
 	int appState = 0;
+	
+	final int GAMESTATE_ACCUMULATING_ENERGY =0;
+	final int GAMESTATE_GAMING = 1;
+	final int GAMESTATE_CALCULATING_ENERGY = 2;
+	final int GAMESTATE_OVERHEAT = 3;
+	int gameState = GAMESTATE_ACCUMULATING_ENERGY;
+	
+	int energy=0;
+	final int energySteps = 1024;
+	int overheat=0;
+	final int overheatSteps = 1024;
+	
+	long lastFrameTime = 0;
 	
 	boolean soundEnabled = true;
 	   
@@ -105,11 +120,13 @@ public class Deflektor implements ApplicationListener {
 		case APPSTATE_LOADING:
 			break;
 		case APPSTATE_MENU:
+			Gdx.input.setCatchBackKey(false);
 			if (soundEnabled) music.play();
 			break;
 		case APPSTATE_SELECTLEVEL:
 			break;
 		case APPSTATE_GAME:
+			Gdx.input.setCatchBackKey(true);
 			music.stop();
 			initGame();
 			break;
@@ -171,9 +188,15 @@ public class Deflektor implements ApplicationListener {
 			batch.setProjectionMatrix(camera.combined);
 			batch.begin();
 			drawField();
+			drawGameInfo();
 			batch.end();
 			
-			animateField();		
+			// check if we need to create a new raindrop
+			if(TimeUtils.nanoTime() - lastFrameTime > 50000000) {
+				animateField();
+			} else break;
+			lastFrameTime = TimeUtils.nanoTime();
+				
 			switch (beamState) {
 			case BEAMSTATE_NORMAL:
 				laserOverheatSound.stop();
@@ -202,6 +225,8 @@ public class Deflektor implements ApplicationListener {
 				if (x>=0 && x<winWidth && y>=0 && y<winHeight)
 					touch(x/(sprSize*2)/sprScale, y/(sprSize*2)/sprScale);
 			}
+			
+			if(Gdx.input.isKeyPressed(Keys.BACK)) gotoAppState(APPSTATE_MENU);
 			break;
 		};
 
@@ -265,6 +290,9 @@ public class Deflektor implements ApplicationListener {
 	public void initGame() {
 		
 		beamState = BEAMSTATE_NORMAL;
+		gameState = GAMESTATE_ACCUMULATING_ENERGY;
+		energy=0;
+		overheat=50;
 		
 		field=new int[field_width*field_height];
 		
@@ -350,6 +378,43 @@ public class Deflektor implements ApplicationListener {
 		int f=0;
 		boolean needToExplodeBarrier=true;
 		boolean barrierFound = false;
+    
+		
+		switch (gameState) {
+		case GAMESTATE_ACCUMULATING_ENERGY:
+			if (energy==0) laserFillInSound.loop();
+			energy+=energySteps/40;
+			if (energy>=energySteps-1) {
+				energy=energySteps-1;
+				laserFillInSound.stop();
+				gameState=GAMESTATE_GAMING;
+			}
+
+			break;
+		case GAMESTATE_GAMING:
+			energy--;
+			if (energy<=0) gotoAppState(APPSTATE_MENU);
+			
+			if (beamState==BEAMSTATE_OVERHEAT) overheat+=overheatSteps/64;
+			else if (beamState==BEAMSTATE_BOMB) overheat+=overheatSteps/20;
+			else overheat-=overheatSteps/128;
+			if (overheat <=0) overheat =0;
+			if (overheat>=overheatSteps) {
+				laserOverheatSound.stop();
+				gotoAppState(APPSTATE_MENU);
+			}
+			
+			
+			break;
+		case GAMESTATE_CALCULATING_ENERGY:
+			break;
+		case GAMESTATE_OVERHEAT:
+			break;
+		};
+		
+		//int overheat=50;
+		
+		
 		for (int i=0;i<field_width;i++) 
 			for (int j=0;j<field_height;j++) {
 				f=field[j*field_width+i];
@@ -368,6 +433,7 @@ public class Deflektor implements ApplicationListener {
 			for (int i=0;i<field_width*field_height;i++)
 				if ((field[i]&FLD_EXPLODEONEND)!=0) field[i]=FLD_EXPLODE;
 		};
+		
 	}
 	
 	void rotateThing(int x, int y) {
@@ -386,6 +452,28 @@ public class Deflektor implements ApplicationListener {
 	void spr_putRegionSafe(int x, int y, int srcWidth, int srcHeight, int srcX, int srcY) {
 		batch.draw(spritesImage, winX+x*sprScale, screenHeight-winY-y*sprScale-srcHeight*sprScale, srcWidth*sprScale,srcHeight*sprScale, srcX, srcY, srcWidth,srcHeight,false,false);
 	};
+	
+	void drawGameInfo () {
+		int nrg = (energy *64) /energySteps;
+		int ovh = (overheat * 64) / overheatSteps;
+		if (nrg>63) nrg=63;
+		if (nrg<0) nrg=0;
+		if (ovh>63) ovh=63;
+		if (ovh<0) ovh=0;
+		menu_putRegion( 28, field_height*16, 64, 8, 0, 8);
+		if (nrg>0) menu_putRegion( 28, field_height*16+8, nrg, 8, 0, 0);
+		if (nrg<63) menu_putRegion( 28+nrg, field_height*16+8, 64-nrg, 8, 64+nrg, 0);
+		menu_putRegion( 100, field_height*16, 64, 8, 64, 8);
+		if (ovh>0) menu_putRegion( 100, field_height*16+8, ovh, 8, 0, 0);
+		if (ovh<63) menu_putRegion( 100+ovh, field_height*16+8, 64-ovh, 8, 64+ovh, 0);
+		menu_putRegion( 172, field_height*16, 48, 16, 0, 16);
+		
+		
+		//level
+		menu_putRegion( 0, field_height*16, 16, 16, 64, 16);
+		//pause button
+		menu_putRegion( (field_width-1)*16, field_height*16, 16, 16, 48, 16);
+	}
 	
 	void drawField() {
 		int f_angle;
@@ -526,13 +614,18 @@ public class Deflektor implements ApplicationListener {
 			newBeamX = beamX+angleNodeSteps[beamAngle][0];
 			newBeamY = beamY+angleNodeSteps[beamAngle][1];
 			oldBeamAngle = beamAngle;
-			if (newBeamX>=field_width*4 || newBeamX<0 || newBeamY>=field_height*4 || newBeamY<0) {
+			if (newBeamX>field_width*4 || newBeamX<0 || newBeamY>field_height*4 || newBeamY<0) {
 				endBeam=true;
 				continue;
 			};
 			
 			drawSpriteLine(beamX, beamY, newBeamX, newBeamY);
-						
+
+			if (newBeamX>=field_width*4 || newBeamX<0 || newBeamY>=field_height*4 || newBeamY<0) {
+				endBeam=true;
+				continue;
+			};
+			
 			beamX = newBeamX;
 			beamY = newBeamY;
 			
