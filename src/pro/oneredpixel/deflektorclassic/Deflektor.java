@@ -146,7 +146,7 @@ public class Deflektor implements ApplicationListener {
 		
 		sprSize = Math.min(screenWidth/field_width, screenHeight/(field_height+1));
 		sprScale = sprSize/8/2;
-		sprSize = sprSize/sprScale/2;
+		sprSize = 8;
 		
 		//sprScale =1;
 		//sprSize=8;
