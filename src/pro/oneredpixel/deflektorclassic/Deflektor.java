@@ -9,6 +9,9 @@ import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.input.GestureDetector;
+import com.badlogic.gdx.input.GestureDetector.GestureListener;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.TimeUtils;
 
 public class Deflektor implements ApplicationListener {
@@ -95,6 +98,7 @@ public class Deflektor implements ApplicationListener {
 		camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		
 		batch = new SpriteBatch();
+		Gdx.input.setInputProcessor(new GestureDetector(new MyGestureListener()));
 		
 		gotoAppState(APPSTATE_STARTED);
 
@@ -111,6 +115,66 @@ public class Deflektor implements ApplicationListener {
 	public void pause() {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	public class MyGestureListener implements GestureListener {
+		
+		public boolean pinch (Vector2 initialFirstPointer, Vector2 initialSecondPointer, Vector2 firstPointer, Vector2 secondPointer) {
+			return false;
+		}
+
+		@Override
+		public boolean fling(float arg0, float arg1, int arg2) {
+			// TODO Auto-generated method stub
+			return false;
+		}
+
+		@Override
+		public boolean longPress(float arg0, float arg1) {
+			// TODO Auto-generated method stub
+			return false;
+		}
+
+		@Override
+		public boolean pan(float arg0, float arg1, float arg2, float arg3) {
+			// TODO Auto-generated method stub
+			return false;
+		}
+
+		@Override
+		public boolean tap(float x, float y, int tapCount, int button) {
+			// TODO Auto-generated method stub
+			
+			switch (appState) {
+			case APPSTATE_STARTED:
+				break;
+			case APPSTATE_LOADING:
+				break;
+			case APPSTATE_MENU:
+				gotoAppState(APPSTATE_GAME);
+				break;
+			case APPSTATE_SELECTLEVEL:
+				break;
+			case APPSTATE_GAME:
+				if (x>=0 && x<winWidth && y>=0 && y<winHeight)
+					touch(((int)x)/(sprSize*2)/sprScale, ((int)y)/(sprSize*2)/sprScale);
+				break;
+			};
+			
+			return false;
+		}
+
+		@Override
+		public boolean touchDown(float arg0, float arg1, int arg2, int arg3) {
+			// TODO Auto-generated method stub
+			return false;
+		}
+
+		@Override
+		public boolean zoom(float arg0, float arg1) {
+			// TODO Auto-generated method stub
+			return false;
+		}
 	}
 	
 	void gotoAppState(int newState) {
@@ -171,13 +235,13 @@ public class Deflektor implements ApplicationListener {
 			menu_putRegion(240/2-80/2, 128, 80, 24, 0, 72);
 			batch.end();
 			// process user input
-			if(Gdx.input.isTouched()) {
-				gotoAppState(APPSTATE_GAME);
-				//Vector3 touchPos = new Vector3();
-				//touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
-				//camera.unproject(touchPos);
-				//touch(Gdx.input.getX()/16/2, Gdx.input.getY()/16/2);
-			}
+			//if(Gdx.input.isTouched()) {
+			//	gotoAppState(APPSTATE_GAME);
+			//	//Vector3 touchPos = new Vector3();
+			//	//touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
+			//	//camera.unproject(touchPos);
+			//	//touch(Gdx.input.getX()/16/2, Gdx.input.getY()/16/2);
+			//}
 			break;
 		case APPSTATE_SELECTLEVEL:
 			break;
@@ -216,15 +280,15 @@ public class Deflektor implements ApplicationListener {
 				break;
 			};
 			// process user input
-			if(Gdx.input.isTouched()) {
-				//Vector3 touchPos = new Vector3();
-				//touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
-				//camera.unproject(touchPos);
-				int x = Gdx.input.getX()-winX;
-				int y = Gdx.input.getY()-winY;
-				if (x>=0 && x<winWidth && y>=0 && y<winHeight)
-					touch(x/(sprSize*2)/sprScale, y/(sprSize*2)/sprScale);
-			}
+			//if(Gdx.input.isTouched()) {
+			//	//Vector3 touchPos = new Vector3();
+			//	//touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
+			//	//camera.unproject(touchPos);
+			//	int x = Gdx.input.getX()-winX;
+			//	int y = Gdx.input.getY()-winY;
+			//	if (x>=0 && x<winWidth && y>=0 && y<winHeight)
+			//		touch(x/(sprSize*2)/sprScale, y/(sprSize*2)/sprScale);
+			//}
 			
 			if(Gdx.input.isKeyPressed(Keys.BACK)) gotoAppState(APPSTATE_MENU);
 			break;
@@ -855,5 +919,6 @@ public class Deflektor implements ApplicationListener {
 		//drawField();
 		//animateField();
 	};
-
+	
 }
+
