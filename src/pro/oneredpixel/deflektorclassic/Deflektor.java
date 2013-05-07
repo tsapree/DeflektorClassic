@@ -39,6 +39,7 @@ public class Deflektor implements ApplicationListener {
 	int winY;
 	int winWidth;
 	int winHeight;
+	int panScale;
 	
 	final int BEAMSTATE_NORMAL = 0;
 	final int BEAMSTATE_OVERHEAT = 1;
@@ -70,6 +71,25 @@ public class Deflektor implements ApplicationListener {
 	   
 	@Override
 	public void create() {
+		
+		screenWidth = Gdx.graphics.getWidth();
+		screenHeight = Gdx.graphics.getHeight();
+		
+		sprSize = Math.min(screenWidth/field_width, screenHeight/(field_height+1));
+		sprScale = sprSize/8/2;
+		sprSize = 8;
+		
+		//sprScale =1;
+		//sprSize=8;
+		
+		winWidth = field_width*sprSize*2*sprScale;
+		winHeight = (field_height+1)*sprSize*2*sprScale;
+		
+		winX = (screenWidth-winWidth)/2;
+		winY = (screenHeight-winHeight)/2;		
+		
+		panScale=sprSize/1;
+		
 		// load the images for the droplet and the bucket, 48x48 pixels each
 		spritesImage = new Texture(Gdx.files.internal("sprites.png"));
 		menuImage = new Texture(Gdx.files.internal("menu.png"));
@@ -98,7 +118,11 @@ public class Deflektor implements ApplicationListener {
 		camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		
 		batch = new SpriteBatch();
-		Gdx.input.setInputProcessor(new GestureDetector(new MyGestureListener()));
+		
+		//GestureDetector(float halfTapSquareSize, float tapCountInterval, float longPressDuration, float maxFlingDelay, GestureDetector.GestureListener listener) 
+		//GestureDetector(GestureDetector.GestureListener listener)
+		//Creates a new GestureDetector with default values: halfTapSquareSize=20, tapCountInterval=0.4f, longPressDuration=1.1f, maxFlingDelay=0.15f.
+		Gdx.input.setInputProcessor(new GestureDetector(4, 0.4f, 1.1f, 0.15f, new MyGestureListener()));
 		
 		gotoAppState(APPSTATE_STARTED);
 
@@ -119,6 +143,10 @@ public class Deflektor implements ApplicationListener {
 	
 	public class MyGestureListener implements GestureListener {
 		
+		float touchX=0;
+		float touchY=0;
+		int restDelta = 0;
+		
 		public boolean pinch (Vector2 initialFirstPointer, Vector2 initialSecondPointer, Vector2 firstPointer, Vector2 secondPointer) {
 			return false;
 		}
@@ -131,12 +159,6 @@ public class Deflektor implements ApplicationListener {
 
 		@Override
 		public boolean longPress(float arg0, float arg1) {
-			// TODO Auto-generated method stub
-			return false;
-		}
-
-		@Override
-		public boolean pan(float arg0, float arg1, float arg2, float arg3) {
 			// TODO Auto-generated method stub
 			return false;
 		}
@@ -165,11 +187,51 @@ public class Deflektor implements ApplicationListener {
 		}
 
 		@Override
-		public boolean touchDown(float arg0, float arg1, int arg2, int arg3) {
+		public boolean touchDown(float x, float y, int pointer, int button) {
 			// TODO Auto-generated method stub
+			switch (appState) {
+			case APPSTATE_STARTED:
+				break;
+			case APPSTATE_LOADING:
+				break;
+			case APPSTATE_MENU:
+				break;
+			case APPSTATE_SELECTLEVEL:
+				break;
+			case APPSTATE_GAME:
+				touchX = x;
+				touchY = y;
+				restDelta = 0;
+				break;
+			};
+			return false;
+		} 
+
+		@Override
+		public boolean pan(float x, float y, float deltaX, float deltaY) {
+			// TODO Auto-generated method stub
+			switch (appState) {
+			case APPSTATE_STARTED:
+				break;
+			case APPSTATE_LOADING:
+				break;
+			case APPSTATE_MENU:
+				break;
+			case APPSTATE_SELECTLEVEL:
+				break;
+			case APPSTATE_GAME:
+				if (touchX>=0 && touchX<winWidth && touchY>=0 && touchY<winHeight) {
+					int delta=(int)Math.sqrt((deltaX)*(deltaX)+(deltaY)*(deltaY));
+					if (deltaX<(-deltaY)) delta=-delta;
+					delta = delta + restDelta;
+					rotateMirror( ((int)touchX)/(sprSize*2)/sprScale, ((int)touchY)/(sprSize*2)/sprScale, (delta/panScale)&0x1f);
+					restDelta=delta-((int)(delta/panScale))*panScale;
+				};
+				break;
+			};
 			return false;
 		}
-
+		
 		@Override
 		public boolean zoom(float arg0, float arg1) {
 			// TODO Auto-generated method stub
@@ -205,22 +267,6 @@ public class Deflektor implements ApplicationListener {
 		
 		camera.update();
 		
-		screenWidth = Gdx.graphics.getWidth();
-		screenHeight = Gdx.graphics.getHeight();
-		
-		sprSize = Math.min(screenWidth/field_width, screenHeight/(field_height+1));
-		sprScale = sprSize/8/2;
-		sprSize = 8;
-		
-		//sprScale =1;
-		//sprSize=8;
-		
-		winWidth = field_width*sprSize*2*sprScale;
-		winHeight = (field_height+1)*sprSize*2*sprScale;
-		
-		winX = (screenWidth-winWidth)/2;
-		winY = (screenHeight-winHeight)/2;		
-
 		switch (appState) {
 		case APPSTATE_STARTED:
 			gotoAppState(APPSTATE_MENU);
@@ -501,8 +547,19 @@ public class Deflektor implements ApplicationListener {
 	}
 	
 	void rotateThing(int x, int y) {
+		rotateThing(x,y,1);
+		//int f=field[y*field_width+x];
+		//field[y*field_width+x]=(++f)&0xFFFFFF1F;
+	}
+	
+	void rotateThing(int x, int y, int angle) {
 		int f=field[y*field_width+x];
-		field[y*field_width+x]=(++f)&0xFFFFFF1F;
+		field[y*field_width+x]=(f+angle)&0xFFFFFF1F;
+	}
+	
+	void rotateMirror(int x, int y, int angle) {
+		if ((field[y*field_width+x]&0xFF00)==FLD_MIRROR)
+			rotateThing(x,y,angle);
 	}
 
 	void menu_putRegion(int x, int y, int srcWidth, int srcHeight, int srcX, int srcY) {
@@ -916,9 +973,26 @@ public class Deflektor implements ApplicationListener {
 		if ((f&0xFF00)==FLD_MIRROR) {
 			rotateThing(x,y);
 		};
-		//drawField();
-		//animateField();
 	};
+	
+	/*
+	int getMirrorAngle (int x, int y) {
+		if (x<0 || x>= field_width || y< 0 || y>=field_height) return -1;
+		int f=field[y*field_width+x];
+		if ((f&0xFF00)==FLD_MIRROR) {
+			return f&0x1f;
+		};
+		return -1;
+	};
+	
+	void setMirrorAngle (int x, int y, int angle) {
+		if (x<0 || x>= field_width || y< 0 || y>=field_height || angle<0) return;
+		int f=field[y*field_width+x];
+		if ((f&0xFF00)==FLD_MIRROR) {
+			field[y*field_width+x]=(f&0xFFFFFF00)|(angle&0x1f);
+		};
+	};
+	*/
 	
 }
 
