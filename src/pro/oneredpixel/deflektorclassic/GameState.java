@@ -32,7 +32,7 @@ public class GameState extends State {
 	int overheat=0;
 	final int overheatSteps = 1024;
 	
-	int playingLevel = 2;
+	int playingLevel = 0;
 	
 	void create() {
 		
@@ -598,7 +598,7 @@ public class GameState extends State {
 					continue;
 				case FLD_RECEIVER:
 					//if right angle
-					beamState = BEAMSTATE_CONNECTED;
+					if ((f_angle*4)==((beamAngle+8)&15)) beamState = BEAMSTATE_CONNECTED;
 					endBeam=true;
 					break;
 				case FLD_MIRROR:
