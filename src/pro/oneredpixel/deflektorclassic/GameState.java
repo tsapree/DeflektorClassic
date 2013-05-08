@@ -17,18 +17,22 @@ public class GameState extends State {
 	final int GAMESTATE_GAMING = 1;
 	final int GAMESTATE_CALCULATING_ENERGY = 2;
 	final int GAMESTATE_OVERHEAT = 3;
+	final int GAMESTATE_LEVELCOMPLETED = 4;
 	int gameStateId = GAMESTATE_ACCUMULATING_ENERGY;
 	
 	final int BEAMSTATE_NORMAL = 0;
 	final int BEAMSTATE_OVERHEAT = 1;
 	final int BEAMSTATE_BOMB = 2;
+	final int BEAMSTATE_CONNECTED = 3;
 	int beamState;
 	int prevBeamState;
 	
 	int energy=0;
-	final int energySteps = 1024;
+	int energySteps = 1024;
 	int overheat=0;
 	final int overheatSteps = 1024;
+	
+	int playingLevel = 2;
 	
 	void create() {
 		
@@ -170,6 +174,7 @@ public class GameState extends State {
 	int packedLevels[][] = {
 		//01
 		{
+			1024, //energySteps
 			FLD_MIRROR|6,FLD_NULL|3,FLD_WALL_B|0x0a,FLD_CELL,FLD_CELL,FLD_WALL_A|0x05,FLD_MIRROR,FLD_NULL|1, 
 				FLD_SLIT_B|7|FLD_AUTOROTATING,FLD_CELL,FLD_CELL,FLD_WALL_A|0x05,FLD_WALL_A|0x0b,
 			FLD_NULL|1,FLD_CELL,FLD_CELL,FLD_CELL,FLD_WALL_B|0x0a,FLD_CELL,FLD_CELL,FLD_WALL_A|0x05,
@@ -188,11 +193,35 @@ public class GameState extends State {
 
 		},
 		//02
-		{0,},
+		{
+			1024, //energySteps
+			FLD_MIRROR,FLD_CELL,FLD_MINE,FLD_NULL,FLD_CELL,FLD_WALL_A|4,FLD_NULL|3,FLD_CELL,FLD_WALL_A|1,FLD_NULL,FLD_MINE,FLD_NULL,FLD_RECEIVER|2,
+			FLD_NULL,FLD_WALL_A|1,FLD_WALL_A|4,FLD_CELL,FLD_WALL_A|8,FLD_WALL_A|4,FLD_WALL_A|9,FLD_NULL,FLD_MIRROR,FLD_NULL|3,FLD_WALL_A|2,FLD_CELL,FLD_WALL_A|3|FLD_EXPLODEONEND,
+			FLD_WALL_A|8,FLD_NULL,FLD_WALL_A|4,FLD_WALL_A|8,FLD_MINE,FLD_NULL,FLD_WALL_A|2,FLD_WALL_A|2,FLD_NULL,FLD_WALL_A|2,FLD_WALL_A|8,FLD_MINE,FLD_WALL_A|1,FLD_NULL|2,
+			FLD_NULL,FLD_MIRROR,FLD_WALL_A|1,FLD_NULL,FLD_WALL_A|8,FLD_WALL_A|3,FLD_NULL,FLD_MINE,FLD_NULL|2,FLD_CELL,FLD_WALL_A|8,FLD_CELL,FLD_WALL_A|9,FLD_NULL,
+			FLD_MINE,FLD_WALL_A|2,FLD_CELL,FLD_NULL,FLD_WALL_A|2,FLD_NULL,FLD_MIRROR,FLD_NULL,FLD_WALL_A|8,FLD_NULL,FLD_WALL_A|9,FLD_NULL|2,FLD_MINE,FLD_NULL,
+			FLD_NULL|2,FLD_WALL_A|2,FLD_NULL,FLD_WALL_A|4,FLD_NULL|2,FLD_WALL_A|6,FLD_NULL,FLD_CELL,FLD_NULL,FLD_WALL_A|1,FLD_WALL_A|4,FLD_WALL_A|4,FLD_WALL_A|5,
+			FLD_LASER_GUN|2,FLD_CELL,FLD_NULL|2,FLD_MIRROR,FLD_NULL,FLD_WALL_A|2,FLD_NULL,FLD_WALL_A|4,FLD_NULL,FLD_MIRROR,FLD_NULL,FLD_WALL_A|4,FLD_NULL|2,
+			FLD_NULL,FLD_WALL_A|8,FLD_WALL_A|6,FLD_MINE,FLD_NULL,FLD_WALL_A|1,FLD_CELL,FLD_WALL_A|6,FLD_NULL|2,FLD_WALL_A|2,FLD_WALL_A|4,FLD_MINE,FLD_WALL_A|2,FLD_MIRROR,
+			FLD_MIRROR,FLD_NULL,FLD_WALL_A|1,FLD_NULL,FLD_WALL_A|4,FLD_NULL,FLD_WALL_A|1,FLD_NULL,FLD_MIRROR,FLD_NULL|2,FLD_WALL_A|9,FLD_WALL_A|1,FLD_NULL,FLD_CELL,
+		},
 		//03
-		{0,},
+		{
+			1024, //energySteps
+			FLD_CELL,FLD_CELL,FLD_WALL_A|11,FLD_NULL|3,FLD_MIRROR,FLD_NULL,FLD_CELL,FLD_WALL_A|5,FLD_NULL|2,FLD_CELL,FLD_NULL,FLD_MIRROR,
+			FLD_CELL,FLD_CELL,FLD_WALL_A|4,FLD_WALL_A|13,FLD_NULL|5,FLD_WALL_A|5,FLD_NULL|3,FLD_WALL_A|3,FLD_NULL,
+			FLD_CELL,FLD_CELL,FLD_PRISM,FLD_NULL,FLD_MIRROR,FLD_NULL|3,FLD_WALL_A|3,FLD_WALL_A|15,FLD_WALL_A|10,FLD_NULL|2,FLD_WALL_A|10,FLD_SLIT_A,
+			FLD_CELL,FLD_CELL,FLD_WALL_A|1,FLD_WALL_A|7,FLD_NULL|9,FLD_WALL_A|11,FLD_CELL,
+			FLD_CELL,FLD_CELL,FLD_WALL_A|14,FLD_NULL|4,FLD_WALL_A|1,FLD_WALL_A|3,FLD_WALL_A|2,FLD_NULL,FLD_MIRROR,FLD_NULL,FLD_WALL_A|4,FLD_WALL_A|12,
+			FLD_WALL_A|12,FLD_WALL_A|12,FLD_WALL_A|8,FLD_NULL,FLD_WALL_A|15,FLD_WALL_A|10,FLD_PRISM,FLD_WALL_B|5|FLD_EXPLODEONEND,FLD_RECEIVER|3,FLD_WALL_A|14,FLD_WALL_A|12,FLD_NULL,FLD_SLIT_A,FLD_NULL|2,
+			FLD_WALL_A|2,FLD_CELL,FLD_NULL|5,FLD_WALL_A|4,FLD_WALL_A|12,FLD_WALL_A|10,FLD_MIRROR,FLD_NULL,FLD_WALL_A|3,FLD_WALL_A|7,FLD_NULL,
+			FLD_WALL_A|10,FLD_NULL|5,FLD_SLIT_A,FLD_NULL|2,FLD_WALL_A|13,FLD_NULL|2,FLD_WALL_A|12,FLD_WALL_A|12,FLD_CELL,
+			FLD_WALL_A|11,FLD_WALL_A|3,FLD_NULL,FLD_MIRROR,FLD_NULL|4,FLD_CELL,FLD_WALL_A|5,FLD_LASER_GUN|0,FLD_WALL_A|11,FLD_WALL_A|3,FLD_NULL|2,
+			
+		},
 		//04
 		{
+			1024, //energySteps
 			FLD_MINE,FLD_CELL,FLD_CELL,FLD_CELL,FLD_CELL,FLD_CELL,FLD_CELL,FLD_CELL,FLD_MIRROR,FLD_CELL,FLD_MIRROR,FLD_CELL,FLD_CELL,FLD_CELL,FLD_MINE,
 			FLD_CELL,FLD_CELL,FLD_CELL,FLD_CELL,FLD_CELL,FLD_CELL,FLD_CELL,FLD_CELL,FLD_CELL,FLD_CELL,FLD_CELL,FLD_CELL,FLD_CELL,FLD_CELL,FLD_CELL,
 			FLD_CELL,FLD_CELL,FLD_CELL,FLD_CELL,FLD_CELL,FLD_CELL,FLD_CELL,FLD_CELL,FLD_CELL,FLD_CELL,FLD_CELL,FLD_CELL,FLD_CELL,FLD_MIRROR,FLD_CELL,
@@ -204,15 +233,26 @@ public class GameState extends State {
 			FLD_RECEIVER|1,FLD_WALL_B|0x05|FLD_EXPLODEONEND,FLD_CELL,FLD_CELL,FLD_CELL,FLD_CELL,FLD_CELL,FLD_CELL,FLD_CELL,FLD_CELL,FLD_CELL,FLD_CELL,FLD_MIRROR,FLD_NULL,FLD_LASER_GUN|3,
 			
 		},
+		//05
+		{
+			1024, //energySteps
+			//FLD_MIRROR,FLD_NULL,FLD_MIRROR,FLD_NULL,FLD_MIRROR,FLD_NULL,FLD_MIRROR,FLD_NULL,FLD_MIRROR,FLD_NULL,FLD_MIRROR,FLD_NULL,FLD_MIRROR,FLD_NULL,FLD_MIRROR,
+			//FLD_NULL,FLD_MIRROR,FLD_NULL,FLD_MIRROR,FLD_NULL,FLD_MIRROR,FLD_NULL,FLD_MIRROR,FLD_NULL,FLD_MIRROR,FLD_NULL,FLD_MIRROR,FLD_NULL,FLD_MIRROR,FLD_NULL,
+			FLD_MIRROR,FLD_CELL,FLD_MIRROR,FLD_NULL,FLD_MIRROR,FLD_NULL,FLD_MIRROR,FLD_NULL,FLD_MIRROR,FLD_CELL,FLD_MIRROR,FLD_CELL,FLD_MIRROR,FLD_NULL,FLD_RECEIVER|2,
+			FLD_CELL,FLD_MIRROR,FLD_NULL,FLD_MIRROR,FLD_NULL,FLD_MIRROR,FLD_CELL,FLD_MIRROR,FLD_NULL,FLD_MIRROR,FLD_NULL,FLD_MIRROR,FLD_NULL,FLD_MIRROR,FLD_MINE|FLD_EXPLODEONEND,
+			FLD_MIRROR,FLD_NULL,FLD_MIRROR,FLD_NULL,FLD_MIRROR,FLD_CELL,FLD_MIRROR,FLD_NULL,FLD_MIRROR,FLD_MINE,FLD_MIRROR,FLD_NULL,FLD_MIRROR,FLD_CELL,FLD_MIRROR,
+			FLD_NULL,FLD_MIRROR,FLD_CELL,FLD_MIRROR,FLD_NULL,FLD_MIRROR,FLD_NULL,FLD_MIRROR,FLD_NULL,FLD_MIRROR,FLD_CELL,FLD_MIRROR,FLD_CELL,FLD_MIRROR,FLD_NULL,
+			FLD_MIRROR,FLD_NULL,FLD_MIRROR,FLD_CELL,FLD_MIRROR,FLD_NULL,FLD_MIRROR,FLD_NULL,FLD_MIRROR,FLD_NULL,FLD_MIRROR,FLD_NULL,FLD_MIRROR,FLD_NULL,FLD_MIRROR,
+			FLD_NULL,FLD_MIRROR,FLD_NULL,FLD_MIRROR,FLD_NULL,FLD_MIRROR,FLD_CELL,FLD_MIRROR,FLD_NULL,FLD_MIRROR,FLD_CELL,FLD_MIRROR,FLD_NULL,FLD_MIRROR,FLD_NULL,
+			FLD_MIRROR,FLD_NULL,FLD_MIRROR,FLD_NULL,FLD_MIRROR,FLD_NULL,FLD_MIRROR,FLD_NULL,FLD_MIRROR,FLD_NULL,FLD_MIRROR,FLD_NULL,FLD_MIRROR,FLD_CELL,FLD_MIRROR,
+			FLD_NULL,FLD_MIRROR,FLD_CELL,FLD_MIRROR,FLD_NULL,FLD_MIRROR,FLD_NULL,FLD_MIRROR,FLD_CELL,FLD_MIRROR,FLD_NULL,FLD_MIRROR,FLD_NULL,FLD_MIRROR,FLD_CELL,
+			FLD_LASER_GUN,FLD_NULL,FLD_MIRROR,FLD_NULL,FLD_MIRROR,FLD_CELL,FLD_MIRROR,FLD_MINE,FLD_MIRROR,FLD_NULL,FLD_MIRROR,FLD_CELL,FLD_MIRROR,FLD_NULL,FLD_MIRROR,
+			
+		},
 	};
 
 	
 
-		
-
-
-	
-	
 	
 	
 	//коэффициенты шага луча
@@ -244,88 +284,17 @@ public class GameState extends State {
 		
 		field=new int[field_width*field_height];
 		
-		unpackLevel(3);
-		/*
-		field[0+0*field_width]=FLD_MIRROR|6;
-		field[2+2*field_width]=FLD_MIRROR|FLD_AUTOROTATING;
-		field[2+5*field_width]=FLD_MIRROR;
-		field[0+7*field_width]=FLD_MIRROR|12;
-		field[8+0*field_width]=FLD_MIRROR;
-		field[8+8*field_width]=FLD_MIRROR;
-		field[14+3*field_width]=FLD_MIRROR;
-		field[14+5*field_width]=FLD_MIRROR;
-
-		
-		field[1+1*field_width]=FLD_CELL;
-		field[1+2*field_width]=FLD_CELL;
-		field[1+3*field_width]=FLD_CELL;
-		field[2+1*field_width]=FLD_CELL;
-		field[2+3*field_width]=FLD_CELL;
-		field[3+1*field_width]=FLD_CELL;
-		field[3+2*field_width]=FLD_CELL;
-		field[3+3*field_width]=FLD_CELL;
-		
-		field[5+0*field_width]=FLD_CELL;
-		field[6+0*field_width]=FLD_CELL;
-		field[5+1*field_width]=FLD_CELL;
-		field[6+1*field_width]=FLD_CELL;
-		field[11+0*field_width]=FLD_CELL;
-		field[12+0*field_width]=FLD_CELL;
-		field[11+1*field_width]=FLD_CELL;
-		field[9+4*field_width]=FLD_CELL;
-		field[10+7*field_width]=FLD_CELL;
-		field[10+8*field_width]=FLD_CELL;
-		field[12+7*field_width]=FLD_CELL;
-		
-		field[11+6*field_width]=FLD_MINE;
-		field[11+7*field_width]=FLD_MINE;
-		
-		field[5+2*field_width]=FLD_PRISM;
-		
-		field[7+4*field_width]=FLD_SLIT_A|4|FLD_AUTOROTATING;
-		field[10+0*field_width]=FLD_SLIT_B|7|FLD_AUTOROTATING;
-		field[12+2*field_width]=FLD_SLIT_B|7;
-		field[12+6*field_width]=FLD_SLIT_B|7;
-		
-		field[10+3*field_width]=FLD_WARPBOX|1;
-		field[14+7*field_width]=FLD_WARPBOX|1;
-		
-		field[4+0*field_width]=FLD_WALL_B|0x0a;
-		field[4+1*field_width]=FLD_WALL_B|0x0a;
-		field[4+2*field_width]=FLD_WALL_B|0x0f;
-		field[4+3*field_width]=FLD_WALL_B|0x0f;
-		field[4+4*field_width]=FLD_WALL_B|0x0f;
-		field[1+4*field_width]=FLD_WALL_B|0x0c;
-		field[2+4*field_width]=FLD_WALL_B|0x0c;
-		field[3+4*field_width]=FLD_WALL_B|0x0c;
-		
-		field[2+8*field_width]=FLD_WALL_A|0x0a;
-		field[4+8*field_width]=FLD_WALL_A|0x05|FLD_EXPLODEONEND;
-		field[4+7*field_width]=FLD_WALL_A|0x05;
-		field[6+2*field_width]=FLD_WALL_A|0x0c;
-		field[7+2*field_width]=FLD_WALL_A|0x0c;
-		field[7+1*field_width]=FLD_WALL_A|0x05;
-		field[7+0*field_width]=FLD_WALL_A|0x05;
-		field[13+0*field_width]=FLD_WALL_A|0x05;
-		field[14+0*field_width]=FLD_WALL_A|0x0b;
-		field[14+1*field_width]=FLD_WALL_A|0x05;
-		field[14+8*field_width]=FLD_WALL_A|0x02;
-		field[13+8*field_width]=FLD_WALL_A|0x03;
-		field[12+8*field_width]=FLD_WALL_A|0x03;
-		field[9+8*field_width]=FLD_WALL_A|0x05;
-		field[9+7*field_width]=FLD_WALL_A|0x0d;
-		
-		field[3+7*field_width]=FLD_LASER_GUN|3;
-		field[3+8*field_width]=FLD_RECEIVER|1;
-		*/
-
+		unpackLevel(playingLevel);
 	}
 	
 	void unpackLevel(int levelNumber) {
 		int piece;
 		int fieldIndex=0;
 		if (levelNumber>=packedLevels.length) return;
-		for (int i=0;i<packedLevels[levelNumber].length;i++) {
+		
+		energySteps = packedLevels[levelNumber][0];
+		
+		for (int i=1;i<packedLevels[levelNumber].length;i++) {
 			piece = packedLevels[levelNumber][i];
 			if ((piece&0xFF00)==FLD_NULL) {
 				piece&=0xFF;
@@ -366,16 +335,25 @@ public class GameState extends State {
 
 			break;
 		case GAMESTATE_GAMING:
+			energy++;	//TODO: УБРАТЬ - ЧИТ :)
 			energy--;
 			if (energy<=0) app.gotoAppState(Deflektor.APPSTATE_MENU);
 			
 			if (beamState==BEAMSTATE_OVERHEAT) overheat+=overheatSteps/128;
 			else if (beamState==BEAMSTATE_BOMB) overheat+=overheatSteps/20;
 			else overheat-=overheatSteps/128;
+			
+			if (beamState==BEAMSTATE_CONNECTED) {
+				gameStateId = GAMESTATE_LEVELCOMPLETED;
+				app.levelCompletedSound.play();
+			}
+			
 			if (overheat <=0) overheat =0;
 			if (overheat>=overheatSteps) {
-				app.laserOverheatSound.stop();
-				app.gotoAppState(Deflektor.APPSTATE_MENU);
+				overheat=0; //TODO: УБРАТЬ - ЧИТ :)
+				//TODO: раскомментировать для окончания игры по перегреву :)
+				//app.laserOverheatSound.stop();
+				//app.gotoAppState(Deflektor.APPSTATE_MENU);
 			}
 			
 			
@@ -384,11 +362,12 @@ public class GameState extends State {
 			break;
 		case GAMESTATE_OVERHEAT:
 			break;
+		case GAMESTATE_LEVELCOMPLETED:
+			if (playingLevel++<4) initGame();
+			else app.gotoAppState(Deflektor.APPSTATE_MENU);
+			break;
 		};
-		
-		//int overheat=50;
-		
-		
+
 		for (int i=0;i<field_width;i++) 
 			for (int j=0;j<field_height;j++) {
 				f=field[j*field_width+i];
@@ -618,6 +597,9 @@ public class GameState extends State {
 					endBeam=true;
 					continue;
 				case FLD_RECEIVER:
+					//if right angle
+					beamState = BEAMSTATE_CONNECTED;
+					endBeam=true;
 					break;
 				case FLD_MIRROR:
 					beamAngle =(((f_angle<<1)-beamAngle-beamAngle)>>1)&0xf;
