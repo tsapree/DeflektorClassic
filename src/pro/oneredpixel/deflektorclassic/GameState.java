@@ -117,6 +117,8 @@ public class GameState extends State {
 	}
 
 	public boolean tap(float x, float y, int tapCount, int button) {
+		x=x-app.winX;
+		y=y-app.winY;
 		if (x>=0 && x<app.winWidth && y>=0 && y<app.winHeight)
 			touch(((int)x)/(app.sprSize*2)/app.sprScale, ((int)y)/(app.sprSize*2)/app.sprScale);
 		return false;
@@ -134,11 +136,11 @@ public class GameState extends State {
 	} 
 
 	public boolean pan(float x, float y, float deltaX, float deltaY) {
-		if (touchX>=0 && touchX<app.winWidth && touchY>=0 && touchY<app.winHeight) {
+		if (touchX>=app.winX && touchX<app.winWidth+app.winX && touchY>=app.winY && touchY<app.winHeight+app.winY) {
 			int delta=(int)Math.sqrt((deltaX)*(deltaX)+(deltaY)*(deltaY));
 			if (deltaX<(-deltaY)) delta=-delta;
 			delta = delta + restDelta;
-			rotateMirror( ((int)touchX)/(app.sprSize*2)/app.sprScale, ((int)touchY)/(app.sprSize*2)/app.sprScale, (delta/app.panScale)&0x1f);
+			rotateMirror( ((int)(touchX-app.winX))/(app.sprSize*2)/app.sprScale, ((int)(touchY-app.winY))/(app.sprSize*2)/app.sprScale, (delta/app.panScale)&0x1f);
 			restDelta=delta-((int)(delta/app.panScale))*app.panScale;
 		};
 		return false;
