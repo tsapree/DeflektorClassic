@@ -710,6 +710,14 @@ public class GameState extends State {
 				
 				if (((beamX&1)+(beamY&1))==0) {
 					wall_angle=wall_a_angle_matrix[( ((beamAngle&3)==0)?16:0 )|(wallsAround&0xF)];
+					//если угол луча не совпадает с осями
+					if ((beamAngle&3)!=0 && wallsAround!=6 && wallsAround!=9) {
+						//то проверяем, светит ли луч в препятствие или же просто проходит через угол.
+						if ((beamAngle<4) && ((wallsAround&4)==0)) wall_angle=-1;
+						else if ((beamAngle>4) && (beamAngle<8) && ((wallsAround&1)==0)) wall_angle=-1;
+						else if ((beamAngle>8) && (beamAngle<12) && ((wallsAround&2)==0)) wall_angle=-1;
+						else if ((beamAngle>12) && (wallsAround&8)==0) wall_angle=-1;
+					}
 				} else {
 
 				//	1,0,x,x0x0	не изменять траекторию
