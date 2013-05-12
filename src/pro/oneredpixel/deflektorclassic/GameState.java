@@ -399,6 +399,7 @@ public class GameState extends State {
 					field[j*field_width+i]=f;
 				};
 				if ((f&0xF00)==FLD_CELL) needToExplodeBarrier = false;
+				if ((f&0xF00)==FLD_PRISM) field[j*field_width+i]=(f&0xF00)|((int)((8*Math.random())+0.5));
 			};
 		if (needToExplodeBarrier && barrierFound) {
 			app.exitOpenSound.play();
@@ -649,7 +650,7 @@ public class GameState extends State {
 					endBeam=true;
 					continue;
 				case FLD_PRISM:
-					beamAngle= (beamAngle-4+((int)((8*Math.random())+0.5)))&0xf;
+					beamAngle= (beamAngle-4+(f&0xFF))&0xf;
 					break;
 				case FLD_EXPLODE:
 					if (f_angle>2) break;
