@@ -32,6 +32,10 @@ public class GameState extends State {
 	int overheat=0;
 	final int overheatSteps = 1024;
 	
+	boolean cursorEnabled = false;
+	int cursorX = 0;
+	int cursorY = 0;
+	
 	int playingLevel = 0;
 	
 	void create() {
@@ -117,6 +121,7 @@ public class GameState extends State {
 	}
 
 	public boolean tap(float x, float y, int tapCount, int button) {
+		setCursor((int)x,(int)y);
 		x=x-app.winX;
 		y=y-app.winY;
 		if (x>=0 && x<app.winWidth && y>=0 && y<app.winHeight)
@@ -132,15 +137,30 @@ public class GameState extends State {
 		touchX = x;
 		touchY = y;
 		restDelta = 0;
+		setCursor((int)x,(int)y);
 		return false;
 	} 
+	
+	void setCursor(int x, int y) {
+		int newCursorX=(x-app.winX)/(app.sprSize*2)/app.sprScale;
+		int newCursorY=(y-app.winY)/(app.sprSize*2)/app.sprScale;	
+		
+		if (newCursorX>=0 && newCursorX<field_width && newCursorY>=0 && newCursorY<field_height) {
+			int f=field[newCursorX+newCursorY*field_width];
+			if ((f&0xF00)==FLD_MIRROR) {
+				cursorEnabled=true;
+				cursorX=newCursorX;
+				cursorY=newCursorY;
+			};
+		};
+	}
 
 	public boolean pan(float x, float y, float deltaX, float deltaY) {
-		if (touchX>=app.winX && touchX<app.winWidth+app.winX && touchY>=app.winY && touchY<app.winHeight+app.winY) {
+		if (cursorEnabled) {
 			int delta=(int)Math.sqrt((deltaX)*(deltaX)+(deltaY)*(deltaY));
 			if (deltaX<(-deltaY)) delta=-delta;
 			delta = delta + restDelta;
-			rotateMirror( ((int)(touchX-app.winX))/(app.sprSize*2)/app.sprScale, ((int)(touchY-app.winY))/(app.sprSize*2)/app.sprScale, (delta/app.panScale)&0x1f);
+			rotateMirror( cursorX, cursorY, (delta/app.panScale)&0x1f);
 			restDelta=delta-((int)(delta/app.panScale))*app.panScale;
 		};
 		return false;
@@ -283,6 +303,7 @@ public class GameState extends State {
 		gameStateId = GAMESTATE_ACCUMULATING_ENERGY;
 		energy=0;
 		overheat=0;
+		cursorEnabled = false;		
 		
 		field=new int[field_width*field_height];
 		
@@ -316,10 +337,6 @@ public class GameState extends State {
 	}
 	
 	void animateField() {
-		animateField(-1,-1);
-	}
-	
-	void animateField(int x, int y) {
 		int f=0;
 		boolean needToExplodeBarrier=true;
 		boolean barrierFound = false;
@@ -373,7 +390,7 @@ public class GameState extends State {
 		for (int i=0;i<field_width;i++) 
 			for (int j=0;j<field_height;j++) {
 				f=field[j*field_width+i];
-				if (((f&FLD_AUTOROTATING)!=0) && ((x!=i) || (y!=j)) ) rotateThing(i,j);
+				if ((f&FLD_AUTOROTATING)!=0) rotateThing(i,j);
 				if ((f&FLD_EXPLODEONEND)!=0) barrierFound = true;
 				if ((f&0xf00)==FLD_EXPLODE) {
 					f++;
@@ -403,6 +420,7 @@ public class GameState extends State {
 	}
 	
 	void rotateMirror(int x, int y, int angle) {
+		if (x>=field_width || y>=field_height) return;
 		if ((field[y*field_width+x]&0xFF00)==FLD_MIRROR)
 			rotateThing(x,y,angle);
 	}
@@ -500,6 +518,12 @@ public class GameState extends State {
 					break;
 				}
 			};
+			
+			
+			
+		if (cursorEnabled) {
+			app.spr_putRegion( cursorX*16, cursorY*16, 16, 16, 0*16, 5*16);
+		};
 			
 	};
 

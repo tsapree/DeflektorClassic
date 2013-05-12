@@ -74,7 +74,7 @@ public class Deflektor implements ApplicationListener {
 		winX = (screenWidth-winWidth)/2;
 		winY = (screenHeight-winHeight)/2;		
 		
-		panScale=sprSize/1;
+		panScale=sprSize*sprScale/1;
 		
 		// load the images for the droplet and the bucket, 48x48 pixels each
 		spritesImage = new Texture(Gdx.files.internal("sprites.png"));
@@ -108,7 +108,7 @@ public class Deflektor implements ApplicationListener {
 		//GestureDetector(float halfTapSquareSize, float tapCountInterval, float longPressDuration, float maxFlingDelay, GestureDetector.GestureListener listener) 
 		//GestureDetector(GestureDetector.GestureListener listener)
 		//Creates a new GestureDetector with default values: halfTapSquareSize=20, tapCountInterval=0.4f, longPressDuration=1.1f, maxFlingDelay=0.15f.
-		Gdx.input.setInputProcessor(new GestureDetector(4, 0.4f, 1.1f, 0.15f, new MyGestureListener()));
+		Gdx.input.setInputProcessor(new GestureDetector(sprSize/2*sprScale, 0.4f, 1.1f, 0.15f, new MyGestureListener()));
 		
 		gotoAppState(APPSTATE_MENU);
 
