@@ -33,6 +33,9 @@ public class GameState extends State {
 	final int overheatSteps = 1024;
 	
 	boolean cursorEnabled = false;
+	int cursorPhase = 0;
+	final int cursorPhases = 6;
+	final int cursorDisplayPhases = 3;
 	int cursorX = 0;
 	int cursorY = 0;
 	
@@ -149,6 +152,7 @@ public class GameState extends State {
 			int f=field[newCursorX+newCursorY*field_width];
 			if ((f&0xF00)==FLD_MIRROR) {
 				cursorEnabled=true;
+				cursorPhase=0;
 				cursorX=newCursorX;
 				cursorY=newCursorY;
 			};
@@ -341,6 +345,7 @@ public class GameState extends State {
 		boolean needToExplodeBarrier=true;
 		boolean barrierFound = false;
     
+		if (++cursorPhase>=cursorPhases) cursorPhase=0;		
 		
 		switch (gameStateId) {
 		case GAMESTATE_ACCUMULATING_ENERGY:
@@ -522,10 +527,10 @@ public class GameState extends State {
 			
 			
 			
-		if (cursorEnabled) {
+		if (cursorEnabled && cursorPhase<cursorDisplayPhases) {
 			app.spr_putRegion( cursorX*16, cursorY*16, 16, 16, 6*16, 6*16);
 		};
-			
+
 	};
 
 	//angle=0..31
