@@ -56,7 +56,8 @@ public class GameState extends State {
 	
 	//state stoped
 	void stop() {
-		
+		app.laserOverheatSound.stop();
+		app.burnBombSound.stop();
 	};
 	
 	public void render(SpriteBatch batch) {
@@ -74,24 +75,27 @@ public class GameState extends State {
 			animateField();
 		} else return;
 		app.lastFrameTime = TimeUtils.nanoTime();
-			
-		switch (beamState) {
-		case BEAMSTATE_NORMAL:
-			app.laserOverheatSound.stop();
-			app.burnBombSound.stop();
-			break;
-		case BEAMSTATE_OVERHEAT:
-			if (beamState!=prevBeamState) {
-				app.burnBombSound.stop();
-				app.laserOverheatSound.loop();
-			}
-			break;
-		case BEAMSTATE_BOMB:
-			if (beamState!=prevBeamState) {
+		
+		if (prevBeamState!=beamState) {
+			switch (beamState) {
+			case BEAMSTATE_NORMAL:
+			case BEAMSTATE_CONNECTED:
 				app.laserOverheatSound.stop();
-				app.burnBombSound.loop();
-			}
-			break;
+				app.burnBombSound.stop();
+				break;
+			case BEAMSTATE_OVERHEAT:
+				if (beamState!=prevBeamState) {
+					app.burnBombSound.stop();
+					app.laserOverheatSound.loop();
+				}
+				break;
+			case BEAMSTATE_BOMB:
+				if (beamState!=prevBeamState) {
+					app.laserOverheatSound.stop();
+					app.burnBombSound.loop();
+				}
+				break;
+			};
 		};
 		// process user input
 		//if(Gdx.input.isTouched()) {
@@ -127,7 +131,7 @@ public class GameState extends State {
 		setCursor((int)x,(int)y);
 		x=x-app.winX;
 		y=y-app.winY;
-		if (x>=0 && x<app.winWidth && y>=0 && y<app.winHeight)
+		if (x>=0 && x<app.winWidth && y>=0 && y<app.winHeight && beamState!=BEAMSTATE_CONNECTED)
 			touch(((int)x)/(app.sprSize*2)/app.sprScale, ((int)y)/(app.sprSize*2)/app.sprScale);
 		return false;
 	}
@@ -160,7 +164,7 @@ public class GameState extends State {
 	}
 
 	public boolean pan(float x, float y, float deltaX, float deltaY) {
-		if (cursorEnabled) {
+		if (cursorEnabled && beamState!=BEAMSTATE_CONNECTED) {
 			int delta=(int)Math.sqrt((deltaX)*(deltaX)+(deltaY)*(deltaY));
 			if (deltaX<(-deltaY)) delta=-delta;
 			delta = delta + restDelta;
