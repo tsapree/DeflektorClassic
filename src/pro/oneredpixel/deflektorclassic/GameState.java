@@ -523,7 +523,7 @@ public class GameState extends State {
 			
 			
 		if (cursorEnabled) {
-			app.spr_putRegion( cursorX*16, cursorY*16, 16, 16, 0*16, 5*16);
+			app.spr_putRegion( cursorX*16, cursorY*16, 16, 16, 6*16, 6*16);
 		};
 			
 	};
