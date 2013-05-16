@@ -39,7 +39,7 @@ public class GameState extends State {
 	int cursorX = 0;
 	int cursorY = 0;
 	
-	int playingLevel = 5;//0;
+	int playingLevel = 0;//0;
 	
 	void create() {
 		
@@ -56,8 +56,8 @@ public class GameState extends State {
 	
 	//state stoped
 	void stop() {
-		app.laserOverheatSound.stop();
-		app.burnBombSound.stop();
+		playContinuousOverHeatSound(false);
+		playContinuousBurningSound(false);
 	};
 	
 	public void render(SpriteBatch batch) {
@@ -76,26 +76,20 @@ public class GameState extends State {
 		} else return;
 		app.lastFrameTime = TimeUtils.nanoTime();
 		
-		if (prevBeamState!=beamState) {
-			switch (beamState) {
-			case BEAMSTATE_NORMAL:
-			case BEAMSTATE_CONNECTED:
-				app.laserOverheatSound.stop();
-				app.burnBombSound.stop();
-				break;
-			case BEAMSTATE_OVERHEAT:
-				if (beamState!=prevBeamState) {
-					app.burnBombSound.stop();
-					app.laserOverheatSound.loop();
-				}
-				break;
-			case BEAMSTATE_BOMB:
-				if (beamState!=prevBeamState) {
-					app.laserOverheatSound.stop();
-					app.burnBombSound.loop();
-				}
-				break;
-			};
+		switch (beamState) {
+		case BEAMSTATE_NORMAL:
+		case BEAMSTATE_CONNECTED:
+			playContinuousOverHeatSound(false);
+			playContinuousBurningSound(false);
+			break;
+		case BEAMSTATE_OVERHEAT:
+			playContinuousOverHeatSound(true);
+			playContinuousBurningSound(false);
+			break;
+		case BEAMSTATE_BOMB:
+			playContinuousOverHeatSound(false);
+			playContinuousBurningSound(true);
+			break;
 		};
 		// process user input
 		//if(Gdx.input.isTouched()) {
@@ -110,6 +104,24 @@ public class GameState extends State {
 		
 		if(Gdx.input.isKeyPressed(Keys.BACK)) app.gotoAppState(Deflektor.APPSTATE_MENU);
 	};
+	
+	boolean playingOverHeatSound=false;
+	void playContinuousOverHeatSound(boolean play) {
+		if (playingOverHeatSound!=play) {
+			if (play) app.laserOverheatSound.loop();
+			else app.laserOverheatSound.stop();
+			playingOverHeatSound=play;
+		};
+	}
+	
+	boolean playingContinuousBurningSound=false;
+	void playContinuousBurningSound(boolean play) {
+		if (playingContinuousBurningSound!=play) {
+			if (play) app.burnBombSound.loop();
+			else app.burnBombSound.stop();
+			playingContinuousBurningSound=play;
+		};
+	}
 	
 	
 	//------
