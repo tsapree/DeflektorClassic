@@ -38,6 +38,8 @@ public class Deflektor implements ApplicationListener {
 	int winWidth;
 	int winHeight;
 	int panScale;
+	
+	int openedLevel=3;
 
 
 	final static int APPSTATE_STARTED = 0;
