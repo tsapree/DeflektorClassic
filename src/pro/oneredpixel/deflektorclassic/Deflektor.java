@@ -50,6 +50,7 @@ public class Deflektor implements ApplicationListener {
 	
 	GameState gameState;
 	MenuState menuState;
+	LevelsState levelsState;
 	
 	public long lastFrameTime = 0;
 	
@@ -190,6 +191,12 @@ public class Deflektor implements ApplicationListener {
 			if (soundEnabled) music.play();
 			break;
 		case APPSTATE_SELECTLEVEL:
+			if (levelsState==null) {
+				levelsState = new LevelsState(this);
+				levelsState.create();
+			};
+			appState = levelsState;
+			Gdx.input.setCatchBackKey(false);
 			break;
 			
 		case APPSTATE_GAME:
