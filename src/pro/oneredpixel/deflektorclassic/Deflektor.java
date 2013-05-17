@@ -39,7 +39,8 @@ public class Deflektor implements ApplicationListener {
 	int winHeight;
 	int panScale;
 	
-	int openedLevel=3;
+	int unlockedLevel=1;
+	final int countOfLevels = 60;
 
 
 	final static int APPSTATE_STARTED = 0;
@@ -248,6 +249,9 @@ public class Deflektor implements ApplicationListener {
 		batch.draw(spritesImage, winX+x*sprScale, screenHeight-winY-y*sprScale-srcHeight*sprScale, srcWidth*sprScale,srcHeight*sprScale, srcX, srcY, srcWidth,srcHeight,false,false);
 	};
 	
+	void unlockLevel(int level) {
+		unlockedLevel=level;
+	}
 
 }
 

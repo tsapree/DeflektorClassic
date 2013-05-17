@@ -39,7 +39,7 @@ public class GameState extends State {
 	int cursorX = 0;
 	int cursorY = 0;
 	
-	int playingLevel = 0;//0;
+	int playingLevel = 1;//0;
 	
 	void create() {
 		
@@ -347,6 +347,7 @@ public class GameState extends State {
 	void unpackLevel(int levelNumber) {
 		int piece;
 		int fieldIndex=0;
+		levelNumber--;
 		if (levelNumber>=packedLevels.length) return;
 		
 		energySteps = packedLevels[levelNumber][0];
@@ -417,8 +418,11 @@ public class GameState extends State {
 		case GAMESTATE_OVERHEAT:
 			break;
 		case GAMESTATE_LEVELCOMPLETED:
-			if (playingLevel++<4) initGame();
-			else app.gotoAppState(Deflektor.APPSTATE_MENU);
+			playingLevel++;
+			if (playingLevel<=app.countOfLevels) {
+				app.unlockLevel(playingLevel);
+				initGame();
+			} else app.gotoAppState(Deflektor.APPSTATE_MENU);
 			break;
 		};
 
