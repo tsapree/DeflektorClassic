@@ -39,7 +39,8 @@ public class Deflektor implements ApplicationListener {
 	int winHeight;
 	int panScale;
 	
-	int unlockedLevel=1;
+	int playingLevel = 1;
+	int unlockedLevel = 6;
 	final int countOfLevels = 60;
 
 
@@ -248,6 +249,13 @@ public class Deflektor implements ApplicationListener {
 	void spr_putRegionSafe(int x, int y, int srcWidth, int srcHeight, int srcX, int srcY) {
 		batch.draw(spritesImage, winX+x*sprScale, screenHeight-winY-y*sprScale-srcHeight*sprScale, srcWidth*sprScale,srcHeight*sprScale, srcX, srcY, srcWidth,srcHeight,false,false);
 	};
+	
+	void showBigNumber(int x, int y, int num) {
+		int up=num/10;
+		int lo=num-up*10;
+		menu_putRegion(x, y, 8, 8, up*8,96);
+		menu_putRegion(x+8, y, 8, 8, lo*8,96);
+	}
 	
 	void unlockLevel(int level) {
 		unlockedLevel=level;

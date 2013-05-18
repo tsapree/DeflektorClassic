@@ -39,8 +39,6 @@ public class GameState extends State {
 	int cursorX = 0;
 	int cursorY = 0;
 	
-	int playingLevel = 1;//0;
-	
 	void create() {
 		
 	};
@@ -341,7 +339,7 @@ public class GameState extends State {
 		
 		field=new int[field_width*field_height];
 		
-		unpackLevel(playingLevel);
+		unpackLevel(app.playingLevel);
 	}
 	
 	void unpackLevel(int levelNumber) {
@@ -418,9 +416,9 @@ public class GameState extends State {
 		case GAMESTATE_OVERHEAT:
 			break;
 		case GAMESTATE_LEVELCOMPLETED:
-			playingLevel++;
-			if (playingLevel<=app.countOfLevels) {
-				app.unlockLevel(playingLevel);
+			app.playingLevel++;
+			if (app.playingLevel<=app.countOfLevels) {
+				app.unlockLevel(app.playingLevel);
 				initGame();
 			} else app.gotoAppState(Deflektor.APPSTATE_MENU);
 			break;
@@ -482,7 +480,7 @@ public class GameState extends State {
 		
 		
 		//level
-		app.menu_putRegion( 0, field_height*16, 16, 16, 64, 16);
+		app.showBigNumber(6, field_height*16+4, app.playingLevel);
 		//pause button
 		app.menu_putRegion( (field_width-1)*16, field_height*16, 16, 16, 48, 16);
 	}
