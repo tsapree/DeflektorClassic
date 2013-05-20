@@ -258,7 +258,8 @@ public class Deflektor implements ApplicationListener {
 	}
 	
 	void unlockLevel(int level) {
-		unlockedLevel=level;
+		if (unlockedLevel<level)
+			unlockedLevel=level;
 	}
 
 }
