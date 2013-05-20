@@ -40,7 +40,7 @@ public class Deflektor implements ApplicationListener {
 	int panScale;
 	
 	int playingLevel = 1;
-	int unlockedLevel = 6;
+	int unlockedLevel = 7;
 	final int countOfLevels = 60;
 
 
