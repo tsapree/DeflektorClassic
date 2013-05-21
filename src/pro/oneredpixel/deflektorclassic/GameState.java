@@ -56,6 +56,7 @@ public class GameState extends State {
 	void stop() {
 		playContinuousOverHeatSound(false);
 		playContinuousBurningSound(false);
+		app.laserFillInSound.stop();
 	};
 	
 	public void render(SpriteBatch batch) {
@@ -378,7 +379,7 @@ public class GameState extends State {
 		//13
 		{
 			1024, //energySteps
-			NULL,CELL,NULL,WL_A|3,WL_A|15,NULL,WL_A|10,NULL,CELL,WL_A|3,WL_A|14,NULL,CELL,WL_A|15,LASR,
+			NULL,CELL,NULL,WL_A|3,WL_A|15,NULL,WL_A|10,NULL,CELL,WL_A|3,WL_A|14,NULL,CELL,WL_A|15,LASR|2,
 			MIRR,NULL,CELL,WL_A|10,NULL|2,WL_A|10,MIRR,NULL,WL_A|10,NULL,WL_A|7,WL_A|3,WL_A|15,NULL,
 			NULL|3,WL_A|10,MIRR,NULL,WL_A|10,NULL|2,WL_A|10,MIRR,WL_A|1,NULL|2,MIRR,
 			NULL|3,WL_A|10,NULL|2,WL_A|8,WL_A|5,NULL,WL_A|3,NULL,WL_A|5,NULL,WL_A|15,WL_A|3,
