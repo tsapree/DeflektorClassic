@@ -31,6 +31,7 @@ public class GameState extends State {
 	int energySteps = 1024;
 	int overheat=0;
 	final int overheatSteps = 1024;
+	int countOfGremlins = 0;
 	
 	boolean cursorEnabled = false;
 	int cursorPhase = 0;
@@ -40,7 +41,10 @@ public class GameState extends State {
 	int cursorY = 0;
 	
 	void create() {
-		
+		grm=new Gremlin[8];
+		for (int i=0;i<8;i++) {
+			grm[i]=new Gremlin();
+		};
 	};
 	
 	void destroy() {
@@ -212,10 +216,13 @@ public class GameState extends State {
 	final int ROTATING = 0x2000;	//autorotate
 	final int EXPLODE = 0x4000;		//kill this brick when all cells burned off
 	
+	Gremlin grm[];
+	
 	int packedLevels[][] = {
 		//01
 		{
 			1024, //energySteps
+			0,	//count of gremlins
 			MIRR|6,NULL|3,WL_B|0x0a,CELL,CELL,WL_A|0x05,MIRR,NULL|1,SL_B|7|ROTATING,CELL,CELL,WL_A|0x05,WL_A|0x0b,
 			NULL|1,CELL,CELL,CELL,WL_B|0x0a,CELL,CELL,WL_A|0x05,NULL|3,CELL,NULL|2,WL_A|0x05,
 			NULL|1,CELL,MIRR|ROTATING,CELL,WL_B|0x0f,PRSM,WL_A|0x0c,WL_A|0x0c,NULL|4,SL_B|7,NULL|2,
@@ -230,6 +237,7 @@ public class GameState extends State {
 		//02
 		{
 			1024, //energySteps
+			0,	//count of gremlins
 			MIRR,CELL,MINE,NULL,CELL,WL_A|4,NULL|3,CELL,WL_A|1,NULL,MINE,NULL,RCVR|2,
 			NULL,WL_A|1,WL_A|4,CELL,WL_A|8,WL_A|4,WL_A|9,NULL,MIRR,NULL|3,WL_A|2,CELL,WL_A|3|EXPLODE,
 			WL_A|8,NULL,WL_A|4,WL_A|8,MINE,NULL,WL_A|2,WL_A|2,NULL,WL_A|2,WL_A|8,MINE,WL_A|1,NULL|2,
@@ -243,6 +251,7 @@ public class GameState extends State {
 		//03
 		{
 			1024, //energySteps
+			0,	//count of gremlins
 			CELL,CELL,WL_A|11,NULL|3,MIRR,NULL,CELL,WL_A|5,NULL|2,CELL,NULL,MIRR,
 			CELL,CELL,WL_A|4,WL_A|13,NULL|5,WL_A|5,NULL|3,WL_A|3,NULL,
 			CELL,CELL,PRSM,NULL,MIRR,NULL|3,WL_A|3,WL_A|15,WL_A|10,NULL|2,WL_A|10,SL_A|1,
@@ -257,6 +266,7 @@ public class GameState extends State {
 		//04
 		{
 			1024, //energySteps
+			0,	//count of gremlins
 			MINE,CELL,CELL,CELL,CELL,CELL,CELL,CELL,MIRR,CELL,MIRR,CELL,CELL,CELL,MINE,
 			CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,
 			CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,MIRR,CELL,
@@ -271,8 +281,7 @@ public class GameState extends State {
 		//05
 		{
 			1024, //energySteps
-			//MIRR,NULL,MIRR,NULL,MIRR,NULL,MIRR,NULL,MIRR,NULL,MIRR,NULL,MIRR,NULL,MIRR,
-			//NULL,MIRR,NULL,MIRR,NULL,MIRR,NULL,MIRR,NULL,MIRR,NULL,MIRR,NULL,MIRR,NULL,
+			0,	//count of gremlins
 			MIRR,CELL,MIRR,NULL,MIRR,NULL,MIRR,NULL,MIRR,CELL,MIRR,CELL,MIRR,NULL,RCVR|2,
 			CELL,MIRR,NULL,MIRR,NULL,MIRR,CELL,MIRR,NULL,MIRR,NULL,MIRR,NULL,MIRR,MINE|EXPLODE,
 			MIRR,NULL,MIRR,NULL,MIRR,CELL,MIRR,NULL,MIRR,MINE,MIRR,NULL,MIRR,CELL,MIRR,
@@ -287,6 +296,7 @@ public class GameState extends State {
 		//06
 		{
 			1024, //energySteps
+			0,	//count of gremlins
 			LASR|1,NULL,MIRR,NULL,WL_A|10,MIRR,NULL,WL_A|2,MIRR,NULL|5,PRSM,
 			WL_A|15,WL_A|3,WL_A|3,NULL|4,WL_A|10,NULL|2,SL_A|3|ROTATING,NULL,SL_A|5|ROTATING,CELL,NULL,
 			MINE,NULL|4,WL_A|15,NULL,WL_A|10,SL_A|5|ROTATING,NULL|2,MINE,NULL|2,PRSM,
@@ -301,6 +311,7 @@ public class GameState extends State {
 		//07
 		{
 			1024, //energySteps
+			0,	//count of gremlins
 			CELL,NULL,MIRR,NULL,WL_A|12,WL_A|8,MIRR,NULL|3,MIRR,WL_A|5,RCVR|1,WL_B|15|EXPLODE,MIRR,
 			WL_A|14,WL_A|12,NULL|2,CELL,NULL|2,WL_A|15,NULL,WL_A|13,NULL,WL_A|5,WL_A|12,WL_A|13,NULL,
 			NULL,CELL,NULL|3,WL_A|3,NULL|2,CELL,WL_A|5,NULL|2,CELL,WL_A|5,NULL,
@@ -314,6 +325,7 @@ public class GameState extends State {
 		//08
 		{
 			1024, //energySteps
+			0,	//count of gremlins
 			LASR|2,WL_B|5,WL_B|15,WL_A|15,WL_A|12,WL_A|12,WL_A|12,WL_A|13,WL_A|10,NULL,WL_A|12,NULL,MINE,NULL,WARP|0,
 			NULL,WL_B|5,RCVR|1,WL_A|5|EXPLODE,CELL,CELL,CELL,WL_A|4,WL_A|8,NULL|3,MIRR,NULL|2,
 			NULL,WL_B|5,WL_B|15,WL_A|14,CELL,MINE,CELL,CELL,WL_A|13,NULL|6,
@@ -327,6 +339,7 @@ public class GameState extends State {
 		//09
 		{
 			1024, //energySteps
+			0,	//count of gremlins
 			MINE,CELL,CELL,PRSM,CELL,CELL,CELL,LASR|2,CELL,CELL,CELL,PRSM,CELL,CELL,MINE,
 			CELL,CELL,CELL,CELL,MINE,CELL,CELL,NULL,CELL,CELL,MINE,CELL,CELL,CELL,CELL,
 			CELL,CELL,CELL,CELL,CELL,CELL,CELL,MIRR,CELL,CELL,CELL,CELL,CELL,CELL,CELL,
@@ -340,6 +353,7 @@ public class GameState extends State {
 		//10
 		{
 			1024, //energySteps
+			0,	//count of gremlins
 			MIRR,CELL,MIRR,CELL,MIRR,NULL,MIRR,NULL,MIRR,CELL,MIRR,MINE,MIRR,NULL,MIRR,
 			NULL,MIRR,NULL,MIRR,CELL,MIRR,CELL,MIRR,NULL,MIRR,NULL,MIRR,NULL,MIRR,MINE,
 			MIRR,CELL,MIRR,MINE,MIRR,NULL,MIRR,NULL,MIRR,MINE,MIRR,CELL,MIRR,CELL,MIRR,
@@ -353,6 +367,7 @@ public class GameState extends State {
 		//11
 		{
 			1024, //energySteps
+			0,	//count of gremlins
 			RCVR|2,NULL|3,MIRR,NULL,WARP|0,NULL,CELL,NULL|2,MINE,NULL,MINE,NULL,
 			MINE|EXPLODE,NULL,CELL,WL_A|11,WL_A|3,NULL|3,WL_A|14,MINE,NULL|2,CELL,NULL|2,
 			MIRR,NULL,SL_A|2|ROTATING,NULL,WL_A|10,NULL|3,WL_A|10,NULL,CELL,MINE,NULL|2,CELL,
@@ -366,6 +381,7 @@ public class GameState extends State {
 		//12
 		{
 			1024, //energySteps
+			0,	//count of gremlins
 			MIRR,NULL,MINE,NULL,CELL,NULL|2,MINE,NULL|2,MIRR,NULL|2,CELL,NULL,
 			NULL,WL_A|15,NULL,CELL,WL_A|12,WL_A|12,WL_A|12,NULL,MIRR,CELL,NULL|3,MINE,CELL,
 			LASR|1,NULL|3,MIRR,NULL,MIRR,NULL|4,MIRR,NULL|3,
@@ -379,6 +395,7 @@ public class GameState extends State {
 		//13
 		{
 			1024, //energySteps
+			0,	//count of gremlins
 			NULL,CELL,NULL,WL_A|3,WL_A|15,NULL,WL_A|10,NULL,CELL,WL_A|3,WL_A|14,NULL,CELL,WL_A|15,LASR|2,
 			MIRR|ROTATING,NULL,CELL,WL_A|10,NULL|2,WL_A|10,MIRR,NULL,WL_A|10,NULL,WL_A|7,WL_A|3,WL_A|15,NULL,
 			NULL|3,WL_A|10,MIRR,NULL,WL_A|10,NULL|2,WL_A|10,MIRR,WL_A|1,NULL|2,MIRR,
@@ -392,6 +409,7 @@ public class GameState extends State {
 		//14
 		{
 			1024, //energySteps
+			0,	//count of gremlins
 			LASR|2,RCVR|1,WL_B|5|EXPLODE,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,MIRR,CELL,CELL,MINE,
 			CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,MIRR,CELL,CELL,CELL,CELL,
 			MIRR,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,
@@ -405,6 +423,7 @@ public class GameState extends State {
 		//15
 		{
 			1024, //energySteps
+			0,	//count of gremlins
 			MIRR,CELL,MIRR|ROTATING,NULL,MIRR,NULL,MIRR,NULL,MIRR,CELL,MIRR,NULL,MIRR|ROTATING,CELL,MIRR,
 			NULL,MIRR,NULL,MIRR,CELL,MIRR,CELL,MIRR,NULL,MIRR,NULL,MIRR,NULL,MIRR,NULL,
 			MIRR,NULL,MIRR,NULL,MIRR,NULL,MIRR,NULL,MIRR,MINE,MIRR,CELL,MIRR,CELL,MIRR,
@@ -418,6 +437,7 @@ public class GameState extends State {
 		//16
 		{
 			1024, //energySteps
+			0,	//count of gremlins
 			WL_A|10,NULL|2,WL_A|5,CELL,NULL,CELL,WL_A|10,WARP|3,WL_B|15,WARP|2,NULL,WL_B|7,MINE,CELL,
 			WL_A|10,NULL,CELL,WL_A|4,SL_B|6,NULL|2,WL_A|10,NULL,WARP|0,NULL|2,PRSM,CELL,MINE,
 			WL_A|10,WL_A|5,NULL,WL_A|1,WL_A|5,NULL,WL_A|5,WL_A|8,WL_A|15,WL_A|3,NULL,CELL,WL_B|13,MINE,CELL,
@@ -432,6 +452,7 @@ public class GameState extends State {
 		//17
 		{
 			1024, //energySteps
+			0,	//count of gremlins
 			RCVR|1,SL_A|EXPLODE,NULL,SL_A|4,SL_A|3|ROTATING,NULL|3,CELL,NULL|4,MIRR,NULL,
 			NULL|2,CELL,NULL|3,MINE,SL_A|6,SL_A|6,SL_A|6,CELL,NULL,SL_A|1|ROTATING,NULL,SL_A|4,
 			MINE,SL_A,SL_A,SL_A,NULL,MIRR,NULL|5,MIRR,NULL|2,SL_A|4,
@@ -446,6 +467,7 @@ public class GameState extends State {
 		//18
 		{
 			1024, //energySteps
+			0,	//count of gremlins
 			LASR|1,NULL|2,MIRR,WL_A|5,WL_A|8,CELL,WL_A|4,WL_A|15,WL_A|10,RCVR|1,WL_A|5|EXPLODE,CELL,NULL,MIRR,
 			WL_A|12,WL_A|13,WL_A|11,NULL,WL_A|7,NULL,MIRR,NULL,WL_A|15,CELL,NULL,WL_A|4,WL_A|15,WL_A|11,NULL,
 			MIRR,NULL|3,WL_A|13,NULL|3,WL_A|12,NULL|2,CELL,NULL,WL_A|15,NULL,
@@ -459,6 +481,7 @@ public class GameState extends State {
 		//19
 		{
 			1024, //energySteps
+			0,	//count of gremlins
 			CELL,CELL,CELL,CELL,MINE,CELL,WL_A|5,WL_A|15,LASR|1,NULL,NULL,MIRR,CELL,CELL,MINE,
 			MIRR,CELL,CELL,CELL,CELL,MINE,WL_A|5,CELL,MINE,CELL,CELL,CELL,CELL,CELL,CELL,
 			CELL,MIRR,CELL,CELL,WL_A|10|EXPLODE,RCVR|3,WL_A|15,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,
@@ -472,6 +495,7 @@ public class GameState extends State {
 		//20
 		{
 			1024, //energySteps
+			0,	//count of gremlins
 			MIRR,CELL,MIRR,NULL,MIRR,NULL,MIRR,NULL,MIRR,CELL,MIRR,NULL,MIRR,MINE,MIRR,
 			NULL,MIRR,NULL,MIRR,NULL,MIRR,CELL,MIRR,NULL,MIRR,NULL,MIRR,CELL,MIRR,NULL,
 			LASR,NULL,MIRR,NULL,MIRR,NULL,MIRR,NULL,MIRR,MINE,MIRR,CELL,MIRR,CELL,MIRR,
@@ -485,6 +509,7 @@ public class GameState extends State {
 		//21
 		{
 			1024, //energySteps
+			0,	//count of gremlins
 			PRSM,NULL|11,CELL,WL_B|5|EXPLODE,RCVR|3,
 			NULL|8,PRSM,NULL|2,CELL,NULL|3,
 			MIRR,NULL|2,PRSM,NULL,CELL,NULL,CELL,NULL,CELL,NULL|3,MIRR,NULL,
@@ -498,6 +523,7 @@ public class GameState extends State {
 		//22
 		{
 			1024, //energySteps
+			0,	//count of gremlins
 			WL_A|15,WL_A|12,WL_A|12,WL_A|12,WL_A|12,WL_A|12,WL_A|10,WL_B|15,WL_A|12,WL_A|12,WL_A|15,NULL,SL_A|7|ROTATING,CELL,SL_A|2|ROTATING,
 			NULL|4,WARP|0,NULL,WL_A|10,NULL,WL_A|5,NULL|3,CELL,CELL,CELL,
 			PRSM,NULL,PRSM,NULL|2,MIRR,WL_A|10,MIRR,WL_A|5,NULL|3,SL_A|6|ROTATING,CELL,SL_A|5|ROTATING,
@@ -511,6 +537,7 @@ public class GameState extends State {
 		//23
 		{
 			1024, //energySteps
+			0,	//count of gremlins
 			WL_B|15,CELL,NULL,MIRR,NULL,CELL,NULL|3,CELL,NULL,MIRR,NULL,CELL,WL_B|15,
 			WL_B|15,NULL,CELL,NULL,SL_B|6,NULL,WL_B|15,MINE,WL_B|15,NULL,SL_B|2,NULL,CELL,NULL,WL_B|15,
 			WL_B|15,WL_B|13,NULL|5,SL_B,NULL|5,WL_B|14,WL_B|15,
@@ -524,6 +551,7 @@ public class GameState extends State {
 		//24
 		{
 			1024, //energySteps
+			0,	//count of gremlins
 			MINE,CELL,CELL,CELL,CELL,CELL,CELL,LASR|2,CELL,CELL,CELL,MIRR,CELL,CELL,MINE,
 			CELL,CELL,CELL,CELL,CELL,CELL,CELL,NULL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,
 			MIRR,CELL,CELL,CELL,CELL,CELL,CELL,MIRR,CELL,CELL,CELL,CELL,CELL,CELL,CELL,
@@ -537,6 +565,7 @@ public class GameState extends State {
 		//25
 		{
 			1024, //energySteps
+			0,	//count of gremlins
 			MIRR,CELL,MIRR,CELL,MIRR,NULL,MIRR,NULL,MIRR,MINE,MIRR,NULL,MIRR,CELL,MIRR,
 			NULL,MIRR,MINE,MIRR,NULL,MIRR,CELL,MIRR,NULL,MIRR,NULL,MIRR,NULL,MIRR,MINE,
 			MIRR,MINE,MIRR,NULL,MIRR,CELL,MIRR,NULL,MIRR,MINE,MIRR,CELL,MIRR,CELL,MIRR,
@@ -550,6 +579,7 @@ public class GameState extends State {
 		//26
 		{
 			1024, //energySteps
+			0,	//count of gremlins
 			RCVR|1,WL_B|5|EXPLODE,NULL,WARP|0,NULL|2,CELL,NULL|2,MIRR,WL_A|12,WL_A|12,WL_A|12,WL_A|12,CELL,
 			WL_B|15,WL_B|12,WL_B|8,NULL,WL_B|4,WL_B|12,WL_B|15,WL_B|15,WL_B|10,NULL,SL_B|7|ROTATING,CELL,SL_B|3|ROTATING,NULL,WL_A|5,
 			MINE,MIRR,CELL,PRSM,CELL,MIRR,MINE,WL_B|5,WL_B|10,SL_B|7|ROTATING,NULL|3,MIRR,WL_A|4,
@@ -563,6 +593,7 @@ public class GameState extends State {
 		//27
 		{
 			1024, //energySteps
+			0,	//count of gremlins
 			WL_B|14,WL_B|12,WL_B|8,MIRR,NULL,MIRR,WL_B|4,WL_B|12,WL_B|8,MIRR,NULL,MIRR,WL_B|4,WL_B|12,WL_B|13,
 			WL_B|10,SL_B|2,NULL|5,RCVR|2,NULL|5,SL_B|6,WL_B|5,
 			WL_B|10,NULL|6,WL_B|3|EXPLODE,NULL|6,WL_B|5,
@@ -576,6 +607,7 @@ public class GameState extends State {
 		//28
 		{
 			1024, //energySteps
+			0,	//count of gremlins
 			MIRR,MIRR,NULL|2,WARP|3,WL_A|5,NULL,MIRR,MIRR,NULL|3,MIRR,WL_A|5,CELL,
 			MIRR,MIRR,NULL|3,WL_A|5,NULL,MIRR,MIRR,NULL|2,WARP|1,WL_A|1,WL_A|6,CELL,
 			WL_A|3,WL_A|3,NULL|2,CELL,WL_A|5,NULL|3,WARP|0,NULL|3,CELL,CELL,
@@ -589,6 +621,7 @@ public class GameState extends State {
 		//29
 		{
 			1024, //energySteps
+			0,	//count of gremlins
 			MIRR,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,
 			CELL,CELL,CELL,CELL,CELL,CELL,CELL,MIRR,CELL,CELL,CELL,MIRR,CELL,CELL,CELL,
 			CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,MINE,CELL,CELL,CELL,CELL,MIRR,
@@ -603,6 +636,7 @@ public class GameState extends State {
 		//30
 		{
 			1024, //energySteps
+			0,	//count of gremlins
 			MIRR,CELL,MIRR,MINE,MIRR,MINE,MIRR,MINE,MIRR,CELL,MIRR,MINE,MIRR,MINE,MIRR,
 			MINE,MIRR,NULL,MIRR,CELL,MIRR,CELL,MIRR,NULL,MIRR,NULL,MIRR,CELL,MIRR,MINE,
 			MIRR,CELL,MIRR,NULL,MIRR,NULL,MIRR,NULL,MIRR,CELL,MIRR,CELL,MIRR,CELL,MIRR,
@@ -616,6 +650,7 @@ public class GameState extends State {
 		//31
 		{
 			1024, //energySteps
+			0,	//count of gremlins
 			NULL,WL_A|12,WL_A|12,WL_A|13,LASR|2,WL_B|15,MIRR,NULL|5,MIRR,WL_A|5,MINE,
 			CELL,WL_A|15,WL_A|15,WL_A|3,NULL,WL_B|15,NULL,WL_B|15,NULL|5,WL_A|5,CELL,
 			NULL|4,MIRR,WL_B|15,WARP|0|EXPLODE,WL_B|15,WARP|1,NULL|3,MIRR,WL_A|5,CELL,
@@ -629,6 +664,7 @@ public class GameState extends State {
 		//32
 		{
 			1024, //energySteps
+			0,	//count of gremlins
 			CELL,NULL|2,WL_A|9,NULL,WL_A|8,MIRR,NULL,WL_A|8,NULL,WL_A|2,NULL,LASR|1,NULL,MIRR,
 			NULL,WL_A|4,MINE,WL_A|2,WL_A|4,NULL|2,WL_A|2,CELL,WL_A|8,NULL,MINE,WL_A|6,WL_A|1,NULL,
 			NULL,MIRR,NULL|2,WL_A|4,NULL,WL_A|2,NULL,WL_A|4,NULL,WL_A|9,NULL|2,CELL,NULL,
@@ -642,6 +678,7 @@ public class GameState extends State {
 		//33
 		{
 			1024, //energySteps
+			0,	//count of gremlins
 			RCVR|2,WL_A|12,WL_A|12,WL_A|12,WL_A|12,WL_A|13,MINE,NULL|5,MIRR,NULL,WL_A|15,
 			WL_B|12|EXPLODE,CELL,SL_B|7|ROTATING,CELL,MINE,WL_A|5,NULL,MIRR,NULL|6,WL_A|5,
 			PRSM,NULL|2,MINE,MINE,WL_A|5,NULL|2,WL_A|3,WL_A|3,WL_A|10,NULL|3,WL_A|5,
@@ -655,6 +692,7 @@ public class GameState extends State {
 		//34
 		{
 			1024, //energySteps
+			0,	//count of gremlins
 			MINE,CELL,MIRR,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,MINE|EXPLODE,RCVR|3,
 			CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,MINE,
 			CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,MIRR|ROTATING,CELL,CELL,CELL,CELL,CELL,
@@ -669,6 +707,7 @@ public class GameState extends State {
 		//35
 		{
 			1024, //energySteps
+			0,	//count of gremlins
 			MIRR,MINE,MIRR,CELL,MIRR,NULL,MIRR,MINE,MIRR,NULL,MIRR,NULL,MIRR,NULL,LASR|3,
 			CELL,WARP|0,NULL,MIRR,NULL,MIRR,CELL,MIRR,NULL,MIRR,NULL,MIRR,CELL,MIRR,NULL,
 			MIRR,CELL,MIRR,NULL,MIRR,NULL,MIRR,NULL,MIRR,NULL,WARP|1,NULL,MIRR,NULL,MIRR,
@@ -682,6 +721,7 @@ public class GameState extends State {
 		//36
 		{
 			1024, //energySteps
+			0,	//count of gremlins
 			RCVR|2,WL_B|5,WL_B|12,WL_B|13,CELL,WL_A|10,MIRR,NULL|2,CELL,CELL,CELL,WL_B|14,WL_B|12,WL_B|12,
 			WL_B|3|EXPLODE,WL_B|7,MIRR,WL_B|5,CELL,WL_A|10,NULL|2,MIRR,WL_B|12,WL_B|13,LASR|1,NULL|2,MIRR,
 			WARP|0,NULL|7,SL_B|6,NULL|6,
@@ -695,6 +735,7 @@ public class GameState extends State {
 		//37
 		{
 			1024, //energySteps
+			0,	//count of gremlins
 			WL_A|15,WL_A|12,WL_A|12,WL_A|12,NULL,MINE,NULL,CELL,WL_A|7,NULL,WL_A|13,NULL,MIRR,NULL,LASR|3,
 			NULL,CELL,NULL|4,MIRR,NULL,WL_A|10,CELL,WL_A|5,NULL|2,WL_A|12,WL_A|12,
 			MIRR,NULL,WL_A|13,NULL,WL_A|15,NULL|3,WL_A|10,NULL,WL_A|5,WL_A|2,NULL,MIRR,NULL,
@@ -708,6 +749,7 @@ public class GameState extends State {
 		//38
 		{
 			1024, //energySteps
+			0,	//count of gremlins
 			WL_B|14,WL_B|12,WL_B|12,WL_B|8,WL_A|15,WL_A|12,WL_A|12,WL_A|12,WL_A|12,WL_A|12,WL_A|12,WL_A|10,WL_B|12,WL_B|13,RCVR|2,
 			WARP|1,NULL,MIRR,NULL,PRSM,CELL,CELL,MINE,MINE,CELL,MINE,WL_A|10,WARP|0,WL_B|5,WL_B|3|EXPLODE,
 			NULL|4,WL_A|13,CELL,CELL,CELL,CELL,MINE,CELL,WL_A|13,WL_A|3,NULL|2,
@@ -722,6 +764,7 @@ public class GameState extends State {
 		//39
 		{
 			1024, //energySteps
+			0,	//count of gremlins
 			MINE,CELL,CELL,PRSM,CELL,CELL,CELL,CELL,MIRR,CELL,MIRR,CELL,CELL,CELL,MINE,
 			CELL,CELL,CELL,CELL,CELL,MINE,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,
 			CELL,SL_A|3|ROTATING,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,MIRR,CELL,CELL,CELL,
@@ -735,6 +778,7 @@ public class GameState extends State {
 		//40
 		{
 			1024, //energySteps
+			0,	//count of gremlins
 			RCVR|1,MINE|EXPLODE,MIRR,NULL,MIRR,NULL,MIRR,MINE,MIRR,CELL,MIRR,NULL,MIRR,NULL,LASR|2,
 			MINE,MIRR,NULL,MIRR,CELL,MIRR,CELL,MIRR,NULL,MIRR,NULL,MIRR,CELL,MIRR,NULL,
 			MIRR,CELL,MIRR,NULL,MIRR,NULL,MIRR,NULL,MIRR,NULL,MIRR,NULL,MIRR,NULL,MIRR,
@@ -748,6 +792,7 @@ public class GameState extends State {
 		//41
 		{
 			1024, //energySteps
+			0,	//count of gremlins
 			LASR|1,NULL,MIRR,NULL|3,MIRR,NULL,WL_A|10,CELL,MIRR,WL_A|5,CELL,WARP|0,CELL,
 			WL_A|15,WL_A|3,NULL|2,WL_A|12,WL_A|10,NULL|2,WL_A|10,WL_A|5,NULL,WL_A|5,CELL,CELL,MINE,
 			WL_A|15,NULL|5,SL_A|2|ROTATING,NULL,WL_A|13,NULL|2,WL_A|15,CELL,PRSM,CELL,
@@ -761,6 +806,7 @@ public class GameState extends State {
 		//42
 		{
 			1024, //energySteps
+			0,	//count of gremlins
 			WL_B|3,CELL,NULL,MIRR,WL_B|4,WL_B|12,CELL,NULL|2,MINE,NULL|2,MIRR,NULL,MINE,
 			WL_B|12,WL_B|13,NULL|3,MIRR,NULL|2,WARP|0,NULL|5,MIRR,
 			RCVR|1,WL_B|5|EXPLODE,NULL|2,MIRR,NULL|5,SL_B,NULL,MIRR,NULL,CELL,
@@ -774,6 +820,7 @@ public class GameState extends State {
 		//43
 		{
 			1024, //energySteps
+			0,	//count of gremlins
 			MINE,WL_B|5,CELL,NULL,MIRR,WL_B|5,CELL,WL_A|10,WARP|0,CELL,PRSM,CELL,MINE,WL_A|15,LASR|2,
 			CELL,MINE,MINE,WL_B|15,WL_B|3,NULL,CELL,WL_A|11,WL_A|3,WL_A|7,NULL,WL_A|11,WL_A|3,WL_A|15,NULL,
 			MIRR,NULL|5,PRSM,NULL|3,MIRR,NULL|3,MIRR,
@@ -787,6 +834,7 @@ public class GameState extends State {
 		//44
 		{
 			1024, //energySteps
+			0,	//count of gremlins
 			MIRR,CELL,CELL,CELL,CELL,CELL,CELL,MIRR,CELL,CELL,CELL,CELL,CELL,CELL,MIRR,
 			CELL,CELL,CELL,MINE,CELL,CELL,CELL,NULL,CELL,CELL,CELL,MINE,CELL,CELL,CELL,
 			CELL,CELL,CELL,CELL,CELL,CELL,CELL,NULL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,
@@ -800,6 +848,7 @@ public class GameState extends State {
 		//45
 		{
 			1024, //energySteps
+			0,	//count of gremlins
 			MIRR,MINE,MIRR|ROTATING,CELL,MIRR,NULL,MIRR,MINE,MIRR|ROTATING,NULL,MIRR,CELL,MIRR,NULL,LASR|2,
 			MINE,MIRR,NULL,MIRR,NULL,MIRR,CELL,MIRR,NULL,MIRR,NULL,MIRR,CELL,MIRR,NULL,
 			MIRR,CELL,MIRR,CELL,MIRR,NULL,MIRR,NULL,MIRR,CELL,MIRR|ROTATING,NULL,MIRR,NULL,MIRR,
@@ -813,6 +862,7 @@ public class GameState extends State {
 		//46
 		{
 			1024, //energySteps
+			0,	//count of gremlins
 			LASR|1,NULL|2,MIRR,NULL,WL_A|10,MIRR,NULL,MINE,WL_A|12,WL_A|12,WL_A|13,NULL,MIRR,NULL,
 			NULL|5,WL_A|10,NULL|2,PRSM,CELL,CELL,WL_A|5,NULL|2,WARP|1,
 			NULL,WARP|3,NULL,WARP|1,NULL,WL_A|10,NULL|3,CELL,CELL,WL_A|5,CELL,NULL,WL_A|5,
@@ -839,6 +889,7 @@ public class GameState extends State {
 		//48
 		{
 			1024, //energySteps
+			0,	//count of gremlins
 			WL_A|14,WL_A|12,WL_A|12,WL_A|12,WL_A|12,WL_A|10,MIRR,NULL,CELL,WL_A|15,CELL,MIRR,NULL,WL_A|5,WL_A|15,
 			NULL|2,CELL,NULL|2,WL_A|11,NULL,WL_A|4,WL_A|12,WL_A|13,WL_A|15,NULL,CELL,WL_A|7,LASR|2,
 			CELL,NULL,WL_A|15,NULL|2,WL_A|13,NULL|2,MIRR,NULL|3,WL_A|12,WL_A|13,NULL,
@@ -852,6 +903,7 @@ public class GameState extends State {
 		//49
 		{
 			1024, //energySteps
+			0,	//count of gremlins
 			MIRR,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,MINE,
 			CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,
 			CELL,CELL,CELL,CELL,CELL,CELL,CELL,MIRR,CELL,CELL,CELL,MIRR|ROTATING,CELL,CELL,CELL,
@@ -865,6 +917,7 @@ public class GameState extends State {
 		//50
 		{
 			1024, //energySteps
+			0,	//count of gremlins
 			MIRR,CELL,MIRR,NULL,MIRR,NULL,MIRR,NULL,MIRR,CELL,MIRR,NULL,MIRR,MINE,MIRR,
 			NULL,MIRR,MINE,MIRR,CELL,MIRR,CELL,MIRR,NULL,MIRR,NULL,MIRR|ROTATING,CELL,MIRR,NULL,
 			MIRR,CELL,SL_B|ROTATING,NULL,MIRR,NULL,MIRR,NULL,MIRR,MINE,MIRR|ROTATING,CELL,MIRR|ROTATING,CELL,MIRR,
@@ -878,6 +931,7 @@ public class GameState extends State {
 		//51
 		{
 			1024, //energySteps
+			0,	//count of gremlins
 			WL_A|12,WL_A|12,WL_A|12,WL_A|12,WL_A|12,WL_A|12,WL_A|8,MIRR,WL_A|1,WL_A|7,CELL,MIRR,MINE,MIRR,CELL,
 			CELL,NULL|7,WL_A|7,MINE,MIRR,CELL,MIRR,CELL,MIRR,
 			MINE,NULL,WL_A|4,WL_A|12,WL_A|12,WL_A|12,WL_A|13,NULL,WL_A|10,MIRR,CELL,MIRR,CELL,MIRR,MINE,
@@ -891,6 +945,7 @@ public class GameState extends State {
 		//52
 		{
 			1024, //energySteps
+			0,	//count of gremlins
 			PRSM,CELL,PRSM,NULL,PRSM,CELL,PRSM,CELL,PRSM,CELL,PRSM,NULL,PRSM,CELL,PRSM,
 			CELL,NULL,CELL,NULL|9,CELL,NULL,CELL,
 			PRSM,CELL,PRSM,NULL,PRSM,NULL,PRSM,NULL,PRSM,NULL,PRSM,NULL,PRSM,CELL,PRSM,
@@ -904,6 +959,7 @@ public class GameState extends State {
 		//53
 		{
 			1024, //energySteps
+			0,	//count of gremlins
 			WL_A|10,MINE,CELL,MIRR,NULL|4,SL_B|4|ROTATING,CELL,MINE,WL_A|5,WL_A|15,WL_A|15,WL_A|15,
 			WL_A|15,WL_A|12,WL_A|12,NULL|2,WL_B|12,WL_B|15,WL_A|15,WL_A|3,WL_A|3,WL_A|3,WL_A|7,NULL|2,WL_A|5,
 			NULL|6,WARP|0,NULL|5,MIRR,NULL,WL_A|5,
@@ -917,6 +973,7 @@ public class GameState extends State {
 		//54
 		{
 			1024, //energySteps
+			0,	//count of gremlins
 			LASR|2,MINE,CELL,CELL,CELL,CELL,MIRR,CELL,CELL,CELL,CELL,CELL,CELL,CELL,MINE,
 			NULL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,MINE,CELL,CELL,CELL,CELL,
 			MIRR,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,MIRR,
@@ -930,6 +987,7 @@ public class GameState extends State {
 		//55
 		{
 			1024, //energySteps
+			0,	//count of gremlins
 			MIRR,CELL,MIRR|ROTATING,CELL,MIRR|ROTATING,CELL,MIRR,NULL,MIRR,NULL,MIRR,CELL,MIRR,CELL,MIRR,
 			MINE,MIRR,MINE,MIRR,NULL,MIRR,CELL,MIRR,CELL,MIRR,NULL,MIRR,MINE,MIRR,CELL,
 			MIRR,CELL,MIRR|ROTATING,NULL,MIRR|ROTATING,NULL,MIRR,NULL,MIRR,CELL,MIRR,NULL,MIRR,NULL,MIRR,
@@ -943,6 +1001,7 @@ public class GameState extends State {
 		//56
 		{
 			1024, //energySteps
+			0,	//count of gremlins
 			CELL,NULL|5,MIRR,NULL|4,CELL,NULL,WL_B|15|EXPLODE,RCVR|3,
 			NULL,PRSM,NULL|8,MIRR,NULL|4,
 			NULL|3,MIRR,NULL|3,CELL,PRSM,NULL|4,CELL,NULL,
@@ -956,6 +1015,7 @@ public class GameState extends State {
 		//57
 		{
 			1024, //energySteps
+			0,	//count of gremlins
 			MIRR,MIRR,MIRR,NULL,WARP|3,NULL|2,WL_A|12,WL_A|12,WL_A|12,NULL|2,MIRR,NULL,LASR|3,
 			MIRR,MIRR,MIRR,NULL,CELL,WL_A|5,NULL,MIRR,MIRR,MIRR,NULL,MINE,WL_A|3,WL_A|3,WL_A|3,
 			NULL|4,MINE,WL_A|4,WL_A|10,MIRR,MIRR,MIRR,WL_A|5,NULL,CELL,NULL,WARP|1,
@@ -969,6 +1029,7 @@ public class GameState extends State {
 		//58
 		{
 			1024, //energySteps
+			0,	//count of gremlins
 			CELL,CELL,CELL,CELL,CELL,CELL,CELL,LASR|2,CELL,CELL,CELL,CELL,CELL,CELL,CELL,
 			CELL,CELL,CELL,CELL,CELL,CELL,CELL,NULL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,
 			CELL,CELL,CELL,CELL,CELL,CELL,CELL,NULL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,
@@ -982,6 +1043,7 @@ public class GameState extends State {
 		//59
 		{
 			1024, //energySteps
+			0,	//count of gremlins
 			WL_B|7,WL_B|15,CELL,WL_B|15,CELL,WL_B|15,CELL,WL_B|15,CELL,WL_B|15,CELL,WL_B|15,CELL,WL_B|15,WL_B|11,
 			WL_B|15,CELL,MIRR,MIRR,MIRR,MIRR,MIRR,MIRR,MIRR,MIRR,MIRR,MIRR,MIRR,CELL,WL_B|15,
 			SL_B|2,WL_B|15,MIRR,MIRR,MIRR,MIRR,MIRR,MIRR,MIRR,MIRR,MIRR,MIRR,MIRR,WL_B|15,SL_B|6,
@@ -995,6 +1057,7 @@ public class GameState extends State {
 		//60
 		{
 			1024, //energySteps
+			8,	//count of gremlins
 			CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,
 			CELL,PRSM,CELL,PRSM,CELL,PRSM,CELL,RCVR|2,CELL,PRSM,CELL,PRSM,CELL,PRSM,CELL,
 			CELL,CELL,CELL,CELL,CELL,CELL,CELL,MINE|EXPLODE,CELL,CELL,CELL,CELL,CELL,CELL,CELL,
@@ -1054,22 +1117,28 @@ public class GameState extends State {
 		
 		energySteps = packedLevels[levelNumber][0];
 		
-		for (int i=1;i<packedLevels[levelNumber].length;i++) {
+		for (int i=2;i<packedLevels[levelNumber].length;i++) {
+			if (fieldIndex>=field_width*field_height) break;
 			piece = packedLevels[levelNumber][i];
 			if ((piece&0xFF00)==NULL) {
 				piece&=0xFF;
 				if (piece<1) piece=1;
 				for (int n=0;n<piece;n++) {
 					field[fieldIndex++]=NULL;
-					if (fieldIndex>=field_width*field_height) return;
+					if (fieldIndex>=field_width*field_height) break;
 				}
 			} else {
 				field[fieldIndex++] = piece;
-				if (fieldIndex>=field_width*field_height) return;
 			}
 		}
 		while (fieldIndex<field_width*field_height)
 			field[fieldIndex++]=NULL;
+		
+		countOfGremlins = packedLevels[levelNumber][1];
+		if (countOfGremlins>0)
+			for (int i=0;i<countOfGremlins;i++) {
+				grm[i].init();
+			};
 		
 	}
 	
@@ -1112,8 +1181,27 @@ public class GameState extends State {
 				//app.laserOverheatSound.stop();
 				//app.gotoAppState(Deflektor.APPSTATE_MENU);
 			}
-			
-			
+			if (countOfGremlins>0)
+				for (int i=0;i<countOfGremlins;i++) grm[i].animate();
+			for (int i=0;i<field_width;i++) 
+				for (int j=0;j<field_height;j++) {
+					f=field[j*field_width+i];
+					if ((f&ROTATING)!=0) rotateThing(i,j);
+					if ((f&EXPLODE)!=0) barrierFound = true;
+					if ((f&0xf00)==_EXPL) {
+						f++;
+						if ((f&0xf)>4) f=NULL;
+						else needToExplodeBarrier = false;
+						field[j*field_width+i]=f;
+					};
+					if ((f&0xF00)==CELL) needToExplodeBarrier = false;
+					if ((f&0xF00)==PRSM) field[j*field_width+i]=(f&0xF00)|((int)((8*Math.random())+0.5));
+				};
+			if (needToExplodeBarrier && barrierFound) {
+				app.exitOpenSound.play();
+				for (int i=0;i<field_width*field_height;i++)
+					if ((field[i]&EXPLODE)!=0) field[i]=_EXPL;
+			};
 			break;
 		case GAMESTATE_CALCULATING_ENERGY:
 			break;
@@ -1131,27 +1219,6 @@ public class GameState extends State {
 			}
 			break;
 		};
-
-		for (int i=0;i<field_width;i++) 
-			for (int j=0;j<field_height;j++) {
-				f=field[j*field_width+i];
-				if ((f&ROTATING)!=0) rotateThing(i,j);
-				if ((f&EXPLODE)!=0) barrierFound = true;
-				if ((f&0xf00)==_EXPL) {
-					f++;
-					if ((f&0xf)>4) f=NULL;
-					else needToExplodeBarrier = false;
-					field[j*field_width+i]=f;
-				};
-				if ((f&0xF00)==CELL) needToExplodeBarrier = false;
-				if ((f&0xF00)==PRSM) field[j*field_width+i]=(f&0xF00)|((int)((8*Math.random())+0.5));
-			};
-		if (needToExplodeBarrier && barrierFound) {
-			app.exitOpenSound.play();
-			for (int i=0;i<field_width*field_height;i++)
-				if ((field[i]&EXPLODE)!=0) field[i]=_EXPL;
-		};
-		
 	}
 	
 	void rotateThing(int x, int y) {
@@ -1170,7 +1237,7 @@ public class GameState extends State {
 		if ((field[y*field_width+x]&0xFF00)==MIRR)
 			rotateThing(x,y,angle);
 	}
-
+	
 	void drawGameInfo () {
 		int nrg = (energy *64) /energySteps;
 		int ovh = (overheat * 64) / overheatSteps;
@@ -1265,8 +1332,9 @@ public class GameState extends State {
 				}
 			};
 			
-			
-			
+		if (countOfGremlins>0)
+			for (int i=0;i<countOfGremlins;i++) grm[i].draw();
+		
 		if (cursorEnabled && cursorPhase<cursorDisplayPhases) {
 			app.spr_putRegion( cursorX*16, cursorY*16, 16, 16, 6*16, 6*16);
 		};
@@ -1611,6 +1679,47 @@ public class GameState extends State {
 		};
 	};
 	*/
+	
+	class Gremlin {
+		int x;
+		int y;
+		int phase;
+		int delay;
+		
+		void init() {
+			do {
+				x=((int)(Math.random()*(field_width-1)))*2;
+				y=((int)(Math.random()*(field_height-1)))*2;
+			} while (!checkFreeSpace(x,y));
+			phase=0;
+			delay=(int)(Math.random()*100)+60;
+		};
+		
+		void draw() {
+			if (delay==0) 
+				app.spr_putRegion(x*8, y*8, 16, 16, 0+phase*16, 128);
+		};
+		
+		void animate() {
+			if (delay>0) delay--;
+			else {
+				int sx=(int)(Math.random()*4);
+				int sy=(int)(Math.random()*4);
+				if ((sx==0) && (x>0)) x--;
+				if ((sx==3) && (x<(field_width-1)*2)) x++;
+				if ((sy==0) && (y>0)) y--;
+				if ((sy==3) && (y<(field_height-1)*2)) y++;
+			};
+			phase=(phase+1)&0x3;
+		};
+		
+		boolean checkFreeSpace(int cx,int cy) {
+			int f;
+			f=field[(cx/2)+(cy*field_height/2)]&0xFF00;
+			if ((f!=SL_A) && (f!=SL_B) && (f!=WL_A) && (f!=WL_B)) return true;
+			else return false;
+		};
+	}
 	
 	
 	
