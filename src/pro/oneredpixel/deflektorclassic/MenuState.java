@@ -17,7 +17,7 @@ public class MenuState extends State {
 	public void render(SpriteBatch batch) {
 		batch.setProjectionMatrix(app.camera.combined);
 		batch.begin();
-		app.menu_putRegion(240/2-128/2, 8, 128, 16, 0, 56);
+		app.spr_putRegion(240/2-128/2, 8, 128, 16, 0, 56+144);
 		batch.end();
 		// process user input
 		//if(Gdx.input.isTouched()) {

@@ -1178,19 +1178,19 @@ public class GameState extends State {
 		if (nrg<0) nrg=0;
 		if (ovh>63) ovh=63;
 		if (ovh<0) ovh=0;
-		app.menu_putRegion( 28, field_height*16, 64, 8, 0, 8);
-		if (nrg>0) app.menu_putRegion( 28, field_height*16+8, nrg, 8, 0, 0);
-		if (nrg<63) app.menu_putRegion( 28+nrg, field_height*16+8, 64-nrg, 8, 64+nrg, 0);
-		app.menu_putRegion( 100, field_height*16, 64, 8, 64, 8);
-		if (ovh>0) app.menu_putRegion( 100, field_height*16+8, ovh, 8, 0, 0);
-		if (ovh<63) app.menu_putRegion( 100+ovh, field_height*16+8, 64-ovh, 8, 64+ovh, 0);
-		app.menu_putRegion( 172, field_height*16, 48, 16, 0, 16);
+		app.spr_putRegion( 28, field_height*16, 64, 8, 0, 8+144);
+		if (nrg>0) app.spr_putRegion( 28, field_height*16+8, nrg, 8, 0, 0+144);
+		if (nrg<63) app.spr_putRegion( 28+nrg, field_height*16+8, 64-nrg, 8, 64+nrg, 0+144);
+		app.spr_putRegion( 100, field_height*16, 64, 8, 64, 8+144);
+		if (ovh>0) app.spr_putRegion( 100, field_height*16+8, ovh, 8, 0, 0+144);
+		if (ovh<63) app.spr_putRegion( 100+ovh, field_height*16+8, 64-ovh, 8, 64+ovh, 0+144);
+		app.spr_putRegion( 172, field_height*16, 48, 16, 0, 16+144);
 		
 		
 		//level
 		app.showBigNumber(6, field_height*16+4, app.playingLevel);
 		//pause button
-		app.menu_putRegion( (field_width-1)*16, field_height*16, 16, 16, 48, 16);
+		app.spr_putRegion( (field_width-1)*16, field_height*16, 16, 16, 48, 16+144);
 	}
 	
 	void drawField() {

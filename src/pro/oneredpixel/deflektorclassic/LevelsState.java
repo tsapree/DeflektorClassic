@@ -49,16 +49,16 @@ public class LevelsState extends State {
 			if (s>app.countOfLevels) break;
 		};
 
-		if (page>1) app.menu_putRegion(8, 160/2-8, 16, 16, 32,32);
-		if (page<3) app.menu_putRegion(240-8-16, 160/2-8, 16, 16, 48,32);
+		if (page>1) app.spr_putRegion(8, 160/2-8, 16, 16, 32,32+144);
+		if (page<3) app.spr_putRegion(240-8-16, 160/2-8, 16, 16, 48,32+144);
 		
 		batch.end();
 	};
 	
 	void drawLevelBox(int x, int y, int levelNumber) {
-		app.menu_putRegion(x, y, 24, 24, 0,32);
+		app.spr_putRegion(x, y, 24, 24, 0,32+144);
 		app.showBigNumber(x+4,y+8,levelNumber);
-		if (app.unlockedLevel<levelNumber) app.menu_putRegion(x+15, y+15, 8, 8, 24,32);
+		if (app.unlockedLevel<levelNumber) app.spr_putRegion(x+15, y+15, 8, 8, 24,32+144);
 	};
 	
 

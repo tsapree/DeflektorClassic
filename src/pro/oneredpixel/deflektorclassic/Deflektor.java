@@ -15,7 +15,6 @@ import com.badlogic.gdx.math.Vector2;
 public class Deflektor implements ApplicationListener {
 	
 	Texture spritesImage;
-	Texture menuImage;
 	Sound burnCellSound;
 	Sound burnBombSound;
 	Sound exitOpenSound;
@@ -83,7 +82,6 @@ public class Deflektor implements ApplicationListener {
 		
 		// load the images for the droplet and the bucket, 48x48 pixels each
 		spritesImage = new Texture(Gdx.files.internal("sprites.png"));
-		menuImage = new Texture(Gdx.files.internal("menu.png"));
 		  
 		// load the drop sound effect and the rain background "music"
 		burnCellSound = Gdx.audio.newSound(Gdx.files.internal("burn-cell.wav"));
@@ -238,9 +236,9 @@ public class Deflektor implements ApplicationListener {
 		
 	}
 	
-	void menu_putRegion(int x, int y, int srcWidth, int srcHeight, int srcX, int srcY) {
-		batch.draw(menuImage, winX+x*sprScale, screenHeight-winY-y*sprScale-srcHeight*sprScale, srcWidth*sprScale,srcHeight*sprScale, srcX, srcY, srcWidth,srcHeight,false,false);
-	};
+//	void menu_putRegion(int x, int y, int srcWidth, int srcHeight, int srcX, int srcY) {
+//		batch.draw(menuImage, winX+x*sprScale, screenHeight-winY-y*sprScale-srcHeight*sprScale, srcWidth*sprScale,srcHeight*sprScale, srcX, srcY, srcWidth,srcHeight,false,false);
+//	};
 	
 	void spr_putRegion(int x, int y, int srcWidth, int srcHeight, int srcX, int srcY) {
 		batch.draw(spritesImage, winX+x*sprScale, screenHeight-winY-y*sprScale-srcHeight*sprScale, srcWidth*sprScale,srcHeight*sprScale, srcX, srcY, srcWidth,srcHeight,false,false);
@@ -253,8 +251,8 @@ public class Deflektor implements ApplicationListener {
 	void showBigNumber(int x, int y, int num) {
 		int up=num/10;
 		int lo=num-up*10;
-		menu_putRegion(x, y, 8, 8, up*8,96);
-		menu_putRegion(x+8, y, 8, 8, lo*8,96);
+		spr_putRegion(x, y, 8, 8, up*8,96+144);
+		spr_putRegion(x+8, y, 8, 8, lo*8,96+144);
 	}
 	
 	void unlockLevel(int level) {
