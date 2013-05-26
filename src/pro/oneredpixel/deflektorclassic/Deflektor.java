@@ -255,6 +255,22 @@ public class Deflektor implements ApplicationListener {
 		spr_putRegion(x+8, y, 8, 8, lo*8,96+144);
 	}
 	
+	void showChar(int x, int y, char c) {
+		if (c>='0' && c<='9') spr_putRegion(x, y, 8, 8, (c-'0')*8,72+144);
+		if (c>='A' && c<='P') spr_putRegion(x, y, 8, 8, (c-'A')*8,80+144);
+		if (c>='Q' && c<='Z') spr_putRegion(x, y, 8, 8, (c-'Q')*8,88+144);
+	}
+	
+	void showString(int x, int y, String s) {
+		for (int i=0;i<s.length();i++) {
+			showChar(x+i*8,y,s.charAt(i));
+		};
+	}
+	
+	void drawBox(int x, int y, int width, int height, int srcx, int srcy) {
+		//TODO
+	};
+	
 	void unlockLevel(int level) {
 		if (unlockedLevel<level)
 			unlockedLevel=level;

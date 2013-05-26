@@ -40,6 +40,8 @@ public class LevelsState extends State {
 		batch.setProjectionMatrix(app.camera.combined);
 		batch.begin();
 		
+		app.showString((240-8*14)/2, 8, "SELECT A LEVEL");
+		
 		int s=(page-1)*20+1;
 		for (int i=0;i<4;i++) {
 			for (int j=0;j<5;j++) {
