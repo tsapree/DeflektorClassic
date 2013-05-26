@@ -1170,6 +1170,7 @@ public class GameState extends State {
 			if (energy>=energySteps-1) {
 				energy=energySteps-1;
 				app.laserFillInSound.stop();
+				app.laserReadySound.play();
 				gameStateId=GAMESTATE_GAMING;
 			}
 
