@@ -12,6 +12,8 @@ public class GameState extends State {
 		super(defl);
 		// TODO Auto-generated constructor stub
 	}
+	
+	final int desiredFPS = 15;
 
 	final int GAMESTATE_ACCUMULATING_ENERGY =0;
 	final int GAMESTATE_GAMING = 1;
@@ -73,8 +75,7 @@ public class GameState extends State {
 		drawGameInfo();
 		batch.end();
 		
-		// check if we need to create a new raindrop
-		if(TimeUtils.nanoTime() - app.lastFrameTime > 100000000) {
+		if(TimeUtils.nanoTime() - app.lastFrameTime > (1000000000/desiredFPS)) {
 			animateField();
 		} else return;
 		app.lastFrameTime = TimeUtils.nanoTime();
@@ -254,12 +255,12 @@ public class GameState extends State {
 			2,	//count of gremlins
 			CELL,CELL,WL_A|11,NULL|3,MIRR,NULL,CELL,WL_A|5,NULL|2,CELL,NULL,MIRR,
 			CELL,CELL,WL_A|4,WL_A|13,NULL|5,WL_A|5,NULL|3,WL_A|3,NULL,
-			CELL,CELL,PRSM,NULL,MIRR,NULL|3,WL_A|3,WL_A|15,WL_A|10,NULL|2,WL_A|10,SL_A|1,
+			CELL,CELL,PRSM,NULL,MIRR,NULL|3,WL_A|3,WL_A|15,WL_A|10,NULL|2,WL_A|10,SL_A|1|ROTATING,
 			CELL,CELL,WL_A|1,WL_A|7,NULL|9,WL_A|11,CELL,
 			CELL,CELL,WL_A|14,NULL|4,WL_A|1,WL_A|3,WL_A|2,NULL,MIRR,NULL,WL_A|4,WL_A|12,
-			WL_A|12,WL_A|12,WL_A|8,NULL,WL_A|15,WL_A|10,PRSM,WL_B|5|EXPLODE,RCVR|3,WL_A|14,WL_A|12,NULL,SL_A|2,NULL|2,
+			WL_A|12,WL_A|12,WL_A|8,NULL,WL_A|15,WL_A|10,PRSM,WL_B|5|EXPLODE,RCVR|3,WL_A|14,WL_A|12,NULL,SL_A|2|ROTATING,NULL|2,
 			WL_A|2,CELL,NULL|5,WL_A|4,WL_A|12,WL_A|10,MIRR,NULL,WL_A|3,WL_A|7,NULL,
-			WL_A|10,NULL|5,SL_A|6,NULL|2,WL_A|13,NULL|2,WL_A|12,WL_A|12,CELL,
+			WL_A|10,NULL|5,SL_A|6|ROTATING,NULL|2,WL_A|13,NULL|2,WL_A|12,WL_A|12,CELL,
 			WL_A|11,WL_A|3,NULL,MIRR,NULL|4,CELL,WL_A|5,LASR|0,WL_A|11,WL_A|3,NULL|2,
 			
 		},
@@ -273,7 +274,7 @@ public class GameState extends State {
 			CELL,CELL,MIRR,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,
 			CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,
 			CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,MINE,CELL,CELL,MINE,
-			CELL,CELL,CELL,CELL,CELL,MIRR,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,
+			CELL,CELL,CELL,CELL,CELL,MIRR|ROTATING,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,
 			CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,MINE,CELL,CELL,CELL,CELL,CELL,
 			RCVR|1,WL_B|0x05|EXPLODE,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,CELL,MIRR,NULL,LASR|3,
 			
@@ -1128,6 +1129,7 @@ public class GameState extends State {
 					if (fieldIndex>=field_width*field_height) break;
 				}
 			} else {
+				if ((piece&0xf00)==MIRR) piece=piece&0xFFFFFF00 | ((int)(Math.random()*0x1f));
 				field[fieldIndex++] = piece;
 			}
 		}
@@ -1710,18 +1712,18 @@ public class GameState extends State {
 		void animate() {
 			if (delay>0) delay--;
 			else {
-				//int sx=(int)(Math.random()*4);
-				//int sy=(int)(Math.random()*4);
-				//if ((sx==0) && (x>0) && checkFreeSpace(x-1,y)) x--;
-				//if ((sx==3) && (x<(field_width-1)*2) && checkFreeSpace(x+1,y)) x++;
-				//if ((sy==0) && (y>0) && checkFreeSpace(x,y-1)) y--;
-				//if ((sy==3) && (y<(field_height-1)*2) && checkFreeSpace(x,y+1)) y++;
-				int sx=(int)(Math.random()*2);
-				int sy=(int)(Math.random()*2);
+				int sx=(int)(Math.random()*4);
+				int sy=(int)(Math.random()*4);
 				if ((sx==0) && (x>0) && checkFreeSpace(x-1,y)) x--;
-				if ((sx==1) && (x<(field_width-1)*2) && checkFreeSpace(x+1,y)) x++;
+				if ((sx==3) && (x<(field_width-1)*2) && checkFreeSpace(x+1,y)) x++;
 				if ((sy==0) && (y>0) && checkFreeSpace(x,y-1)) y--;
-				if ((sy==1) && (y<(field_height-1)*2) && checkFreeSpace(x,y+1)) y++;
+				if ((sy==3) && (y<(field_height-1)*2) && checkFreeSpace(x,y+1)) y++;
+				//int sx=(int)(Math.random()*2);
+				//int sy=(int)(Math.random()*2);
+				//if ((sx==0) && (x>0) && checkFreeSpace(x-1,y)) x--;
+				//if ((sx==1) && (x<(field_width-1)*2) && checkFreeSpace(x+1,y)) x++;
+				//if ((sy==0) && (y>0) && checkFreeSpace(x,y-1)) y--;
+				//if ((sy==1) && (y<(field_height-1)*2) && checkFreeSpace(x,y+1)) y++;
 
 				if (((x&1)+(y&1))==0) {
 					rotateMirror(x/2,y/2,((int)(Math.random()*3)-1)&0x1f); 
