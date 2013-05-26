@@ -1155,6 +1155,16 @@ public class GameState extends State {
 		case GAMESTATE_ACCUMULATING_ENERGY:
 			if (energy==0) app.laserFillInSound.loop();
 			energy+=energySteps/40;
+			
+			//rotate mirrors randomly
+			for (int i=0;i<field.length;i++) {
+				if ((field[i]&0xf00)==MIRR) {
+					int angle=(int)(Math.random()*0x8)-1;
+					if (angle>1) angle=0;
+					field[i]=(field[i]+(angle&0x1f))&0xFFFFFF1F;
+				}
+			}
+			
 			if (energy>=energySteps-1) {
 				energy=energySteps-1;
 				app.laserFillInSound.stop();
@@ -1280,14 +1290,25 @@ public class GameState extends State {
 				} else if ((f&0xf00)==RCVR) {
 					
 				};
-				//TODO: заменить на 1 спрайт
-				app.spr_putRegion( i*16, j*16, 8, 8, 7*16, 5*16+8);
-				app.spr_putRegion( i*16+8, j*16, 8, 8, 7*16, 5*16+8);
-				app.spr_putRegion( i*16, j*16+8, 8, 8, 7*16, 5*16+8);
-				app.spr_putRegion( i*16+8, j*16+8, 8, 8, 7*16, 5*16+8);
+				//TODO: нужно рисовать пустые клетки только там, где не будет ничего другого.
+				if ((f&0xf00)!=MIRR) {
+					app.spr_putRegion( i*16, j*16, 16, 16, 7*16, 6*16);
+				};
 			};
 		
-		drawBeam(beam_x,beam_y,beam_angle);
+			switch (gameStateId) {
+			case GAMESTATE_ACCUMULATING_ENERGY:
+				break;
+			case GAMESTATE_CALCULATING_ENERGY:
+			case GAMESTATE_OVERHEAT:
+			case GAMESTATE_LEVELCOMPLETED:
+			case GAMESTATE_GAMING:
+				drawBeam(beam_x,beam_y,beam_angle);
+				break;
+			};
+
+			
+
 			
 		for (int i=0;i<field_width;i++) 
 			for (int j=0;j<field_height;j++) {
