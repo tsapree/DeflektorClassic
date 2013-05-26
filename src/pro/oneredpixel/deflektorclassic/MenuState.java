@@ -18,15 +18,12 @@ public class MenuState extends State {
 		batch.setProjectionMatrix(app.camera.combined);
 		batch.begin();
 		app.spr_putRegion(240/2-128/2, 8, 128, 16, 0, 56+144);
+		
+		app.drawButton(120, 80-8, "PLAY", true);
+		app.drawButton(16, 160-32,"SETTINGS", false);
+		app.drawButton(240-16-16-12*8, 160-32, "ACHIEVEMENTS", false);
+		
 		batch.end();
-		// process user input
-		//if(Gdx.input.isTouched()) {
-		//	gotoAppState(APPSTATE_GAME);
-		//	//Vector3 touchPos = new Vector3();
-		//	//touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
-		//	//camera.unproject(touchPos);
-		//	//touch(Gdx.input.getX()/16/2, Gdx.input.getY()/16/2);
-		//}
 	};
 	
 

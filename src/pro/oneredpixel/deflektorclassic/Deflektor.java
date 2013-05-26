@@ -268,7 +268,32 @@ public class Deflektor implements ApplicationListener {
 	}
 	
 	void drawBox(int x, int y, int width, int height, int srcx, int srcy) {
-		//TODO
+		//TODO: переделать, если надо рисовать box не кратный 8.
+		height=((int)(height/8))*8;
+		width=((int)(width/8))*8;
+		spr_putRegion(x,y,8,8,srcx,srcy);
+		for (int i=8;i<width-8;i+=8) spr_putRegion(x+i,y,8,8,srcx+8,srcy);
+		spr_putRegion(x+width-8,y,8,8,srcx+16,srcy);
+		
+		for (int j=8;j<height-8;j+=8) {
+			spr_putRegion(x,        y+j,8,8,srcx,srcy+8);
+			for (int i=8;i<width-8;i+=8) spr_putRegion(x+i,y+j,8,8,srcx+8,srcy+8);
+			spr_putRegion(x+width-8,y+j,8,8,srcx+16,srcy+8);
+		};
+		
+		spr_putRegion(x,        y+height-8,8,8,srcx,srcy+16);
+		for (int i=8;i<width-8;i+=8) spr_putRegion(x+i,y+height-8,8,8,srcx+8,srcy+16);
+		spr_putRegion(x+width-8,y+height-8,8,8,srcx+16,srcy+16);
+	};
+	
+	void drawButton (int x, int y, String text, boolean centered) {
+		int width=text.length()*8+16;
+		if (centered) {
+			x=x-width/2;
+			y=y-24/2;
+		};
+		drawBox(x,y,width,24,0,176);
+		showString(x+8,y+8,text);
 	};
 	
 	void unlockLevel(int level) {
