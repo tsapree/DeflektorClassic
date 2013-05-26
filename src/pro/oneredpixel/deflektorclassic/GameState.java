@@ -163,21 +163,6 @@ public class GameState extends State {
 		setCursor((int)x,(int)y);
 		return false;
 	} 
-	
-	void setCursor(int x, int y) {
-		int newCursorX=(x-app.winX)/(app.sprSize*2)/app.sprScale;
-		int newCursorY=(y-app.winY)/(app.sprSize*2)/app.sprScale;	
-		
-		if (newCursorX>=0 && newCursorX<field_width && newCursorY>=0 && newCursorY<field_height) {
-			int f=field[newCursorX+newCursorY*field_width];
-			if ((f&0xF00)==MIRR) {
-				cursorEnabled=true;
-				cursorPhase=0;
-				cursorX=newCursorX;
-				cursorY=newCursorY;
-			};
-		};
-	}
 
 	public boolean pan(float x, float y, float deltaX, float deltaY) {
 		if (cursorEnabled && beamState!=BEAMSTATE_CONNECTED) {
@@ -1144,6 +1129,21 @@ public class GameState extends State {
 		
 	}
 	
+	void setCursor(int x, int y) {
+		int newCursorX=(x-app.winX)/(app.sprSize*2)/app.sprScale;
+		int newCursorY=(y-app.winY)/(app.sprSize*2)/app.sprScale;	
+		
+		if (newCursorX>=0 && newCursorX<field_width && newCursorY>=0 && newCursorY<field_height) {
+			int f=field[newCursorX+newCursorY*field_width];
+			if ((f&0xF00)==MIRR) {
+				cursorEnabled=true;
+				cursorPhase=0;
+				cursorX=newCursorX;
+				cursorY=newCursorY;
+			};
+		};
+	}
+	
 	void animateField() {
 		int f=0;
 		boolean needToExplodeBarrier=true;
@@ -1162,6 +1162,8 @@ public class GameState extends State {
 					int angle=(int)(Math.random()*0x8)-1;
 					if (angle>1) angle=0;
 					field[i]=(field[i]+(angle&0x1f))&0xFFFFFF1F;
+				} else if ((field[i]&ROTATING)!=0) {
+					field[i]=(field[i]+1)&0xFFFFFF1F;
 				}
 			}
 			
@@ -1290,8 +1292,7 @@ public class GameState extends State {
 				} else if ((f&0xf00)==RCVR) {
 					
 				};
-				//TODO: нужно рисовать пустые клетки только там, где не будет ничего другого.
-				if ((f&0xf00)!=MIRR) {
+				if (((f&0xf00)==NULL) || ((f&0xf00)==MINE) || ((f&0xf00)==CELL) || ((f&0xf00)==_EXPL) || ((f&0xf00)==WL_A) || ((f&0xf00)==WL_B) ) {
 					app.spr_putRegion( i*16, j*16, 16, 16, 7*16, 6*16);
 				};
 			};
@@ -1320,19 +1321,19 @@ public class GameState extends State {
 					app.spr_putRegion( i*16, j*16, 16, 16, ((f_angle&3)*16), 4*16);
 					break;
 				case RCVR:
-					putReceiver(i,j,f_angle);
+					app.spr_putRegion( i*16, j*16, 16, 16, (((f_angle&3)+4)*16), 4*16);
 					break;
 				case MIRR:
-					putMirror(i,j,f_angle);
+					app.spr_putRegion( i*16, j*16, 16, 16, (f_angle&7)*16, ((f_angle>>3)&1)*16);
 					break;
 				case WARP:
-					putWarpbox(i,j,f_angle);
+					app.spr_putRegion( i*16, j*16, 16, 16, (((f_angle&3)+2)*16), 5*16);
 					break;
 				case CELL:
-					putCell(i,j);
+					app.spr_putRegion( i*16, j*16, 16, 16, 0, 5*16);
 					break;
 				case MINE:
-					putMine(i,j);
+					app.spr_putRegion( i*16, j*16, 16, 16, 16, 5*16);
 					break;
 				case WL_A:
 					putWallA(i,j,f_angle);
@@ -1341,13 +1342,13 @@ public class GameState extends State {
 					putWallB(i,j,f_angle);
 					break;
 				case PRSM:
-					putPrism(i,j);
+					app.spr_putRegion( i*16, j*16, 16, 16, 6*16, 5*16);
 					break;
 				case SL_A:
-					putSlitA(i,j,f_angle);
+					app.spr_putRegion( i*16, j*16, 16, 16, ((f_angle&7)*16), 3*16);
 					break;
 				case SL_B:
-					putSlitB(i,j,f_angle);
+					app.spr_putRegion( i*16, j*16, 16, 16, ((f_angle&7)*16), 2*16);
 					break;
 				case _EXPL:
 					app.spr_putRegion( i*16, j*16, 16, 16, ((f_angle&7)*16), 6*16);
@@ -1363,44 +1364,6 @@ public class GameState extends State {
 		};
 
 	};
-
-	//angle=0..31
-	void putMirror(int x, int y, int angle) {
-		app.spr_putRegion( x*16, y*16, 16, 16, (angle&7)*16, ((angle>>3)&1)*16);
-	}
-	
-	//angle=0..3
-	void putLaser(int x,int y, int angle) {
-
-	}
-	
-	void putReceiver(int x,int y, int angle) {
-		app.spr_putRegion( x*16, y*16, 16, 16, (((angle&3)+4)*16), 4*16);
-	}
-	
-	void putCell(int x, int y) {
-		app.spr_putRegion( x*16, y*16, 16, 16, 0, 5*16);
-	}
-	
-	void putMine(int x, int y) {
-		app.spr_putRegion( x*16, y*16, 16, 16, 16, 5*16);
-	}
-	
-	void putPrism(int x, int y) {
-		app.spr_putRegion( x*16, y*16, 16, 16, 6*16, 5*16);
-	}
-	
-	void putWarpbox(int x, int y, int type) {
-		app.spr_putRegion( x*16, y*16, 16, 16, (((type&3)+2)*16), 5*16);
-	}
-	
-	void putSlitA(int x, int y, int angle) {
-		app.spr_putRegion( x*16, y*16, 16, 16, ((angle&7)*16), 3*16);
-	}
-
-	void putSlitB(int x, int y, int angle) {
-		app.spr_putRegion( x*16, y*16, 16, 16, ((angle&7)*16), 2*16);
-	}
 	
 	void putWallA(int x, int y, int type) {
 		if ((type&8)!=0)	app.spr_putRegion( x*16, y*16, 8, 8, 7*16+8, 5*16);
