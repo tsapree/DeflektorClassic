@@ -251,7 +251,7 @@ public class GameState extends State {
 		//03
 		{
 			1024, //energySteps
-			0,	//count of gremlins
+			2,	//count of gremlins
 			CELL,CELL,WL_A|11,NULL|3,MIRR,NULL,CELL,WL_A|5,NULL|2,CELL,NULL,MIRR,
 			CELL,CELL,WL_A|4,WL_A|13,NULL|5,WL_A|5,NULL|3,WL_A|3,NULL,
 			CELL,CELL,PRSM,NULL,MIRR,NULL|3,WL_A|3,WL_A|15,WL_A|10,NULL|2,WL_A|10,SL_A|1,
@@ -281,7 +281,7 @@ public class GameState extends State {
 		//05
 		{
 			1024, //energySteps
-			0,	//count of gremlins
+			5,	//count of gremlins
 			MIRR,CELL,MIRR,NULL,MIRR,NULL,MIRR,NULL,MIRR,CELL,MIRR,CELL,MIRR,NULL,RCVR|2,
 			CELL,MIRR,NULL,MIRR,NULL,MIRR,CELL,MIRR,NULL,MIRR,NULL,MIRR,NULL,MIRR,MINE|EXPLODE,
 			MIRR,NULL,MIRR,NULL,MIRR,CELL,MIRR,NULL,MIRR,MINE,MIRR,NULL,MIRR,CELL,MIRR,
@@ -296,7 +296,7 @@ public class GameState extends State {
 		//06
 		{
 			1024, //energySteps
-			0,	//count of gremlins
+			2,	//count of gremlins
 			LASR|1,NULL,MIRR,NULL,WL_A|10,MIRR,NULL,WL_A|2,MIRR,NULL|5,PRSM,
 			WL_A|15,WL_A|3,WL_A|3,NULL|4,WL_A|10,NULL|2,SL_A|3|ROTATING,NULL,SL_A|5|ROTATING,CELL,NULL,
 			MINE,NULL|4,WL_A|15,NULL,WL_A|10,SL_A|5|ROTATING,NULL|2,MINE,NULL|2,PRSM,
@@ -311,7 +311,7 @@ public class GameState extends State {
 		//07
 		{
 			1024, //energySteps
-			0,	//count of gremlins
+			2,	//count of gremlins
 			CELL,NULL,MIRR,NULL,WL_A|12,WL_A|8,MIRR,NULL|3,MIRR,WL_A|5,RCVR|1,WL_B|15|EXPLODE,MIRR,
 			WL_A|14,WL_A|12,NULL|2,CELL,NULL|2,WL_A|15,NULL,WL_A|13,NULL,WL_A|5,WL_A|12,WL_A|13,NULL,
 			NULL,CELL,NULL|3,WL_A|3,NULL|2,CELL,WL_A|5,NULL|2,CELL,WL_A|5,NULL,
@@ -325,7 +325,7 @@ public class GameState extends State {
 		//08
 		{
 			1024, //energySteps
-			0,	//count of gremlins
+			2,	//count of gremlins
 			LASR|2,WL_B|5,WL_B|15,WL_A|15,WL_A|12,WL_A|12,WL_A|12,WL_A|13,WL_A|10,NULL,WL_A|12,NULL,MINE,NULL,WARP|0,
 			NULL,WL_B|5,RCVR|1,WL_A|5|EXPLODE,CELL,CELL,CELL,WL_A|4,WL_A|8,NULL|3,MIRR,NULL|2,
 			NULL,WL_B|5,WL_B|15,WL_A|14,CELL,MINE,CELL,CELL,WL_A|13,NULL|6,
@@ -339,7 +339,7 @@ public class GameState extends State {
 		//09
 		{
 			1024, //energySteps
-			0,	//count of gremlins
+			4,	//count of gremlins
 			MINE,CELL,CELL,PRSM,CELL,CELL,CELL,LASR|2,CELL,CELL,CELL,PRSM,CELL,CELL,MINE,
 			CELL,CELL,CELL,CELL,MINE,CELL,CELL,NULL,CELL,CELL,MINE,CELL,CELL,CELL,CELL,
 			CELL,CELL,CELL,CELL,CELL,CELL,CELL,MIRR,CELL,CELL,CELL,CELL,CELL,CELL,CELL,
@@ -353,7 +353,7 @@ public class GameState extends State {
 		//10
 		{
 			1024, //energySteps
-			0,	//count of gremlins
+			3,	//count of gremlins
 			MIRR,CELL,MIRR,CELL,MIRR,NULL,MIRR,NULL,MIRR,CELL,MIRR,MINE,MIRR,NULL,MIRR,
 			NULL,MIRR,NULL,MIRR,CELL,MIRR,CELL,MIRR,NULL,MIRR,NULL,MIRR,NULL,MIRR,MINE,
 			MIRR,CELL,MIRR,MINE,MIRR,NULL,MIRR,NULL,MIRR,MINE,MIRR,CELL,MIRR,CELL,MIRR,
@@ -1659,6 +1659,13 @@ public class GameState extends State {
 		if ((f&0xFF00)==MIRR) {
 			rotateThing(x,y);
 		};
+		
+		if (countOfGremlins>0)
+			for (int i=0;i<countOfGremlins;i++)
+				if (grm[i].attemptToKill(x, y)) {
+					//TODO:sound of killed gremlin
+				};
+		
 	};
 	
 	/*
@@ -1692,7 +1699,7 @@ public class GameState extends State {
 				y=((int)(Math.random()*(field_height-1)))*2;
 			} while (!checkFreeSpace(x,y));
 			phase=0;
-			delay=(int)(Math.random()*100)+60;
+			delay=(int)(Math.random()*50)+30;
 		};
 		
 		void draw() {
@@ -1703,22 +1710,70 @@ public class GameState extends State {
 		void animate() {
 			if (delay>0) delay--;
 			else {
-				int sx=(int)(Math.random()*4);
-				int sy=(int)(Math.random()*4);
-				if ((sx==0) && (x>0)) x--;
-				if ((sx==3) && (x<(field_width-1)*2)) x++;
-				if ((sy==0) && (y>0)) y--;
-				if ((sy==3) && (y<(field_height-1)*2)) y++;
+				//int sx=(int)(Math.random()*4);
+				//int sy=(int)(Math.random()*4);
+				//if ((sx==0) && (x>0) && checkFreeSpace(x-1,y)) x--;
+				//if ((sx==3) && (x<(field_width-1)*2) && checkFreeSpace(x+1,y)) x++;
+				//if ((sy==0) && (y>0) && checkFreeSpace(x,y-1)) y--;
+				//if ((sy==3) && (y<(field_height-1)*2) && checkFreeSpace(x,y+1)) y++;
+				int sx=(int)(Math.random()*2);
+				int sy=(int)(Math.random()*2);
+				if ((sx==0) && (x>0) && checkFreeSpace(x-1,y)) x--;
+				if ((sx==1) && (x<(field_width-1)*2) && checkFreeSpace(x+1,y)) x++;
+				if ((sy==0) && (y>0) && checkFreeSpace(x,y-1)) y--;
+				if ((sy==1) && (y<(field_height-1)*2) && checkFreeSpace(x,y+1)) y++;
+
+				if (((x&1)+(y&1))==0) {
+					rotateMirror(x/2,y/2,((int)(Math.random()*3)-1)&0x1f); 
+				}
 			};
 			phase=(phase+1)&0x3;
 		};
 		
 		boolean checkFreeSpace(int cx,int cy) {
-			int f;
-			f=field[(cx/2)+(cy*field_height/2)]&0xFF00;
-			if ((f!=SL_A) && (f!=SL_B) && (f!=WL_A) && (f!=WL_B)) return true;
-			else return false;
+			//int f;
+			//f=field[(cx/2)+(cy*field_height/2)]&0xFF00;
+			//if ((f!=SL_A) && (f!=SL_B) && (f!=WL_A) && (f!=WL_B)) return true;
+			//else return false;
+			
+			return checkSmallField(cx,cy) && checkSmallField(cx+1,cy) && checkSmallField(cx,cy+1) && checkSmallField(cx+1,cy+1);
+			
 		};
+		
+		boolean checkSmallField(int dx, int dy) {
+			int f;
+			f=field[(dx/2)+((dy/2)*field_width)];
+			switch (f&0x0F00) {
+			//case NULL:
+			//case MIRR:
+			//case CELL:
+			//case MINE:
+			//	return true;
+			case LASR:
+			case RCVR:
+			case WARP:
+			case PRSM:
+			case SL_A:
+			case SL_B:
+				return false;
+			case WL_A:
+			case WL_B:
+				int i = (8>>(dx&1))>>((dy+dy)&2);
+				if ((f&i)==0) return true;
+				else return false;
+			}
+			return true;
+		}
+		
+		boolean attemptToKill(int tapx, int tapy) {
+			if ((delay==0) && (x==(tapx*2)) && (y==(tapy*2))) {
+				init();
+				delay*=6;
+				return true;
+			};
+			return false;
+		}
+		
 	}
 	
 	
