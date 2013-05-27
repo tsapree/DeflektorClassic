@@ -15,14 +15,14 @@ import com.badlogic.gdx.math.Vector2;
 public class Deflektor implements ApplicationListener {
 	
 	Texture spritesImage;
-	Sound burnCellSound;
-	Sound burnBombSound;
-	Sound exitOpenSound;
-	Sound laserFillInSound;
-	Sound laserOverheatSound;
-	Sound laserReadySound;
-	Sound levelCompletedSound;
-	Sound transferEnergySound;
+	private Sound burnCellSound;
+	private Sound burnBombSound;
+	private Sound exitOpenSound;
+	private Sound laserFillInSound;
+	private Sound laserOverheatSound;
+	private Sound laserReadySound;
+	private Sound levelCompletedSound;
+	private Sound transferEnergySound;
 	Music music;
 	
 	OrthographicCamera camera;
@@ -80,24 +80,17 @@ public class Deflektor implements ApplicationListener {
 		
 		panScale=sprSize*sprScale/1;
 		
-		// load the images for the droplet and the bucket, 48x48 pixels each
 		spritesImage = new Texture(Gdx.files.internal("sprites.png"));
 		  
-		// load the drop sound effect and the rain background "music"
 		burnCellSound = Gdx.audio.newSound(Gdx.files.internal("burn-cell.wav"));
 		burnBombSound = Gdx.audio.newSound(Gdx.files.internal("burn-bomb.wav"));
-		//burnBombSound.loop();
 		exitOpenSound = Gdx.audio.newSound(Gdx.files.internal("exit-open.wav"));
 		laserFillInSound = Gdx.audio.newSound(Gdx.files.internal("laser-fill-in.wav"));
-		//laserFillInSound.loop();
 		laserOverheatSound = Gdx.audio.newSound(Gdx.files.internal("laser-overheat.wav"));
-		//laserOverheatSound.loop();
 		laserReadySound = Gdx.audio.newSound(Gdx.files.internal("laser-ready.wav"));
 		levelCompletedSound = Gdx.audio.newSound(Gdx.files.internal("level-completed.wav"));
 		transferEnergySound = Gdx.audio.newSound(Gdx.files.internal("transfer-energy.wav"));
-		//transferEnergySound.loop();
 
-		//burnBombSound.setLooping(,);
 		music = Gdx.audio.newMusic(Gdx.files.internal("zxmusic.ogg"));
 		  
 		// start the playback of the background music immediately
@@ -299,7 +292,92 @@ public class Deflektor implements ApplicationListener {
 	void unlockLevel(int level) {
 		if (unlockedLevel<level)
 			unlockedLevel=level;
-	}
+	};
+	
+	
+	final static int SND_BURNCELL = 1;
+	final static int SND_LASERBOMB_LOOP =2;
+	final static int SND_EXITOPEN =3;
+	final static int SND_LASERFILLIN_LOOP=4;
+	final static int SND_LASEROVERHEAT_LOOP=5;
+	final static int SND_LASERREADY=6;
+	final static int SND_LEVELCOMPLETED=7;
+	final static int SND_TRANSFERNRG_LOOP=8;
+	
+	int playing_LOOP_id = 0;
+	
+	void playSound(int id) {
+		if ((playing_LOOP_id!=0) && (playing_LOOP_id!=id)) stopSound(playing_LOOP_id);
+		
+		switch (id) { 
+		case SND_BURNCELL:
+			burnCellSound.play();
+			break;
+		case SND_EXITOPEN:
+			exitOpenSound.play();
+			break;
+
+		case SND_LASERREADY:
+			laserReadySound.play();
+			break;
+		case SND_LEVELCOMPLETED:
+			levelCompletedSound.play();
+			break;
+			
+		case SND_LASERFILLIN_LOOP:
+			if (playing_LOOP_id==0) laserFillInSound.loop();
+			playing_LOOP_id=SND_LASERFILLIN_LOOP;
+			break;
+		case SND_LASEROVERHEAT_LOOP:
+			if (playing_LOOP_id==0) laserOverheatSound.loop();
+			playing_LOOP_id=SND_LASEROVERHEAT_LOOP;
+			break;
+		case SND_LASERBOMB_LOOP:
+			if (playing_LOOP_id==0) burnBombSound.loop();
+			playing_LOOP_id=SND_LASERBOMB_LOOP;
+			break;
+		case SND_TRANSFERNRG_LOOP:
+			if (playing_LOOP_id==0) transferEnergySound.loop();
+			playing_LOOP_id=SND_TRANSFERNRG_LOOP;
+			break;
+		};
+	};
+	
+	void stopContinuousSound() {
+		if (playing_LOOP_id!=0) 
+			stopSound(playing_LOOP_id);
+	};
+	
+	private void stopSound(int id) {
+		switch (id) {
+		case SND_BURNCELL:
+		case SND_LEVELCOMPLETED:
+		case SND_LASERREADY:
+		case SND_EXITOPEN:
+			break;
+		case SND_LASEROVERHEAT_LOOP:
+			laserOverheatSound.stop();
+			break;
+		case SND_LASERBOMB_LOOP:
+			burnBombSound.stop();
+			break;
+		case SND_LASERFILLIN_LOOP:
+			laserFillInSound.stop();
+			break;
+		case SND_TRANSFERNRG_LOOP:
+			transferEnergySound.stop();
+			break;
+		};
+		playing_LOOP_id=0;
+	};
+	
+	void playMelody(int id) {
+		
+	};
+	
+	void stopMelody(int id) {
+		
+	};
 
 }
 

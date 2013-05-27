@@ -26,6 +26,7 @@ public class GameState extends State {
 	final int BEAMSTATE_OVERHEAT = 1;
 	final int BEAMSTATE_BOMB = 2;
 	final int BEAMSTATE_CONNECTED = 3;
+	final int BEAMSTATE_CHARGING = 4;
 	int beamState;
 	int prevBeamState;
 	
@@ -60,9 +61,7 @@ public class GameState extends State {
 	
 	//state stoped
 	void stop() {
-		playContinuousOverHeatSound(false);
-		playContinuousBurningSound(false);
-		app.laserFillInSound.stop();
+		app.stopContinuousSound();
 	};
 	
 	public void render(SpriteBatch batch) {
@@ -83,50 +82,18 @@ public class GameState extends State {
 		switch (beamState) {
 		case BEAMSTATE_NORMAL:
 		case BEAMSTATE_CONNECTED:
-			playContinuousOverHeatSound(false);
-			playContinuousBurningSound(false);
+			app.stopContinuousSound();
 			break;
 		case BEAMSTATE_OVERHEAT:
-			playContinuousOverHeatSound(true);
-			playContinuousBurningSound(false);
+			app.playSound(Deflektor.SND_LASEROVERHEAT_LOOP);
 			break;
 		case BEAMSTATE_BOMB:
-			playContinuousOverHeatSound(false);
-			playContinuousBurningSound(true);
+			app.playSound(Deflektor.SND_LASERBOMB_LOOP);
 			break;
 		};
-		// process user input
-		//if(Gdx.input.isTouched()) {
-		//	//Vector3 touchPos = new Vector3();
-		//	//touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
-		//	//camera.unproject(touchPos);
-		//	int x = Gdx.input.getX()-winX;
-		//	int y = Gdx.input.getY()-winY;
-		//	if (x>=0 && x<winWidth && y>=0 && y<winHeight)
-		//		touch(x/(sprSize*2)/sprScale, y/(sprSize*2)/sprScale);
-		//}
-		
+	
 		if(Gdx.input.isKeyPressed(Keys.BACK)) app.gotoAppState(Deflektor.APPSTATE_MENU);
 	};
-	
-	boolean playingOverHeatSound=false;
-	void playContinuousOverHeatSound(boolean play) {
-		if (playingOverHeatSound!=play) {
-			if (play) app.laserOverheatSound.loop();
-			else app.laserOverheatSound.stop();
-			playingOverHeatSound=play;
-		};
-	}
-	
-	boolean playingContinuousBurningSound=false;
-	void playContinuousBurningSound(boolean play) {
-		if (playingContinuousBurningSound!=play) {
-			if (play) app.burnBombSound.loop();
-			else app.burnBombSound.stop();
-			playingContinuousBurningSound=play;
-		};
-	}
-	
 	
 	//------
 	//--- controlling
@@ -1084,7 +1051,7 @@ public class GameState extends State {
 	
 	public void initGame() {
 		
-		beamState = BEAMSTATE_NORMAL;
+		beamState = BEAMSTATE_CHARGING;
 		gameStateId = GAMESTATE_ACCUMULATING_ENERGY;
 		energy=0;
 		overheat=0;
@@ -1153,7 +1120,8 @@ public class GameState extends State {
 		
 		switch (gameStateId) {
 		case GAMESTATE_ACCUMULATING_ENERGY:
-			if (energy==0) app.laserFillInSound.loop();
+			if (energy==0) //app.laserFillInSound.loop();
+				app.playSound(Deflektor.SND_LASERFILLIN_LOOP);
 			energy+=energySteps/40;
 			
 			//rotate mirrors randomly
@@ -1169,8 +1137,8 @@ public class GameState extends State {
 			
 			if (energy>=energySteps-1) {
 				energy=energySteps-1;
-				app.laserFillInSound.stop();
-				app.laserReadySound.play();
+				//app.stopSound(Deflektor.SND_LASERFILLIN_LOOP);
+				app.playSound(Deflektor.SND_LASERREADY);
 				gameStateId=GAMESTATE_GAMING;
 			}
 
@@ -1186,7 +1154,7 @@ public class GameState extends State {
 			
 			if (beamState==BEAMSTATE_CONNECTED) {
 				gameStateId = GAMESTATE_LEVELCOMPLETED;
-				app.levelCompletedSound.play();
+				app.playSound(Deflektor.SND_LEVELCOMPLETED);
 			}
 			
 			if (overheat <=0) overheat =0;
@@ -1213,7 +1181,7 @@ public class GameState extends State {
 					if ((f&0xF00)==PRSM) field[j*field_width+i]=(f&0xF00)|((int)((8*Math.random())+0.5));
 				};
 			if (needToExplodeBarrier && barrierFound) {
-				app.exitOpenSound.play();
+				app.playSound(Deflektor.SND_EXITOPEN);
 				for (int i=0;i<field_width*field_height;i++)
 					if ((field[i]&EXPLODE)!=0) field[i]=_EXPL;
 			};
@@ -1442,7 +1410,7 @@ public class GameState extends State {
 					break;
 				case CELL:
 					field[fx+fy*field_width]=_EXPL;
-					app.burnCellSound.play();
+					app.playSound(Deflektor.SND_BURNCELL);
 					endBeam=true;
 					continue;
 				case MINE:
