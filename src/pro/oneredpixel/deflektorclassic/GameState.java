@@ -14,6 +14,10 @@ public class GameState extends State {
 	}
 	
 	final int desiredFPS = 15;
+	
+	final int WINSTATE_GAMING = 0;
+	final int WINSTATE_PAUSED = 1;
+	int winStateId = WINSTATE_GAMING;
 
 	final int GAMESTATE_ACCUMULATING_ENERGY =0;
 	final int GAMESTATE_GAMING = 1;
@@ -72,27 +76,45 @@ public class GameState extends State {
 		batch.begin();
 		drawField();
 		drawGameInfo();
+		
+		if (winStateId==WINSTATE_PAUSED) {
+			app.drawBox(24, 8, 240-48, 160-32, 0,176);
+			app.showString(32, 24, "GAME PAUSED");
+			app.drawButton(32, 40, "RESUME", false);
+			app.drawButton(32+16+8+8*6, 40, "RESTART", false);
+			app.drawButton(32, 72, "LEVELS", false);
+			if (app.soundEnabled) app.drawButton(32, 104, "SOUND OFF", false);
+			else app.drawButton(32, 104, "SOUND ON", false);
+		};
+		
 		batch.end();
 		
 		if(TimeUtils.nanoTime() - app.lastFrameTime > (1000000000/desiredFPS)) {
-			animateField();
+			if (winStateId==WINSTATE_GAMING) animateField();			
 		} else return;
 		app.lastFrameTime = TimeUtils.nanoTime();
 		
-		switch (beamState) {
-		case BEAMSTATE_NORMAL:
-		case BEAMSTATE_CONNECTED:
-			app.stopContinuousSound();
-			break;
-		case BEAMSTATE_OVERHEAT:
-			app.playSound(Deflektor.SND_LASEROVERHEAT_LOOP);
-			break;
-		case BEAMSTATE_BOMB:
-			app.playSound(Deflektor.SND_LASERBOMB_LOOP);
-			break;
+		if (winStateId==WINSTATE_GAMING) {
+			switch (beamState) {
+			case BEAMSTATE_NORMAL:
+			case BEAMSTATE_CONNECTED:
+				app.stopContinuousSound();
+				break;
+			case BEAMSTATE_OVERHEAT:
+				app.playSound(Deflektor.SND_LASEROVERHEAT_LOOP);
+				break;
+			case BEAMSTATE_BOMB:
+				app.playSound(Deflektor.SND_LASERBOMB_LOOP);
+				break;
+			};
 		};
 	
-		if(Gdx.input.isKeyPressed(Keys.BACK)) app.gotoAppState(Deflektor.APPSTATE_MENU);
+		if(Gdx.input.isKeyPressed(Keys.BACK)) {
+			if (winStateId==WINSTATE_GAMING) {
+				app.stopContinuousSound();
+				winStateId=WINSTATE_PAUSED;
+			} else winStateId=WINSTATE_GAMING;//app.gotoAppState(Deflektor.APPSTATE_MENU);
+		}
 	};
 	
 	//------
@@ -109,13 +131,24 @@ public class GameState extends State {
 	public boolean longPress(float arg0, float arg1) {
 		return false;
 	}
+	
+	public boolean zoom(float arg0, float arg1) {
+		return false;
+	}
 
 	public boolean tap(float x, float y, int tapCount, int button) {
-		setCursor((int)x,(int)y);
-		x=x-app.winX;
-		y=y-app.winY;
-		if (x>=0 && x<app.winWidth && y>=0 && y<app.winHeight && beamState!=BEAMSTATE_CONNECTED)
-			touch(((int)x)/(app.sprSize*2)/app.sprScale, ((int)y)/(app.sprSize*2)/app.sprScale);
+		switch (winStateId) {
+		case WINSTATE_GAMING:
+			setCursor((int)x,(int)y);
+			x=x-app.winX;
+			y=y-app.winY;
+			if (x>=0 && x<app.winWidth && y>=0 && y<app.winHeight && beamState!=BEAMSTATE_CONNECTED)
+				touch(((int)x)/(app.sprSize*2)/app.sprScale, ((int)y)/(app.sprSize*2)/app.sprScale);
+			break;
+		case WINSTATE_PAUSED:
+			app.gotoAppState(Deflektor.APPSTATE_MENU);
+			break;
+		};
 		return false;
 	}
 
@@ -124,25 +157,29 @@ public class GameState extends State {
 	int restDelta = 0;
 	
 	public boolean touchDown(float x, float y, int pointer, int button) {
-		touchX = x;
-		touchY = y;
-		restDelta = 0;
-		setCursor((int)x,(int)y);
+		switch (winStateId) {
+		case WINSTATE_GAMING:
+			touchX = x;
+			touchY = y;
+			restDelta = 0;
+			setCursor((int)x,(int)y);
+			break;
+		};
 		return false;
 	} 
 
 	public boolean pan(float x, float y, float deltaX, float deltaY) {
-		if (cursorEnabled && beamState!=BEAMSTATE_CONNECTED) {
-			int delta=(int)Math.sqrt((deltaX)*(deltaX)+(deltaY)*(deltaY));
-			if (deltaX<(-deltaY)) delta=-delta;
-			delta = delta + restDelta;
-			rotateMirror( cursorX, cursorY, (delta/app.panScale)&0x1f);
-			restDelta=delta-((int)(delta/app.panScale))*app.panScale;
+		switch (winStateId) {
+		case WINSTATE_GAMING:
+			if (cursorEnabled && beamState!=BEAMSTATE_CONNECTED) {
+				int delta=(int)Math.sqrt((deltaX)*(deltaX)+(deltaY)*(deltaY));
+				if (deltaX<(-deltaY)) delta=-delta;
+				delta = delta + restDelta;
+				rotateMirror( cursorX, cursorY, (delta/app.panScale)&0x1f);
+				restDelta=delta-((int)(delta/app.panScale))*app.panScale;
+			};
+			break;
 		};
-		return false;
-	}
-	
-	public boolean zoom(float arg0, float arg1) {
 		return false;
 	}
 	
@@ -1051,6 +1088,7 @@ public class GameState extends State {
 	
 	public void initGame() {
 		
+		winStateId=WINSTATE_GAMING;
 		beamState = BEAMSTATE_CHARGING;
 		gameStateId = GAMESTATE_ACCUMULATING_ENERGY;
 		energy=0;
