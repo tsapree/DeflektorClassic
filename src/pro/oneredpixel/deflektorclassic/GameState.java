@@ -34,6 +34,8 @@ public class GameState extends State {
 	int beamState;
 	int prevBeamState;
 	
+	final int MAXIMUM_REFLECTIONS = 100;
+	
 	int energy=0;
 	int energySteps = 1024;
 	int overheat=0;
@@ -1387,29 +1389,68 @@ public class GameState extends State {
 		if ((type&1)!=0)	app.spr_putRegion( x*16+8, y*16+8, 8, 8, 7*16, 5*16);
 	}
 	
+	final int wall_a_angle_matrix[]={
+			//x,y;u&3==0 true=1, false=0;walls	u
+			//кусок таблицы описывает падение луча не под прямым углом
+		-1,	//0,0,0,0000	не изменять траекторию
+		2,	//0,0,0,0001	2
+		6,	//0,0,0,0010	6
+		4,	//0,0,0,0011	4
+		6,	//0,0,0,0100	6
+		0,	//0,0,0,0101	0
+		2,	//0,0,0,0110	2
+		2,	//0,0,0,0111	2
+		2,	//0,0,0,1000	2
+		6,	//0,0,0,1001	6
+		0,	//0,0,0,1010	0
+		6,	//0,0,0,1011	6
+		4,	//0,0,0,1100	4
+		6,	//0,0,0,1101	6
+		2,	//0,0,0,1110	2
+		-1,	//0,0,0,1111	закончить прорисовку (пока не менять угол)
+		
+			//кусок таблицы описывает падение луча под прямым углом
+		-1,	//0,0,1,0000	не изменять траекторию
+		-1,	//0,0,1,0001	не изменять траекторию
+		-1,	//0,0,1,0010	изменять траекторию
+		4,	//0,0,1,0011	4
+		-1,	//0,0,1,0100	не изменять траекторию
+		0,	//0,0,1,0101	0
+		-2,	//0,0,1,0110	закончить прорисовку
+		-2,	//0,0,1,0111	закончить прорисовку
+		-1,	//0,0,1,1000	не изменять траекторию
+		-2,	//0,0,1,1001	закончить прорисовку
+		0,	//0,0,1,1010	0
+		-2,	//0,0,1,1011	6
+		4,	//0,0,1,1100	4
+		-2,	//0,0,1,1101	6
+		-2,	//0,0,1,1110	2
+		-1	//0,0,1,1111	закончить прорисовку (пока не менять угол)					
+	};
+	
 	void drawBeam(int beamX, int beamY, int beamAngle) {
 		
 		int newBeamX;
 		int newBeamY;
 		int oldBeamAngle;
-		boolean endBeam=false;
+		int endBeam=MAXIMUM_REFLECTIONS;
 		
 		beamState = BEAMSTATE_NORMAL;
 		
-		while (!endBeam) {
+		while ((endBeam--)>0) {
 
 			newBeamX = beamX+angleNodeSteps[beamAngle][0];
 			newBeamY = beamY+angleNodeSteps[beamAngle][1];
 			oldBeamAngle = beamAngle;
 			if (newBeamX>field_width*4 || newBeamX<0 || newBeamY>field_height*4 || newBeamY<0) {
-				endBeam=true;
+				endBeam=0;
 				continue;
 			};
 			
 			drawSpriteLine(beamX, beamY, newBeamX, newBeamY);
 
 			if (newBeamX>=field_width*4 || newBeamX<0 || newBeamY>=field_height*4 || newBeamY<0) {
-				endBeam=true;
+				endBeam=0;
 				continue;
 			};
 			
@@ -1428,12 +1469,12 @@ public class GameState extends State {
 			if ((sx==2) && (sy==2)) {
 				switch (f&0x0f00) {
 				case LASR:
-					endBeam=true;
+					endBeam=0;
 					continue;
 				case RCVR:
 					//if right angle
 					if ((f_angle*4)==((beamAngle+8)&15)) beamState = BEAMSTATE_CONNECTED;
-					endBeam=true;
+					endBeam=0;
 					break;
 				case MIRR:
 					beamAngle =(((f_angle<<1)-beamAngle-beamAngle)>>1)&0xf;
@@ -1450,18 +1491,18 @@ public class GameState extends State {
 				case CELL:
 					field[fx+fy*field_width]=_EXPL;
 					app.playSound(Deflektor.SND_BURNCELL);
-					endBeam=true;
+					endBeam=0;
 					continue;
 				case MINE:
 					beamState = BEAMSTATE_BOMB;
-					endBeam=true;
+					endBeam=0;
 					continue;
 				case PRSM:
 					beamAngle= (beamAngle-4+(f&0xFF))&0xf;
 					break;
 				case _EXPL:
 					if (f_angle>2) break;
-					endBeam=true;
+					endBeam=0;
 					continue;
 				}
 			}
@@ -1475,44 +1516,6 @@ public class GameState extends State {
 			switch (f1&0x0F00) {
 			case WL_A:
 				int wall_angle=-1;
-				final int wall_a_angle_matrix[]={
-						//x,y;u&3==0 true=1, false=0;walls	u
-						//кусок таблицы описывает падение луча не под прямым углом
-					-1,	//0,0,0,0000	не изменять траекторию
-					2,	//0,0,0,0001	2
-					6,	//0,0,0,0010	6
-					4,	//0,0,0,0011	4
-					6,	//0,0,0,0100	6
-					0,	//0,0,0,0101	0
-					2,	//0,0,0,0110	2
-					2,	//0,0,0,0111	2
-					2,	//0,0,0,1000	2
-					6,	//0,0,0,1001	6
-					0,	//0,0,0,1010	0
-					6,	//0,0,0,1011	6
-					4,	//0,0,0,1100	4
-					6,	//0,0,0,1101	6
-					2,	//0,0,0,1110	2
-					-1,	//0,0,0,1111	закончить прорисовку (пока не менять угол)
-					
-						//кусок таблицы описывает падение луча под прямым углом
-					-1,	//0,0,1,0000	не изменять траекторию
-					-1,	//0,0,1,0001	не изменять траекторию
-					-1,	//0,0,1,0010	изменять траекторию
-					4,	//0,0,1,0011	4
-					-1,	//0,0,1,0100	не изменять траекторию
-					0,	//0,0,1,0101	0
-					-2,	//0,0,1,0110	закончить прорисовку
-					-2,	//0,0,1,0111	закончить прорисовку
-					-1,	//0,0,1,1000	не изменять траекторию
-					-2,	//0,0,1,1001	закончить прорисовку
-					0,	//0,0,1,1010	0
-					-2,	//0,0,1,1011	6
-					4,	//0,0,1,1100	4
-					-2,	//0,0,1,1101	6
-					-2,	//0,0,1,1110	2
-					-1	//0,0,1,1111	закончить прорисовку (пока не менять угол)					
-				};
 				int wallsAround=f;
 				int wallUP=0;
 				int wallUPLEFT=0;
@@ -1560,7 +1563,7 @@ public class GameState extends State {
 				//	1,0,x,x1x1	остановить прорисовку	
 				if ((beamX&1)==1) switch (wallsAround&0x5) {
 					case 1: case 4: wall_angle=4; break;
-					case 5: endBeam=true; 
+					case 5: endBeam=0; 
 					};
 					
 				//0,1,x,xx00	не изменять траекторию
@@ -1569,7 +1572,7 @@ public class GameState extends State {
 				//0,1,x,xx11	остановить прорисовку
 				if ((beamY&1)==1) switch (wallsAround&0x3) {
 					case 1: case 2: wall_angle=0; break;
-					case 3: endBeam=true; 
+					case 3: endBeam=0; 
 					};
 					
 				};
@@ -1582,10 +1585,10 @@ public class GameState extends State {
 				break;
 			case WL_B:
 				int crd=((mp_beam_x>>1)&1)+((mp_beam_y)&2);
-				if ((crd==0) && ((f1&8)!=0)) {	endBeam=true;	continue; };
-				if ((crd==1) && ((f1&4)!=0)) {	endBeam=true;	continue; };
-				if ((crd==2) && ((f1&2)!=0)) {	endBeam=true;	continue; };
-				if ((crd==3) && ((f1&1)!=0)) {	endBeam=true;	continue; };
+				if ((crd==0) && ((f1&8)!=0)) {	endBeam=0;	continue; };
+				if ((crd==1) && ((f1&4)!=0)) {	endBeam=0;	continue; };
+				if ((crd==2) && ((f1&2)!=0)) {	endBeam=0;	continue; };
+				if ((crd==3) && ((f1&1)!=0)) {	endBeam=0;	continue; };
 				//(mp_beam_x>1)&1 - координата внутри квадрата 0..1
 				//(mp_beam_y)&2 - координата внутри квадрата 0..1
 				//0,0 && 8
@@ -1595,31 +1598,24 @@ public class GameState extends State {
 				break;
 			case SL_A:
 				if ((f1&7)!=(beamAngle&7)) {
-					if ((beamX&3)==0)
-						beamAngle=(0-beamAngle)&0xf;
-					if ((beamY&3)==0)
-						beamAngle=(4*2-beamAngle)&0xf;
-					//continue;
+					if ((beamX&3)==0)	beamAngle=(0-beamAngle)&0xf;
+					if ((beamY&3)==0)	beamAngle=(4*2-beamAngle)&0xf;
 					break;
 				};
 				break;
 			case SL_B:
-				if ((f1&7)!=(beamAngle&7)) {
-					endBeam=true;
-					//continue;
-					break;
-				};
+				if ((f1&7)!=(beamAngle&7)) endBeam=0;
 				break;
 			}
+			
+			
 			//Если отражение пошло в обратную сторону
 			if (Math.abs(beamAngle-oldBeamAngle)==8) {
-				endBeam=true;
+				endBeam=0;
 				beamState = BEAMSTATE_OVERHEAT;
 			}
 			
 		}
-		
-		
 		
 		
 	};
