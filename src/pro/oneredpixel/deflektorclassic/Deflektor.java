@@ -2,6 +2,8 @@ package pro.oneredpixel.deflektorclassic;
 
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputMultiplexer;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL10;
@@ -57,7 +59,11 @@ public class Deflektor implements ApplicationListener {
 	
 	public long lastFrameTime = 0;
 	
+	//settings
 	boolean soundEnabled = true;
+	boolean controlsTapToRotate = true; //коснуться и отпустить зеркало для поворота на 1 угол
+	boolean controlsTouchAndDrag = true; //коснуться зеркала и не отпуская потянуть для поворота
+	boolean controlsTapThenDrag = true; //коснуться зеркала для выбора, потом отпустить и провести по экрану для поворота
 	   
 	@Override
 	public void create() {
@@ -104,7 +110,11 @@ public class Deflektor implements ApplicationListener {
 		//GestureDetector(float halfTapSquareSize, float tapCountInterval, float longPressDuration, float maxFlingDelay, GestureDetector.GestureListener listener) 
 		//GestureDetector(GestureDetector.GestureListener listener)
 		//Creates a new GestureDetector with default values: halfTapSquareSize=20, tapCountInterval=0.4f, longPressDuration=1.1f, maxFlingDelay=0.15f.
-		Gdx.input.setInputProcessor(new GestureDetector(sprSize/2*sprScale, 0.4f, 1.1f, 0.15f, new MyGestureListener()));
+
+		InputMultiplexer multiplexer = new InputMultiplexer();
+		multiplexer.addProcessor(new GestureDetector(sprSize/2*sprScale, 0.4f, 1.1f, 0.15f, new MyGestureListener()));
+		multiplexer.addProcessor(new MyInputProcessor());
+		Gdx.input.setInputProcessor(multiplexer);
 		
 		gotoAppState(APPSTATE_MENU);
 
@@ -130,9 +140,8 @@ public class Deflektor implements ApplicationListener {
 		}
 
 		@Override
-		public boolean fling(float arg0, float arg1, int arg2) {
-			// TODO Auto-generated method stub
-			return false;
+		public boolean fling(float velocityX, float velocityY, int button) {
+			return appState.fling(velocityX, velocityY, button);
 		}
 
 		@Override
@@ -143,20 +152,17 @@ public class Deflektor implements ApplicationListener {
 
 		@Override
 		public boolean tap(float x, float y, int tapCount, int button) {
-			appState.tap(x, y, tapCount, button);
-			return false;
+			return appState.tap(x, y, tapCount, button);
 		}
 
 		@Override
 		public boolean touchDown(float x, float y, int pointer, int button) {
-			appState.touchDown(x, y, pointer, button);
-			return false;
-		} 
+			return appState.touchDown(x, y, pointer, button);
+		}
 
 		@Override
 		public boolean pan(float x, float y, float deltaX, float deltaY) {
-			appState.pan(x, y, deltaX, deltaY);
-			return false;
+			return appState.pan(x, y, deltaX, deltaY);
 		}
 		
 		@Override
@@ -164,6 +170,57 @@ public class Deflektor implements ApplicationListener {
 			// TODO Auto-generated method stub
 			return false;
 		}
+	}
+	
+	public class MyInputProcessor implements InputProcessor {
+
+		@Override
+		public boolean keyDown(int arg0) {
+			// TODO Auto-generated method stub
+			return appState.keyDown(arg0);
+		}
+
+		@Override
+		public boolean keyTyped(char arg0) {
+			// TODO Auto-generated method stub
+			return false;
+		}
+
+		@Override
+		public boolean keyUp(int arg0) {
+			// TODO Auto-generated method stub
+			return appState.keyUp(arg0);
+		}
+
+		@Override
+		public boolean mouseMoved(int arg0, int arg1) {
+			// TODO Auto-generated method stub
+			return false;
+		}
+
+		@Override
+		public boolean scrolled(int arg0) {
+			// TODO Auto-generated method stub
+			return false;
+		}
+
+		@Override
+		public boolean touchDown(int arg0, int arg1, int arg2, int arg3) {
+			// TODO Auto-generated method stub
+			return false;
+		}
+
+		@Override
+		public boolean touchDragged(int arg0, int arg1, int arg2) {
+			// TODO Auto-generated method stub
+			return false;
+		}
+
+		@Override
+		public boolean touchUp(int x, int y, int pointer, int button) {
+			return appState.touchUp(x, y, pointer, button);
+		}
+
 	}
 	
 	void gotoAppState(int newState) {

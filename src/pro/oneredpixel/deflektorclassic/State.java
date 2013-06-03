@@ -36,7 +36,7 @@ public class State {
 	};
 	
 	//------
-	//--- controlling
+	//--- controlling - Gestures
 	//------
 	public boolean pinch (Vector2 initialFirstPointer, Vector2 initialSecondPointer, Vector2 firstPointer, Vector2 secondPointer) {
 		return false;
@@ -56,13 +56,31 @@ public class State {
 
 	public boolean touchDown(float x, float y, int pointer, int button) {
 		return false;
-	} 
+	}
 
 	public boolean pan(float x, float y, float deltaX, float deltaY) {
 		return false;
 	}
 	
 	public boolean zoom(float arg0, float arg1) {
+		return false;
+	}
+	
+	//
+	//--- controlling - Mouse and finger
+	//
+	public boolean touchUp(int x, int y, int pointer, int button) {
+		return false;
+	}
+	
+	//
+	//--- controlling - Keys
+	//
+	public boolean keyDown(int arg0) {
+		return false;
+	}
+
+	public boolean keyUp(int arg0) {
 		return false;
 	}
 

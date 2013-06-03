@@ -111,12 +111,6 @@ public class GameState extends State {
 			};
 		};
 	
-		if(Gdx.input.isKeyPressed(Keys.BACK)) {
-			if (winStateId==WINSTATE_GAMING) {
-				app.stopContinuousSound();
-				winStateId=WINSTATE_PAUSED;
-			} else winStateId=WINSTATE_GAMING;//app.gotoAppState(Deflektor.APPSTATE_MENU);
-		}
 	};
 	
 	//------
@@ -144,7 +138,7 @@ public class GameState extends State {
 			setCursor((int)x,(int)y);
 			x=x-app.winX;
 			y=y-app.winY;
-			if (x>=0 && x<app.winWidth && y>=0 && y<app.winHeight && beamState!=BEAMSTATE_CONNECTED)
+			if (x>=0 && x<app.winWidth && y>=0 && y<app.winHeight && beamState!=BEAMSTATE_CONNECTED && app.controlsTapToRotate)
 				touch(((int)x)/(app.sprSize*2)/app.sprScale, ((int)y)/(app.sprSize*2)/app.sprScale);
 			break;
 		case WINSTATE_PAUSED:
@@ -164,16 +158,24 @@ public class GameState extends State {
 			touchX = x;
 			touchY = y;
 			restDelta = 0;
-			setCursor((int)x,(int)y);
+			if (app.controlsTouchAndDrag) setCursor((int)x,(int)y);
 			break;
 		};
 		return false;
-	} 
+	}
+	
+	public boolean touchUp(int x, int y, int pointer, int button) {
+		if (!app.controlsTapThenDrag) {
+			disableCursor();
+		};
+		return false;
+	}
+	
 
 	public boolean pan(float x, float y, float deltaX, float deltaY) {
 		switch (winStateId) {
 		case WINSTATE_GAMING:
-			if (cursorEnabled && beamState!=BEAMSTATE_CONNECTED) {
+			if (cursorEnabled && beamState!=BEAMSTATE_CONNECTED && (app.controlsTapThenDrag || app.controlsTouchAndDrag)) {
 				int delta=(int)Math.sqrt((deltaX)*(deltaX)+(deltaY)*(deltaY));
 				if (deltaX<(-deltaY)) delta=-delta;
 				delta = delta + restDelta;
@@ -184,6 +186,25 @@ public class GameState extends State {
 		};
 		return false;
 	}
+	
+	public boolean keyDown(int k) {
+		return false;
+	}
+
+	public boolean keyUp(int k) {
+		if (k==Keys.BACK) {
+		//if(Gdx.input.isKeyPressed(Keys.BACK)) {
+			if (winStateId==WINSTATE_GAMING) {
+				app.stopContinuousSound();
+				winStateId=WINSTATE_PAUSED;
+			} else winStateId=WINSTATE_GAMING;//app.gotoAppState(Deflektor.APPSTATE_MENU);
+			return true;
+		};
+		return false;
+	}
+
+	
+
 	
 	
 	/// game ///
@@ -1135,6 +1156,10 @@ public class GameState extends State {
 				grm[i].init();
 			};
 		
+	}
+	
+	void disableCursor() {
+		cursorEnabled=false;
 	}
 	
 	void setCursor(int x, int y) {
