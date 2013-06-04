@@ -1,6 +1,5 @@
 package pro.oneredpixel.deflektorclassic;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
@@ -151,8 +150,10 @@ public class GameState extends State {
 	float touchX=0;
 	float touchY=0;
 	int restDelta = 0;
+	boolean touched = false;
 	
 	public boolean touchDown(float x, float y, int pointer, int button) {
+		touched=true;
 		switch (winStateId) {
 		case WINSTATE_GAMING:
 			touchX = x;
@@ -165,6 +166,7 @@ public class GameState extends State {
 	}
 	
 	public boolean touchUp(int x, int y, int pointer, int button) {
+		touched=false;
 		if (!app.controlsTapThenDrag) {
 			disableCursor();
 		};
@@ -1182,7 +1184,8 @@ public class GameState extends State {
 		boolean needToExplodeBarrier=true;
 		boolean barrierFound = false;
     
-		if (++cursorPhase>=cursorPhases) cursorPhase=0;		
+		if (++cursorPhase>=cursorPhases) cursorPhase=0;
+		if (touched) cursorPhase=cursorPhases/2-1;
 		
 		switch (gameStateId) {
 		case GAMESTATE_ACCUMULATING_ENERGY:
@@ -1235,7 +1238,10 @@ public class GameState extends State {
 			for (int i=0;i<field_width;i++) 
 				for (int j=0;j<field_height;j++) {
 					f=field[j*field_width+i];
-					if ((f&ROTATING)!=0) rotateThing(i,j);
+					if ((f&ROTATING)!=0) {
+						if (!(((f&0xf00)==MIRR) && (i==cursorX) && (j==cursorY) && touched))
+							rotateThing(i,j);
+					};
 					if ((f&EXPLODE)!=0) barrierFound = true;
 					if ((f&0xf00)==_EXPL) {
 						f++;
@@ -1283,7 +1289,7 @@ public class GameState extends State {
 	
 	void rotateMirror(int x, int y, int angle) {
 		if (x>=field_width || y>=field_height) return;
-		if ((field[y*field_width+x]&0xFF00)==MIRR)
+		if ((field[y*field_width+x]&0x0F00)==MIRR)
 			rotateThing(x,y,angle);
 	}
 	
@@ -1683,25 +1689,6 @@ public class GameState extends State {
 		
 	};
 	
-	/*
-	int getMirrorAngle (int x, int y) {
-		if (x<0 || x>= field_width || y< 0 || y>=field_height) return -1;
-		int f=field[y*field_width+x];
-		if ((f&0xFF00)==MIRR) {
-			return f&0x1f;
-		};
-		return -1;
-	};
-	
-	void setMirrorAngle (int x, int y, int angle) {
-		if (x<0 || x>= field_width || y< 0 || y>=field_height || angle<0) return;
-		int f=field[y*field_width+x];
-		if ((f&0xFF00)==MIRR) {
-			field[y*field_width+x]=(f&0xFFFFFF00)|(angle&0x1f);
-		};
-	};
-	*/
-	
 	class Gremlin {
 		int x;
 		int y;
@@ -1731,12 +1718,6 @@ public class GameState extends State {
 				if ((sx==3) && (x<(field_width-1)*2) && checkFreeSpace(x+1,y)) x++;
 				if ((sy==0) && (y>0) && checkFreeSpace(x,y-1)) y--;
 				if ((sy==3) && (y<(field_height-1)*2) && checkFreeSpace(x,y+1)) y++;
-				//int sx=(int)(Math.random()*2);
-				//int sy=(int)(Math.random()*2);
-				//if ((sx==0) && (x>0) && checkFreeSpace(x-1,y)) x--;
-				//if ((sx==1) && (x<(field_width-1)*2) && checkFreeSpace(x+1,y)) x++;
-				//if ((sy==0) && (y>0) && checkFreeSpace(x,y-1)) y--;
-				//if ((sy==1) && (y<(field_height-1)*2) && checkFreeSpace(x,y+1)) y++;
 
 				if (((x&1)+(y&1))==0) {
 					rotateMirror(x/2,y/2,((int)(Math.random()*3)-1)&0x1f); 
@@ -1746,10 +1727,6 @@ public class GameState extends State {
 		};
 		
 		boolean checkFreeSpace(int cx,int cy) {
-			//int f;
-			//f=field[(cx/2)+(cy*field_height/2)]&0xFF00;
-			//if ((f!=SL_A) && (f!=SL_B) && (f!=WL_A) && (f!=WL_B)) return true;
-			//else return false;
 			
 			return checkSmallField(cx,cy) && checkSmallField(cx+1,cy) && checkSmallField(cx,cy+1) && checkSmallField(cx+1,cy+1);
 			
@@ -1759,11 +1736,6 @@ public class GameState extends State {
 			int f;
 			f=field[(dx/2)+((dy/2)*field_width)];
 			switch (f&0x0F00) {
-			//case NULL:
-			//case MIRR:
-			//case CELL:
-			//case MINE:
-			//	return true;
 			case LASR:
 			case RCVR:
 			case WARP:
