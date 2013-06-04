@@ -139,7 +139,7 @@ public class GameState extends State {
 			y=y-app.winY;
 			if (x>=0 && x<app.winWidth && y>=0 && y<app.winHeight && beamState!=BEAMSTATE_CONNECTED && app.controlsTapToRotate) {
 				touchField(((int)x)/(app.sprSize*2)/app.sprScale, ((int)y)/(app.sprSize*2)/app.sprScale);
-				killGremlins((int)(x/app.sprSize/app.sprScale+0.5), (int)(y/app.sprSize/app.sprScale+0.5));
+				killGremlins((int)(x/app.sprScale), (int)(y/app.sprScale));
 			};
 			break;
 		case WINSTATE_PAUSED:
@@ -1756,7 +1756,7 @@ public class GameState extends State {
 		}
 		
 		boolean attemptToKill(int tapx, int tapy) {
-			if ((delay==0) && ((x+1==tapx) || (x+1==tapx)) && ((y+1==tapy) || (y+1==tapy)) ) {
+			if ((delay==0) && (tapx>=x*app.sprSize) && (tapx<(x+2)*app.sprSize) && (tapy>=y*app.sprSize) && (tapy<(y+2)*app.sprSize) ) {
 				init();
 				delay*=6;
 				return true;
