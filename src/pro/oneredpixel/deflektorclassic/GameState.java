@@ -137,8 +137,10 @@ public class GameState extends State {
 			setCursor((int)x,(int)y);
 			x=x-app.winX;
 			y=y-app.winY;
-			if (x>=0 && x<app.winWidth && y>=0 && y<app.winHeight && beamState!=BEAMSTATE_CONNECTED && app.controlsTapToRotate)
-				touch(((int)x)/(app.sprSize*2)/app.sprScale, ((int)y)/(app.sprSize*2)/app.sprScale);
+			if (x>=0 && x<app.winWidth && y>=0 && y<app.winHeight && beamState!=BEAMSTATE_CONNECTED && app.controlsTapToRotate) {
+				touchField(((int)x)/(app.sprSize*2)/app.sprScale, ((int)y)/(app.sprSize*2)/app.sprScale);
+				killGremlins((int)(x/app.sprSize/app.sprScale+0.5), (int)(y/app.sprSize/app.sprScale+0.5));
+			};
 			break;
 		case WINSTATE_PAUSED:
 			app.gotoAppState(Deflektor.APPSTATE_MENU);
@@ -1674,19 +1676,20 @@ public class GameState extends State {
 		
 	}
 	
-	void touch(int x, int y) {
+	void touchField(int x, int y) {
 		if (x<0 || x>= field_width || y< 0 || y>=field_height) return;
 		int f=field[y*field_width+x];
 		if ((f&0xFF00)==MIRR) {
 			rotateThing(x,y);
 		};
+	};
 		
+	void killGremlins(int x, int y) {
 		if (countOfGremlins>0)
 			for (int i=0;i<countOfGremlins;i++)
 				if (grm[i].attemptToKill(x, y)) {
 					//TODO:sound of killed gremlin
 				};
-		
 	};
 	
 	class Gremlin {
@@ -1753,7 +1756,7 @@ public class GameState extends State {
 		}
 		
 		boolean attemptToKill(int tapx, int tapy) {
-			if ((delay==0) && (x==(tapx*2)) && (y==(tapy*2))) {
+			if ((delay==0) && ((x+1==tapx) || (x+1==tapx)) && ((y+1==tapy) || (y+1==tapy)) ) {
 				init();
 				delay*=6;
 				return true;
