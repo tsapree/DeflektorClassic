@@ -112,7 +112,7 @@ public class Deflektor implements ApplicationListener {
 		//Creates a new GestureDetector with default values: halfTapSquareSize=20, tapCountInterval=0.4f, longPressDuration=1.1f, maxFlingDelay=0.15f.
 
 		InputMultiplexer multiplexer = new InputMultiplexer();
-		multiplexer.addProcessor(new GestureDetector(sprSize/2*sprScale, 0.4f, 1.1f, 0.15f, new MyGestureListener()));
+		multiplexer.addProcessor(new GestureDetector(sprSize*sprScale, 0.4f, 1.1f, 0.15f, new MyGestureListener()));
 		multiplexer.addProcessor(new MyInputProcessor());
 		Gdx.input.setInputProcessor(multiplexer);
 		
