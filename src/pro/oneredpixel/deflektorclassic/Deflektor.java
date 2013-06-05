@@ -297,7 +297,7 @@ public class Deflektor implements ApplicationListener {
 	void spr_putRegionSafe(int x, int y, int srcWidth, int srcHeight, int srcX, int srcY) {
 		batch.draw(spritesImage, winX+x*sprScale, screenHeight-winY-y*sprScale-srcHeight*sprScale, srcWidth*sprScale,srcHeight*sprScale, srcX, srcY, srcWidth,srcHeight,false,false);
 	};
-	
+		
 	void showBigNumber(int x, int y, int num) {
 		int up=num/10;
 		int lo=num-up*10;
@@ -345,6 +345,11 @@ public class Deflektor implements ApplicationListener {
 		drawBox(x,y,width,24,0,176);
 		showString(x+8,y+8,text);
 	};
+	
+	void drawButton (Button b) {
+		drawBox(b.bx,b.by,b.bwidth,b.bheight,0,176);
+		if (b.btxtEng!=null) showString(b.bx+8,b.by+8,b.btxtEng);
+	}
 	
 	void unlockLevel(int level) {
 		if (unlockedLevel<level)
