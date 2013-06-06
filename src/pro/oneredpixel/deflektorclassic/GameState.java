@@ -7,9 +7,19 @@ import com.badlogic.gdx.utils.TimeUtils;
 
 public class GameState extends State {
 
+	Button bResume;
+	Button bRestart;
+	Button bLevels;
+	Button bSound;
+	
 	GameState(Deflektor defl) {
 		super(defl);
-		// TODO Auto-generated constructor stub
+		
+		bResume = new Button(32, 40,0,0,false,"RESUME");
+		bRestart = new Button(32+16+8+8*6, 40,0,0,false,"RESTART");
+		bLevels = new Button(32, 72,0,0,false,"LEVELS");
+		bSound = new Button(32, 104,0,0,false,"SOUND OFF");
+		
 	}
 	
 	final int desiredFPS = 15;
@@ -81,11 +91,13 @@ public class GameState extends State {
 		if (winStateId==WINSTATE_PAUSED) {
 			app.drawBox(24, 8, 240-48, 160-32, 0,176);
 			app.showString(32, 24, "GAME PAUSED");
-			app.drawButton(32, 40, "RESUME", false);
-			app.drawButton(32+16+8+8*6, 40, "RESTART", false);
-			app.drawButton(32, 72, "LEVELS", false);
-			if (app.soundEnabled) app.drawButton(32, 104, "SOUND OFF", false);
-			else app.drawButton(32, 104, "SOUND ON", false);
+			
+			app.drawButton(bResume);
+			app.drawButton(bRestart);
+			app.drawButton(bLevels);
+			
+			if (app.soundEnabled) app.drawButton(bSound);
+			else app.drawButton(bSound, "SOUND ON");
 		};
 		
 		batch.end();
@@ -143,7 +155,16 @@ public class GameState extends State {
 			};
 			break;
 		case WINSTATE_PAUSED:
-			app.gotoAppState(Deflektor.APPSTATE_MENU);
+			int tapx=(int)(x-app.winX)/app.sprScale;
+			int tapy=(int)(y-app.winY)/app.sprScale;
+			if (bResume.checkRegion(tapx,tapy)) 
+				winStateId=WINSTATE_GAMING;
+			if (bRestart.checkRegion(tapx,tapy)) 
+				initGame();
+			if (bLevels.checkRegion(tapx,tapy)) 
+				app.gotoAppState(Deflektor.APPSTATE_SELECTLEVEL);
+			if (bSound.checkRegion(tapx,tapy)) 
+				app.gotoAppState(Deflektor.APPSTATE_MENU);
 			break;
 		};
 		return false;

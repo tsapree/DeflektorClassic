@@ -348,7 +348,12 @@ public class Deflektor implements ApplicationListener {
 	
 	void drawButton (Button b) {
 		drawBox(b.bx,b.by,b.bwidth,b.bheight,0,176);
-		if (b.btxtEng!=null) showString(b.bx+8,b.by+8,b.btxtEng);
+		if (b.btxt!=null) showString(b.bx+8,b.by+8,b.btxt);
+	}
+	
+	void drawButton (Button b, String text) {
+		drawBox(b.bx,b.by,b.bwidth,b.bheight,0,176);
+		if (text!=null) showString(b.bx+8,b.by+8,text);
 	}
 	
 	void unlockLevel(int level) {

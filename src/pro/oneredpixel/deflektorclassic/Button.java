@@ -6,16 +6,15 @@ public class Button {
 	int bwidth;
 	int bheight;
 	int bimg;
-	String btxtEng;
-	String btxtRus;
+	String btxt;
 	
-	Button(int x, int y, int width, int height, boolean centered, String txtEng, String txtRus) {
+	Button(int x, int y, int width, int height, boolean centered, String txt) {
 		bx=x;
 		by=y;
 		bwidth=width;
 		bheight=height;
-		btxtEng=txtEng;
-		btxtRus=txtRus;
+		btxt=txt;
+		correctXYWidthHeight(centered);
 	};
 	
 	Button(int x, int y, int width, int height, boolean centered) {
@@ -23,11 +22,12 @@ public class Button {
 		by=y;
 		bwidth=width;
 		bheight=height;
+		correctXYWidthHeight(centered);
 	};
 	
 	void correctXYWidthHeight(boolean centered) {
 		if (bwidth<=0) {
-			if (btxtEng!=null) bwidth=btxtEng.length()*8+16;
+			if (btxt!=null) bwidth=btxt.length()*8+16;
 			if (bwidth<=0) bwidth=24;
 		};
 		if (bheight==0) bheight=24;
