@@ -163,8 +163,9 @@ public class GameState extends State {
 				initGame();
 			if (bLevels.checkRegion(tapx,tapy)) 
 				app.gotoAppState(Deflektor.APPSTATE_SELECTLEVEL);
-			if (bSound.checkRegion(tapx,tapy)) 
-				app.gotoAppState(Deflektor.APPSTATE_MENU);
+			if (bSound.checkRegion(tapx,tapy))
+				app.soundEnabled=!app.soundEnabled;
+				//app.gotoAppState(Deflektor.APPSTATE_MENU);
 			break;
 		};
 		return false;

@@ -376,37 +376,41 @@ public class Deflektor implements ApplicationListener {
 	void playSound(int id) {
 		if ((playing_LOOP_id!=0) && (playing_LOOP_id!=id)) stopSound(playing_LOOP_id);
 		
-		switch (id) { 
-		case SND_BURNCELL:
-			burnCellSound.play();
-			break;
-		case SND_EXITOPEN:
-			exitOpenSound.play();
-			break;
-
-		case SND_LASERREADY:
-			laserReadySound.play();
-			break;
-		case SND_LEVELCOMPLETED:
-			levelCompletedSound.play();
-			break;
+		if (soundEnabled) {
+		
+			switch (id) { 
+			case SND_BURNCELL:
+				burnCellSound.play();
+				break;
+			case SND_EXITOPEN:
+				exitOpenSound.play();
+				break;
+	
+			case SND_LASERREADY:
+				laserReadySound.play();
+				break;
+			case SND_LEVELCOMPLETED:
+				levelCompletedSound.play();
+				break;
+				
+			case SND_LASERFILLIN_LOOP:
+				if (playing_LOOP_id==0) laserFillInSound.loop();
+				playing_LOOP_id=SND_LASERFILLIN_LOOP;
+				break;
+			case SND_LASEROVERHEAT_LOOP:
+				if (playing_LOOP_id==0) laserOverheatSound.loop();
+				playing_LOOP_id=SND_LASEROVERHEAT_LOOP;
+				break;
+			case SND_LASERBOMB_LOOP:
+				if (playing_LOOP_id==0) burnBombSound.loop();
+				playing_LOOP_id=SND_LASERBOMB_LOOP;
+				break;
+			case SND_TRANSFERNRG_LOOP:
+				if (playing_LOOP_id==0) transferEnergySound.loop();
+				playing_LOOP_id=SND_TRANSFERNRG_LOOP;
+				break;
+			};
 			
-		case SND_LASERFILLIN_LOOP:
-			if (playing_LOOP_id==0) laserFillInSound.loop();
-			playing_LOOP_id=SND_LASERFILLIN_LOOP;
-			break;
-		case SND_LASEROVERHEAT_LOOP:
-			if (playing_LOOP_id==0) laserOverheatSound.loop();
-			playing_LOOP_id=SND_LASEROVERHEAT_LOOP;
-			break;
-		case SND_LASERBOMB_LOOP:
-			if (playing_LOOP_id==0) burnBombSound.loop();
-			playing_LOOP_id=SND_LASERBOMB_LOOP;
-			break;
-		case SND_TRANSFERNRG_LOOP:
-			if (playing_LOOP_id==0) transferEnergySound.loop();
-			playing_LOOP_id=SND_TRANSFERNRG_LOOP;
-			break;
 		};
 	};
 	
