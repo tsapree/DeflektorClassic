@@ -50,12 +50,14 @@ public class Deflektor implements ApplicationListener {
 	final static int APPSTATE_MENU = 2;
 	final static int APPSTATE_SELECTLEVEL = 3;
 	final static int APPSTATE_GAME = 4;
+	final static int APPSTATE_SETTINGS = 5;
 	int appStateId = 0;
 	State appState;
 	
 	GameState gameState;
 	MenuState menuState;
 	LevelsState levelsState;
+	SettingsState settingsState;
 	
 	public long lastFrameTime = 0;
 	
@@ -248,7 +250,8 @@ public class Deflektor implements ApplicationListener {
 				levelsState.create();
 			};
 			appState = levelsState;
-			Gdx.input.setCatchBackKey(false);
+			Gdx.input.setCatchBackKey(true);
+			if (soundEnabled) music.play();
 			break;
 			
 		case APPSTATE_GAME:
@@ -261,6 +264,15 @@ public class Deflektor implements ApplicationListener {
 			Gdx.input.setCatchBackKey(true);
 			music.stop();
 			break;
+		case APPSTATE_SETTINGS:
+			if (settingsState==null) {
+				settingsState = new SettingsState(this);
+				settingsState.create();
+			};
+			appState = settingsState;
+			Gdx.input.setCatchBackKey(true);
+			break;
+		
 		};
 		appStateId = newState;
 		appState.start();

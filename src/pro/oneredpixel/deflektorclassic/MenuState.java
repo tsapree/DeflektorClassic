@@ -22,6 +22,8 @@ public class MenuState extends State {
 		
 		if (bPlay.checkRegion(tapx,tapy)) 
 			app.gotoAppState(Deflektor.APPSTATE_SELECTLEVEL);
+		if (bSettings.checkRegion(tapx,tapy)) 
+			app.gotoAppState(Deflektor.APPSTATE_SETTINGS);
 		return false;
 	}
 

@@ -1,5 +1,6 @@
 package pro.oneredpixel.deflektorclassic;
 
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 public class LevelsState extends State {
@@ -29,6 +30,14 @@ public class LevelsState extends State {
 				};
 			}
 		}		
+		return false;
+	}
+	
+	public boolean keyUp(int k) {
+		if (k==Keys.BACK) {
+			app.gotoAppState(Deflektor.APPSTATE_MENU);
+			return true;
+		};
 		return false;
 	}
 	
