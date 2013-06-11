@@ -1345,7 +1345,7 @@ public class GameState extends State {
 		int beam_y=0;
 		int beam_angle=0;
 
-		//clear field by null-sprite;
+		//clear field by null-sprite and search beam;
 		for (int i=0;i<field_width;i++) 
 			for (int j=0;j<field_height;j++) {
 				int f=field[j*field_width+i];
@@ -1357,11 +1357,16 @@ public class GameState extends State {
 				} else if ((f&0xf00)==RCVR) {
 					
 				};
-				if (((f&0xf00)==NULL) || ((f&0xf00)==MINE) || ((f&0xf00)==CELL) || ((f&0xf00)==_EXPL) || ((f&0xf00)==WL_A) || ((f&0xf00)==WL_B) ) {
-					app.spr_putRegion( i*16, j*16, 16, 16, 7*16, 6*16);
+				//clear field by null-sprite only in zx-version
+				if (app.appGfxId == Deflektor.APPGFX_ZX) {
+					if (((f&0xf00)==NULL) || ((f&0xf00)==MINE) || ((f&0xf00)==CELL) || ((f&0xf00)==_EXPL) || ((f&0xf00)==WL_A) || ((f&0xf00)==WL_B) ) {
+						app.spr_putRegion( i*16, j*16, 16, 16, 7*16, 6*16);
+					};
 				};
 			};
 		
+		// in zx-version beam showing before drawing field
+		if (app.appGfxId == Deflektor.APPGFX_ZX) {
 			switch (gameStateId) {
 			case GAMESTATE_ACCUMULATING_ENERGY:
 				break;
@@ -1372,8 +1377,7 @@ public class GameState extends State {
 				drawBeam(beam_x,beam_y,beam_angle);
 				break;
 			};
-
-			
+		};
 
 			
 		for (int i=0;i<field_width;i++) 
@@ -1419,6 +1423,20 @@ public class GameState extends State {
 					app.spr_putRegion( i*16, j*16, 16, 16, ((f_angle&7)*16), 6*16);
 					break;
 				}
+			};
+			
+			// in non-zx-version beam showing after drawing field
+			if (app.appGfxId != Deflektor.APPGFX_ZX) {
+				switch (gameStateId) {
+				case GAMESTATE_ACCUMULATING_ENERGY:
+					break;
+				case GAMESTATE_CALCULATING_ENERGY:
+				case GAMESTATE_OVERHEAT:
+				case GAMESTATE_LEVELCOMPLETED:
+				case GAMESTATE_GAMING:
+					drawBeam(beam_x,beam_y,beam_angle);
+					break;
+				};
 			};
 			
 		if (countOfGremlins>0)
