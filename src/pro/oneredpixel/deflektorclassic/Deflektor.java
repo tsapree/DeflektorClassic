@@ -88,18 +88,20 @@ public class Deflektor implements ApplicationListener {
 		
 		panScale=sprSize*sprScale/1;
 		
-		spritesImage = new Texture(Gdx.files.internal("sprites.png"));
+		//spritesImage = new Texture(Gdx.files.internal("zx.png"));
+		spritesImage = new Texture(Gdx.files.internal("amiga.png"));
 		  
-		burnCellSound = Gdx.audio.newSound(Gdx.files.internal("burn-cell.wav"));
-		burnBombSound = Gdx.audio.newSound(Gdx.files.internal("burn-bomb.wav"));
-		exitOpenSound = Gdx.audio.newSound(Gdx.files.internal("exit-open.wav"));
-		laserFillInSound = Gdx.audio.newSound(Gdx.files.internal("laser-fill-in.wav"));
-		laserOverheatSound = Gdx.audio.newSound(Gdx.files.internal("laser-overheat.wav"));
-		laserReadySound = Gdx.audio.newSound(Gdx.files.internal("laser-ready.wav"));
-		levelCompletedSound = Gdx.audio.newSound(Gdx.files.internal("level-completed.wav"));
-		transferEnergySound = Gdx.audio.newSound(Gdx.files.internal("transfer-energy.wav"));
+		burnCellSound = Gdx.audio.newSound(Gdx.files.internal("zx-burn-cell.wav"));
+		burnBombSound = Gdx.audio.newSound(Gdx.files.internal("zx-burn-bomb.wav"));
+		exitOpenSound = Gdx.audio.newSound(Gdx.files.internal("zx-exit-open.wav"));
+		laserFillInSound = Gdx.audio.newSound(Gdx.files.internal("zx-laser-fill-in.wav"));
+		laserOverheatSound = Gdx.audio.newSound(Gdx.files.internal("zx-laser-overheat.wav"));
+		laserReadySound = Gdx.audio.newSound(Gdx.files.internal("zx-laser-ready.wav"));
+		levelCompletedSound = Gdx.audio.newSound(Gdx.files.internal("zx-level-completed.wav"));
+		transferEnergySound = Gdx.audio.newSound(Gdx.files.internal("zx-transfer-energy.wav"));
 
-		music = Gdx.audio.newMusic(Gdx.files.internal("zxmusic.ogg"));
+		//music = Gdx.audio.newMusic(Gdx.files.internal("zx.ogg"));
+		music = Gdx.audio.newMusic(Gdx.files.internal("amiga.ogg"));
 		  
 		// start the playback of the background music immediately
 		music.setLooping(true);
