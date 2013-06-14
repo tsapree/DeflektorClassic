@@ -26,6 +26,7 @@ public class GameState extends State {
 	
 	final int WINSTATE_GAMING = 0;
 	final int WINSTATE_PAUSED = 1;
+	final int WINSTATE_STOPED = 2;
 	int winStateId = WINSTATE_GAMING;
 
 	final int GAMESTATE_ACCUMULATING_ENERGY =0;
@@ -76,7 +77,9 @@ public class GameState extends State {
 	
 	//state stoped
 	void stop() {
+		winStateId = WINSTATE_STOPED;
 		app.stopContinuousSound();
+		
 	};
 	
 	public void render(SpriteBatch batch) {
@@ -107,21 +110,6 @@ public class GameState extends State {
 		} else return;
 		app.lastFrameTime = TimeUtils.nanoTime();
 		
-		if (winStateId==WINSTATE_GAMING) {
-			switch (beamState) {
-			case BEAMSTATE_NORMAL:
-			case BEAMSTATE_CONNECTED:
-				app.stopContinuousSound();
-				break;
-			case BEAMSTATE_OVERHEAT:
-				app.playSound(Deflektor.SND_LASEROVERHEAT_LOOP);
-				break;
-			case BEAMSTATE_BOMB:
-				app.playSound(Deflektor.SND_LASERBOMB_LOOP);
-				break;
-			};
-		};
-	
 	};
 	
 	//------
@@ -1242,7 +1230,7 @@ public class GameState extends State {
 
 			break;
 		case GAMESTATE_GAMING:
-			energy++;	//TODO: ”¡–¿“‹ - ◊»“ :)
+			if (app.cheat) energy++;	//TODO: ”¡–¿“‹ - ◊»“ :)
 			energy--;
 			if (energy<=0) app.gotoAppState(Deflektor.APPSTATE_MENU);
 			
@@ -1257,10 +1245,8 @@ public class GameState extends State {
 			
 			if (overheat <=0) overheat =0;
 			if (overheat>=overheatSteps) {
-				overheat=0; //TODO: ”¡–¿“‹ - ◊»“ :)
-				//TODO: ‡ÒÍÓÏÏÂÌÚËÓ‚‡Ú¸ ‰Îˇ ÓÍÓÌ˜‡ÌËˇ Ë„˚ ÔÓ ÔÂÂ„Â‚Û :)
-				//app.laserOverheatSound.stop();
-				//app.gotoAppState(Deflektor.APPSTATE_MENU);
+				if (app.cheat) overheat=0; //TODO: ”¡–¿“‹ - ◊»“ :)
+				else app.gotoAppState(Deflektor.APPSTATE_MENU);  
 			}
 			if (countOfGremlins>0)
 				for (int i=0;i<countOfGremlins;i++) grm[i].animate();
@@ -1286,6 +1272,22 @@ public class GameState extends State {
 				for (int i=0;i<field_width*field_height;i++)
 					if ((field[i]&EXPLODE)!=0) field[i]=_EXPL;
 			};
+			
+			if (winStateId==WINSTATE_GAMING) {
+				switch (beamState) {
+				case BEAMSTATE_NORMAL:
+				case BEAMSTATE_CONNECTED:
+					app.stopContinuousSound();
+					break;
+				case BEAMSTATE_OVERHEAT:
+					app.playSound(Deflektor.SND_LASEROVERHEAT_LOOP);
+					break;
+				case BEAMSTATE_BOMB:
+					app.playSound(Deflektor.SND_LASERBOMB_LOOP);
+					break;
+				};
+			};
+			
 			break;
 		case GAMESTATE_CALCULATING_ENERGY:
 			break;
@@ -1303,6 +1305,7 @@ public class GameState extends State {
 			}
 			break;
 		};
+		
 	}
 	
 	void rotateThing(int x, int y) {

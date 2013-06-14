@@ -8,6 +8,8 @@ public class SettingsState extends State {
 	Button bZX;
 	Button bAmiga;
 	//Button bModern;
+	Button bResetProgress;
+	Button bCheat;
 	
 	SettingsState(Deflektor defl) {
 		super(defl);
@@ -16,6 +18,9 @@ public class SettingsState extends State {
 		bZX = new Button(16, 32,0,0,false,"ZX");
 		bAmiga = new Button(16+16+8*2, 32,0,0,false,"AMIGA");
 		//bModern = new Button(16+16+8*2+16+8*5, 32,0,0,false,"MODERN");
+		
+		bResetProgress = new Button(16, 160-24-8,0,0,false,"RESET PROGRESS");
+		bCheat = new Button(16+8+8+15*8,160-24-8,0,0,false,"CHEAT");
 		
 	}
 	
@@ -37,6 +42,13 @@ public class SettingsState extends State {
 			app.playMelody();
 		};
 		
+		if (bCheat.checkRegion(tapx,  tapy)) {
+			app.cheat=true;
+			app.unlockedLevel=60;
+		};
+		
+		if (bResetProgress.checkRegion(tapx,  tapy)) app.unlockedLevel=1;
+		
 		return false;
 	}
 	
@@ -57,6 +69,9 @@ public class SettingsState extends State {
 		if (app.appGfxId!=Deflektor.APPGFX_ZX) app.drawButton(bZX); else app.drawButton(bZX, 24, 176); 
 		if (app.appGfxId!=Deflektor.APPGFX_AMIGA) app.drawButton(bAmiga); else app.drawButton(bAmiga, 24, 176);
 		//app.drawButton(bModern);
+		
+		app.drawButton(bResetProgress);
+		app.drawButton(bCheat);
 		
 		batch.end();
 	};

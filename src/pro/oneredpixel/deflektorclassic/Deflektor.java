@@ -64,6 +64,8 @@ public class Deflektor implements ApplicationListener {
 	
 	public long lastFrameTime = 0;
 	
+	boolean cheat = false;
+	
 	//settings
 	boolean soundEnabled = true;
 	boolean controlsTapToRotate = true; //коснуться и отпустить зеркало для поворота на 1 угол
@@ -282,6 +284,8 @@ public class Deflektor implements ApplicationListener {
 		if (appState!=null) {
 			appState.stop();
 		};
+		
+		stopContinuousSound();
 		
 		switch (newState) {
 		case APPSTATE_STARTED:
