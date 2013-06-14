@@ -153,6 +153,7 @@ public class GameState extends State {
 				touchField(((int)x)/(app.sprSize*2)/app.sprScale, ((int)y)/(app.sprSize*2)/app.sprScale);
 				killGremlins((int)(x/app.sprScale), (int)(y/app.sprScale));
 			};
+			if (checkInBox((int)(x/app.sprScale),(int)(y/app.sprScale),(field_width-1)*16, field_height*16,16,16)) winStateId=WINSTATE_PAUSED;
 			break;
 		case WINSTATE_PAUSED:
 			int tapx=(int)(x-app.winX)/app.sprScale;
@@ -171,6 +172,10 @@ public class GameState extends State {
 		return false;
 	}
 
+	boolean checkInBox(int x,int y, int bx, int by, int bwidth, int bheight) {
+		return (x>=bx)&&(x<(bx+bwidth))&&(y>=by)&&(y<(by+bheight));
+	};
+	
 	float touchX=0;
 	float touchY=0;
 	int restDelta = 0;
