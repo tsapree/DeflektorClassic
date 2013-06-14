@@ -4,6 +4,7 @@ import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL10;
@@ -41,13 +42,11 @@ public class Deflektor implements ApplicationListener {
 	int panScale;
 	
 	int playingLevel = 1;
-	int unlockedLevel = 60;
 	final int countOfLevels = 60;
 	
 	final static int APPGFX_ZX = 0;
 	final static int APPGFX_AMIGA = 1;
 	final static int APPGFX_MODERN = 2;
-	int appGfxId = APPGFX_AMIGA;
 
 	final static int APPSTATE_STARTED = 0;
 	final static int APPSTATE_LOADING = 1;
@@ -70,11 +69,13 @@ public class Deflektor implements ApplicationListener {
 	boolean controlsTapToRotate = true; //коснуться и отпустить зеркало для поворота на 1 угол
 	boolean controlsTouchAndDrag = true; //коснуться зеркала и не отпуская потянуть для поворота
 	boolean controlsTapThenDrag = true; //коснуться зеркала для выбора, потом отпустить и провести по экрану для поворота
-	   
+	int unlockedLevel = 60;
+	int appGfxId = APPGFX_AMIGA;
+	
 	@Override
 	public void create() {
 		
-		appGfxId=APPGFX_AMIGA;
+		loadSettings();
 		
 		screenWidth = Gdx.graphics.getWidth();
 		screenHeight = Gdx.graphics.getHeight();
@@ -127,11 +128,6 @@ public class Deflektor implements ApplicationListener {
 			music = Gdx.audio.newMusic(Gdx.files.internal("amiga.ogg"));
 			music.setLooping(true);
 			break;
-		
-		//case APPGFX_MODERN:
-		//	spritesImage = new Texture(Gdx.files.internal("amiga.png"));
-		//	break;
-			
 		};
 		
 		burnCellSound = Gdx.audio.newSound(Gdx.files.internal("zx-burn-cell.wav"));
@@ -142,9 +138,6 @@ public class Deflektor implements ApplicationListener {
 		laserReadySound = Gdx.audio.newSound(Gdx.files.internal("zx-laser-ready.wav"));
 		levelCompletedSound = Gdx.audio.newSound(Gdx.files.internal("zx-level-completed.wav"));
 		transferEnergySound = Gdx.audio.newSound(Gdx.files.internal("zx-transfer-energy.wav"));
-
-		// start the playback of the background music immediately
-		
 	}
 	
 	void freeMedia() {
@@ -162,10 +155,27 @@ public class Deflektor implements ApplicationListener {
 		if (levelCompletedSound!=null)  levelCompletedSound.dispose();
 		if (transferEnergySound!=null)  transferEnergySound.dispose();
 	}
+	
+	void loadSettings() {
+		Preferences prefs = Gdx.app.getPreferences("DeflektorPreferences");
+		
+		soundEnabled = prefs.getBoolean("Sound", true);
+		unlockedLevel = prefs.getInteger("UnlockedLevel", 1);
+		appGfxId = prefs.getInteger("GfxType",APPGFX_AMIGA);
+	}
+	
+	void saveSettings() {
+		Preferences prefs = Gdx.app.getPreferences("DeflektorPreferences");
+		prefs.putBoolean("Sound", soundEnabled);
+		prefs.putInteger("UnlockedLevel", unlockedLevel);
+		prefs.putInteger("GfxType", appGfxId);
+		prefs.flush();
+	}
 
 	
 	@Override
 	public void dispose() {
+		saveSettings();
 		freeMedia();
 		// TODO Auto-generated method stub
 		
