@@ -141,20 +141,30 @@ public class GameState extends State {
 				touchField(((int)x)/(app.sprSize*2)/app.sprScale, ((int)y)/(app.sprSize*2)/app.sprScale);
 				killGremlins((int)(x/app.sprScale), (int)(y/app.sprScale));
 			};
-			if (checkInBox((int)(x/app.sprScale),(int)(y/app.sprScale),(field_width-1)*16, field_height*16,16,16)) winStateId=WINSTATE_PAUSED;
+			if (checkInBox((int)(x/app.sprScale),(int)(y/app.sprScale),(field_width-1)*16, field_height*16,16,16)) {
+				winStateId=WINSTATE_PAUSED;
+				app.playSound(Deflektor.SND_TAP);
+			}
 			break;
 		case WINSTATE_PAUSED:
 			int tapx=(int)(x-app.winX)/app.sprScale;
 			int tapy=(int)(y-app.winY)/app.sprScale;
-			if (bResume.checkRegion(tapx,tapy)) 
+			if (bResume.checkRegion(tapx,tapy)) {
 				winStateId=WINSTATE_GAMING;
-			if (bRestart.checkRegion(tapx,tapy)) 
+				app.playSound(Deflektor.SND_TAP);
+			};
+			if (bRestart.checkRegion(tapx,tapy)) {
 				initGame();
-			if (bLevels.checkRegion(tapx,tapy)) 
+				app.playSound(Deflektor.SND_TAP);
+			}
+			if (bLevels.checkRegion(tapx,tapy)) {
 				app.gotoAppState(Deflektor.APPSTATE_SELECTLEVEL);
-			if (bSound.checkRegion(tapx,tapy))
+				app.playSound(Deflektor.SND_TAP);
+			};
+			if (bSound.checkRegion(tapx,tapy)) {
 				app.soundEnabled=!app.soundEnabled;
-				//app.gotoAppState(Deflektor.APPSTATE_MENU);
+				app.playSound(Deflektor.SND_TAP);
+			}
 			break;
 		};
 		return false;
@@ -217,6 +227,7 @@ public class GameState extends State {
 				app.stopContinuousSound();
 				winStateId=WINSTATE_PAUSED;
 			} else winStateId=WINSTATE_GAMING;//app.gotoAppState(Deflektor.APPSTATE_MENU);
+			app.playSound(Deflektor.SND_TAP);
 			return true;
 		};
 		return false;
@@ -1249,7 +1260,9 @@ public class GameState extends State {
 				else app.gotoAppState(Deflektor.APPSTATE_MENU);  
 			}
 			if (countOfGremlins>0)
-				for (int i=0;i<countOfGremlins;i++) grm[i].animate();
+				for (int i=0;i<countOfGremlins;i++) {
+					if (grm[i].animate()) app.playSound(Deflektor.SND_GREMLINAPPEAR);
+				}
 			for (int i=0;i<field_width;i++) 
 				for (int j=0;j<field_height;j++) {
 					f=field[j*field_width+i];
@@ -1737,6 +1750,7 @@ public class GameState extends State {
 			for (int i=0;i<countOfGremlins;i++)
 				if (grm[i].attemptToKill(x, y)) {
 					//TODO:sound of killed gremlin
+					app.playSound(Deflektor.SND_GREMLINDEAD);
 				};
 	};
 	
@@ -1769,8 +1783,11 @@ public class GameState extends State {
 				
 		};
 		
-		void animate() {
-			if (delay>0) delay--;
+		boolean animate() {
+			if (delay>0) {
+				delay--;
+				if (delay==0) return true;
+			}
 			else {
 				int sx=(int)(Math.random()*4);
 				int sy=(int)(Math.random()*4);
@@ -1784,6 +1801,7 @@ public class GameState extends State {
 				}
 			};
 			phase=(phase+1)&0x7;
+			return false;
 		};
 		
 		boolean checkFreeSpace(int cx,int cy) {

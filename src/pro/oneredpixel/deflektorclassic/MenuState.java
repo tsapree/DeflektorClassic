@@ -20,10 +20,14 @@ public class MenuState extends State {
 		int tapx=(int)(x-app.winX)/app.sprScale;
 		int tapy=(int)(y-app.winY)/app.sprScale;
 		
-		if (bPlay.checkRegion(tapx,tapy)) 
+		if (bPlay.checkRegion(tapx,tapy)) {
 			app.gotoAppState(Deflektor.APPSTATE_SELECTLEVEL);
-		if (bSettings.checkRegion(tapx,tapy)) 
+			app.playSound(Deflektor.SND_TAP);
+		};
+		if (bSettings.checkRegion(tapx,tapy)) { 
 			app.gotoAppState(Deflektor.APPSTATE_SETTINGS);
+			app.playSound(Deflektor.SND_TAP);
+		};
 		return false;
 	}
 

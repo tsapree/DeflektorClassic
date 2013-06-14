@@ -32,11 +32,13 @@ public class SettingsState extends State {
 		//	app.gotoAppState(Deflektor.APPSTATE_SELECTLEVEL);
 		
 		if (bZX.checkRegion(tapx,  tapy) && app.appGfxId!=Deflektor.APPGFX_ZX) {
+			app.playSound(Deflektor.SND_TAP);
 			app.appGfxId=Deflektor.APPGFX_ZX;
 			app.loadMedia();
 			app.playMelody();
 		};
 		if (bAmiga.checkRegion(tapx,  tapy) && app.appGfxId!=Deflektor.APPGFX_AMIGA) {
+			app.playSound(Deflektor.SND_TAP);
 			app.appGfxId=Deflektor.APPGFX_AMIGA;
 			app.loadMedia();
 			app.playMelody();
@@ -45,9 +47,13 @@ public class SettingsState extends State {
 		if (bCheat.checkRegion(tapx,  tapy)) {
 			app.cheat=true;
 			app.unlockedLevel=60;
+			app.playSound(Deflektor.SND_TAP);
 		};
 		
-		if (bResetProgress.checkRegion(tapx,  tapy)) app.unlockedLevel=1;
+		if (bResetProgress.checkRegion(tapx,  tapy)) {
+			app.unlockedLevel=1;
+			app.playSound(Deflektor.SND_TAP);
+		}
 		
 		return false;
 	}
@@ -55,6 +61,7 @@ public class SettingsState extends State {
 	public boolean keyUp(int k) {
 		if (k==Keys.BACK) {
 			app.gotoAppState(Deflektor.APPSTATE_MENU);
+			app.playSound(Deflektor.SND_TAP);
 			return true;
 		};
 		return false;

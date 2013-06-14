@@ -26,6 +26,9 @@ public class Deflektor implements ApplicationListener {
 	private Sound laserReadySound;
 	private Sound levelCompletedSound;
 	private Sound transferEnergySound;
+	private Sound gremlinAppearSound;
+	private Sound gremlinDeadSound;
+	private Sound tapSound;
 	Music music;
 	
 	OrthographicCamera camera;
@@ -124,22 +127,34 @@ public class Deflektor implements ApplicationListener {
 			spritesImage = new Texture(Gdx.files.internal("zx.png"));
 			music = Gdx.audio.newMusic(Gdx.files.internal("zx.ogg"));
 			music.setLooping(true);
+			
+			burnCellSound = Gdx.audio.newSound(Gdx.files.internal("zx-burn-cell.wav"));
+			burnBombSound = Gdx.audio.newSound(Gdx.files.internal("zx-burn-bomb.wav"));
+			exitOpenSound = Gdx.audio.newSound(Gdx.files.internal("zx-exit-open.wav"));
+			laserFillInSound = Gdx.audio.newSound(Gdx.files.internal("zx-laser-fill-in.wav"));
+			laserOverheatSound = Gdx.audio.newSound(Gdx.files.internal("zx-laser-overheat.wav"));
+			laserReadySound = Gdx.audio.newSound(Gdx.files.internal("zx-laser-ready.wav"));
+			levelCompletedSound = Gdx.audio.newSound(Gdx.files.internal("zx-level-completed.wav"));
+			transferEnergySound = Gdx.audio.newSound(Gdx.files.internal("zx-transfer-energy.wav"));
+			
 			break;
 		case APPGFX_AMIGA:
 			spritesImage = new Texture(Gdx.files.internal("amiga.png"));
 			music = Gdx.audio.newMusic(Gdx.files.internal("amiga.ogg"));
 			music.setLooping(true);
+			
+			burnCellSound = Gdx.audio.newSound(Gdx.files.internal("amiga-burn-cell.wav"));
+			burnBombSound = Gdx.audio.newSound(Gdx.files.internal("amiga-burn-bomb.wav"));
+			exitOpenSound = Gdx.audio.newSound(Gdx.files.internal("amiga-exit-open.wav"));
+			laserFillInSound = Gdx.audio.newSound(Gdx.files.internal("amiga-laser-fill-in.wav"));
+			gremlinAppearSound=Gdx.audio.newSound(Gdx.files.internal("amiga-gremlin-appear.wav"));
+			gremlinDeadSound=Gdx.audio.newSound(Gdx.files.internal("amiga-gremlin-dead.wav"));
+			tapSound=Gdx.audio.newSound(Gdx.files.internal("amiga-tap.wav"));
+			
 			break;
 		};
 		
-		burnCellSound = Gdx.audio.newSound(Gdx.files.internal("zx-burn-cell.wav"));
-		burnBombSound = Gdx.audio.newSound(Gdx.files.internal("zx-burn-bomb.wav"));
-		exitOpenSound = Gdx.audio.newSound(Gdx.files.internal("zx-exit-open.wav"));
-		laserFillInSound = Gdx.audio.newSound(Gdx.files.internal("zx-laser-fill-in.wav"));
-		laserOverheatSound = Gdx.audio.newSound(Gdx.files.internal("zx-laser-overheat.wav"));
-		laserReadySound = Gdx.audio.newSound(Gdx.files.internal("zx-laser-ready.wav"));
-		levelCompletedSound = Gdx.audio.newSound(Gdx.files.internal("zx-level-completed.wav"));
-		transferEnergySound = Gdx.audio.newSound(Gdx.files.internal("zx-transfer-energy.wav"));
+
 	}
 	
 	void freeMedia() {
@@ -156,6 +171,9 @@ public class Deflektor implements ApplicationListener {
 		if (laserReadySound!=null)  laserReadySound.dispose();
 		if (levelCompletedSound!=null)  levelCompletedSound.dispose();
 		if (transferEnergySound!=null)  transferEnergySound.dispose();
+		if (gremlinAppearSound!=null)  gremlinAppearSound.dispose();
+		if (gremlinDeadSound!=null)  gremlinDeadSound.dispose();
+		if (tapSound!=null)  tapSound.dispose();
 	}
 	
 	void loadSettings() {
@@ -434,8 +452,7 @@ public class Deflektor implements ApplicationListener {
 		if (unlockedLevel<level)
 			unlockedLevel=level;
 	};
-	
-	
+
 	final static int SND_BURNCELL = 1;
 	final static int SND_LASERBOMB_LOOP =2;
 	final static int SND_EXITOPEN =3;
@@ -444,6 +461,9 @@ public class Deflektor implements ApplicationListener {
 	final static int SND_LASERREADY=6;
 	final static int SND_LEVELCOMPLETED=7;
 	final static int SND_TRANSFERNRG_LOOP=8;
+	final static int SND_GREMLINAPPEAR=9;
+	final static int SND_GREMLINDEAD=10;
+	final static int SND_TAP=11;
 	
 	int playing_LOOP_id = 0;
 	
@@ -465,6 +485,15 @@ public class Deflektor implements ApplicationListener {
 				break;
 			case SND_LEVELCOMPLETED:
 				if (levelCompletedSound!=null) levelCompletedSound.play();
+				break;
+			case SND_GREMLINAPPEAR:
+				if (gremlinAppearSound!=null) gremlinAppearSound.play();
+				break;
+			case SND_GREMLINDEAD:
+				if (gremlinDeadSound!=null) gremlinDeadSound.play();
+				break;
+			case SND_TAP:
+				if (tapSound!=null) tapSound.play();
 				break;
 				
 			case SND_LASERFILLIN_LOOP:
@@ -499,6 +528,10 @@ public class Deflektor implements ApplicationListener {
 		case SND_LEVELCOMPLETED:
 		case SND_LASERREADY:
 		case SND_EXITOPEN:
+		case SND_GREMLINAPPEAR:
+		case SND_GREMLINDEAD:
+		case SND_TAP:
+			
 			break;
 		case SND_LASEROVERHEAT_LOOP:
 			if (laserOverheatSound!=null) laserOverheatSound.stop();

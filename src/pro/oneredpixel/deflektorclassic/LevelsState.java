@@ -17,8 +17,14 @@ public class LevelsState extends State {
 		int ix=(int)((x-app.winX)/app.sprScale);
 		int iy=(int)((y-app.winY)/app.sprScale);
 		if ((ix>=0) && (ix<240) && (iy>=0) && (iy<160)) {
-			if ((page>1) && checkInBox(ix,iy,0,160/2-8-8,32,32)) page--;
-			if ((page<3) && checkInBox(ix,iy,240-16-8-8-8, 160/2-8,32,32)) page++;
+			if ((page>1) && checkInBox(ix,iy,0,160/2-8-8,32,32)) {
+				page--;
+				app.playSound(Deflektor.SND_TAP);
+			};
+			if ((page<3) && checkInBox(ix,iy,240-16-8-8-8, 160/2-8,32,32)) {
+				page++;
+				app.playSound(Deflektor.SND_TAP);
+			}
 			int lx=(ix-44)/8;
 			int ly=(iy-20)/8;
 			if ( ((lx&3)!=3) && ((ly&3)!=3) ) {
@@ -27,9 +33,13 @@ public class LevelsState extends State {
 				if ((lx>=0) && (lx<5) && (ly>=0) && (ly<4) && (lev<=app.unlockedLevel)) {
 					app.playingLevel = lev;
 					app.gotoAppState(Deflektor.APPSTATE_GAME);
+					app.playSound(Deflektor.SND_TAP);
 				};
 			}
-			if (checkInBox(ix,iy,8, 160-8-16,16,16)) app.gotoAppState(Deflektor.APPSTATE_MENU);
+			if (checkInBox(ix,iy,8, 160-8-16,16,16)) {
+				app.gotoAppState(Deflektor.APPSTATE_MENU);
+				app.playSound(Deflektor.SND_TAP);
+			}
 		}		
 		return false;
 	}
@@ -37,6 +47,7 @@ public class LevelsState extends State {
 	public boolean keyUp(int k) {
 		if (k==Keys.BACK) {
 			app.gotoAppState(Deflektor.APPSTATE_MENU);
+			app.playSound(Deflektor.SND_TAP);
 			return true;
 		};
 		return false;
