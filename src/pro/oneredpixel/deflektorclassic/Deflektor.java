@@ -127,9 +127,11 @@ public class Deflektor implements ApplicationListener {
 			music = Gdx.audio.newMusic(Gdx.files.internal("amiga.ogg"));
 			music.setLooping(true);
 			break;
-		case APPGFX_MODERN:
-			spritesImage = new Texture(Gdx.files.internal("amiga.png"));
-			break;
+		
+		//case APPGFX_MODERN:
+		//	spritesImage = new Texture(Gdx.files.internal("amiga.png"));
+		//	break;
+			
 		};
 		
 		burnCellSound = Gdx.audio.newSound(Gdx.files.internal("zx-burn-cell.wav"));
@@ -164,6 +166,7 @@ public class Deflektor implements ApplicationListener {
 	
 	@Override
 	public void dispose() {
+		freeMedia();
 		// TODO Auto-generated method stub
 		
 		
