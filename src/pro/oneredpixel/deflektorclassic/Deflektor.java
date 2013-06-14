@@ -166,6 +166,7 @@ public class Deflektor implements ApplicationListener {
 	public void dispose() {
 		// TODO Auto-generated method stub
 		
+		
 	}
 
 	@Override
@@ -399,6 +400,11 @@ public class Deflektor implements ApplicationListener {
 	
 	void drawButton (Button b) {
 		drawBox(b.bx,b.by,b.bwidth,b.bheight,0,176);
+		if (b.btxt!=null) showString(b.bx+8,b.by+8,b.btxt);
+	}
+
+	void drawButton (Button b, int boxx, int boxy) {
+		drawBox(b.bx,b.by,b.bwidth,b.bheight,boxx,boxy);
 		if (b.btxt!=null) showString(b.bx+8,b.by+8,b.btxt);
 	}
 	

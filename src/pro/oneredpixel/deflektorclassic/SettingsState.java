@@ -7,7 +7,7 @@ public class SettingsState extends State {
 	
 	Button bZX;
 	Button bAmiga;
-	Button bModern;
+	//Button bModern;
 	
 	SettingsState(Deflektor defl) {
 		super(defl);
@@ -15,7 +15,7 @@ public class SettingsState extends State {
 		
 		bZX = new Button(16, 32,0,0,false,"ZX");
 		bAmiga = new Button(16+16+8*2, 32,0,0,false,"AMIGA");
-		bModern = new Button(16+16+8*2+16+8*5, 32,0,0,false,"MODERN");
+		//bModern = new Button(16+16+8*2+16+8*5, 32,0,0,false,"MODERN");
 		
 	}
 	
@@ -25,6 +25,18 @@ public class SettingsState extends State {
 		
 		//if (bPlay.checkRegion(tapx,tapy)) 
 		//	app.gotoAppState(Deflektor.APPSTATE_SELECTLEVEL);
+		
+		if (bZX.checkRegion(tapx,  tapy) && app.appGfxId!=Deflektor.APPGFX_ZX) {
+			app.appGfxId=Deflektor.APPGFX_ZX;
+			app.loadMedia();
+			app.playMelody();
+		};
+		if (bAmiga.checkRegion(tapx,  tapy) && app.appGfxId!=Deflektor.APPGFX_AMIGA) {
+			app.appGfxId=Deflektor.APPGFX_AMIGA;
+			app.loadMedia();
+			app.playMelody();
+		};
+		
 		return false;
 	}
 	
@@ -41,9 +53,10 @@ public class SettingsState extends State {
 		batch.begin();
 		app.showString((240-8*8)/2, 8, "SETTINGS");
 		
-		app.drawButton(bZX);
-		app.drawButton(bAmiga);
-		app.drawButton(bModern);
+		
+		if (app.appGfxId!=Deflektor.APPGFX_ZX) app.drawButton(bZX); else app.drawButton(bZX, 24, 176); 
+		if (app.appGfxId!=Deflektor.APPGFX_AMIGA) app.drawButton(bAmiga); else app.drawButton(bAmiga, 24, 176);
+		//app.drawButton(bModern);
 		
 		batch.end();
 	};
