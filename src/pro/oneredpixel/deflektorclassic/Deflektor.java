@@ -132,7 +132,8 @@ public class Deflektor implements ApplicationListener {
 			burnBombSound = Gdx.audio.newSound(Gdx.files.internal("zx-burn-bomb.wav"));
 			exitOpenSound = Gdx.audio.newSound(Gdx.files.internal("zx-exit-open.wav"));
 			laserFillInSound = Gdx.audio.newSound(Gdx.files.internal("zx-laser-fill-in.wav"));
-			laserOverheatSound = Gdx.audio.newSound(Gdx.files.internal("zx-laser-overheat.wav"));
+			//laserOverheatSound = Gdx.audio.newSound(Gdx.files.internal("zx-laser-overheat.wav"));
+			laserOverheatSound = Gdx.audio.newSound(Gdx.files.internal("zx-burn-bomb.wav"));
 			laserReadySound = Gdx.audio.newSound(Gdx.files.internal("zx-laser-ready.wav"));
 			levelCompletedSound = Gdx.audio.newSound(Gdx.files.internal("zx-level-completed.wav"));
 			transferEnergySound = Gdx.audio.newSound(Gdx.files.internal("zx-transfer-energy.wav"));
@@ -147,6 +148,7 @@ public class Deflektor implements ApplicationListener {
 			burnBombSound = Gdx.audio.newSound(Gdx.files.internal("amiga-burn-bomb.wav"));
 			exitOpenSound = Gdx.audio.newSound(Gdx.files.internal("amiga-exit-open.wav"));
 			laserFillInSound = Gdx.audio.newSound(Gdx.files.internal("amiga-laser-fill-in.wav"));
+			laserOverheatSound = Gdx.audio.newSound(Gdx.files.internal("amiga-burn-bomb.wav"));
 			gremlinAppearSound=Gdx.audio.newSound(Gdx.files.internal("amiga-gremlin-appear.wav"));
 			gremlinDeadSound=Gdx.audio.newSound(Gdx.files.internal("amiga-gremlin-dead.wav"));
 			tapSound=Gdx.audio.newSound(Gdx.files.internal("amiga-tap.wav"));
