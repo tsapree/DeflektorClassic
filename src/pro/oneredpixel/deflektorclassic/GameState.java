@@ -1748,8 +1748,17 @@ public class GameState extends State {
 		};
 		
 		void draw() {
-			if (delay==0) 
-				app.spr_putRegion(x*8, y*8, 16, 16, 0+phase*16, 128);
+			if (delay==0)
+				switch (app.appGfxId) {
+				case Deflektor.APPGFX_ZX:
+					app.spr_putRegion(x*8, y*8, 16, 16, 0+(phase&3)*16, 128);
+					break;
+				case Deflektor.APPGFX_AMIGA:
+					if (phase<=3) app.spr_putRegion(x*8, y*8, 16, 16, 0+(phase&3)*16, 128);
+					else app.spr_putRegion(x*8, y*8, 16, 16, 0+(7-phase)*16, 128);
+					break;
+				};
+				
 		};
 		
 		void animate() {
@@ -1766,7 +1775,7 @@ public class GameState extends State {
 					rotateMirror(x/2,y/2,((int)(Math.random()*3)-1)&0x1f); 
 				}
 			};
-			phase=(phase+1)&0x3;
+			phase=(phase+1)&0x7;
 		};
 		
 		boolean checkFreeSpace(int cx,int cy) {
