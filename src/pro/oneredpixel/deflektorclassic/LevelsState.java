@@ -83,7 +83,7 @@ public class LevelsState extends State {
 	void drawLevelBox(int x, int y, int levelNumber) {
 		app.spr_putRegion(x, y, 24, 24, 0,32+144);
 		app.showBigNumber(x+4,y+8,levelNumber);
-		if (app.unlockedLevel<levelNumber) app.spr_putRegion(x+15, y+15, 8, 8, 48,176);
+		if (app.unlockedLevel<levelNumber) app.spr_putRegion(x+15, y+15, 8, 8, 48,192);
 	};
 	
 

@@ -15,10 +15,15 @@ public class GameState extends State {
 	GameState(Deflektor defl) {
 		super(defl);
 		
-		bResume = new Button(32, 40,0,0,false,"RESUME");
-		bRestart = new Button(32+16+8+8*6, 40,0,0,false,"RESTART");
-		bLevels = new Button(32, 72,0,0,false,"LEVELS");
+		//bResume = new Button(32, 40,0,0,false,"RESUME");
+		//bRestart = new Button(32+16+8+8*6, 40,0,0,false,"RESTART");
+		//bLevels = new Button(32, 72,0,0,false,"LEVELS");
 		bSound = new Button(32, 104,0,0,false,"SOUND OFF");
+		bResume = new Button(32, 40,64,176);
+		bRestart = new Button(32+16+8+8*6, 40,96,176);
+		bLevels = new Button(32, 72,48,176);
+		//bSound = new Button(32, 104,0,0,false,"SOUND OFF");
+
 		
 	}
 	

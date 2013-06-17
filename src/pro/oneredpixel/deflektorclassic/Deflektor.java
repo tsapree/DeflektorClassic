@@ -438,6 +438,7 @@ public class Deflektor implements ApplicationListener {
 	void drawButton (Button b) {
 		drawBox(b.bx,b.by,b.bwidth,b.bheight,0,176);
 		if (b.btxt!=null) showString(b.bx+8,b.by+8,b.btxt);
+		if (b.bimgx>0 && b.bimgy>0) spr_putRegion(b.bx+4, b.by+4, 16,16, b.bimgx, b.bimgy);
 	}
 
 	void drawButton (Button b, int boxx, int boxy) {

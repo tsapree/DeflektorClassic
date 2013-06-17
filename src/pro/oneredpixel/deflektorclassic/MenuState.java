@@ -11,8 +11,10 @@ public class MenuState extends State {
 	MenuState(Deflektor defl) {
 		super(defl);
 		// TODO Auto-generated constructor stub
-		bPlay = new Button(120,80-8,0,0,true,"PLAY");
-		bSettings = new Button(16, 160-32,0,0,false,"SETTINGS");
+		//bPlay = new Button(120,80-8,0,0,true,"PLAY");
+		bPlay = new Button(120-12,80-16,64,176);
+		//bSettings = new Button(16, 160-32,0,0,false,"SETTINGS");
+		bSettings = new Button(16, 160-32,80,176);
 		bAchievements = new Button(240-16-16-12*8, 160-32,0,0,false,"ACHIEVEMENTS");
 	}
 	
