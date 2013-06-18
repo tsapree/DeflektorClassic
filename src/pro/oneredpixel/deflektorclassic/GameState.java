@@ -121,9 +121,17 @@ public class GameState extends State {
 					app.showMessage(240/2, 160/2, "CHARGING LASER", true);
 				};
 				break;
+			case GAMESTATE_LEVELCOMPLETED:
+				app.drawBox(24, 8, 240-48, 160-32, 0,176);
+				app.showString(32+8+8, 24, String.format("LEVEL %02d COMPLETED",app.playingLevel));
+				
+				app.drawButton(bResume);
+				app.drawButton(bRestart);
+				app.drawButton(bLevels);
+
+				break;
 			case GAMESTATE_CALCULATING_ENERGY:
 			case GAMESTATE_OVERHEAT:
-			case GAMESTATE_LEVELCOMPLETED:
 			case GAMESTATE_GAMING:
 				break;
 			};
@@ -132,7 +140,7 @@ public class GameState extends State {
 		batch.end();
 		
 		if(TimeUtils.nanoTime() - app.lastFrameTime > (1000000000/desiredFPS)) {
-			if (winStateId==WINSTATE_GAMING) animateField();			
+			if (winStateId==WINSTATE_GAMING && gameStateId!=GAMESTATE_LEVELCOMPLETED) animateField();			
 		} else return;
 		app.lastFrameTime = TimeUtils.nanoTime();
 		
@@ -158,8 +166,33 @@ public class GameState extends State {
 	}
 
 	public boolean tap(float x, float y, int tapCount, int button) {
+		int tapx=(int)(x-app.winX)/app.sprScale;
+		int tapy=(int)(y-app.winY)/app.sprScale;
 		switch (winStateId) {
 		case WINSTATE_GAMING:
+			if (gameStateId==GAMESTATE_LEVELCOMPLETED) {
+				if (bResume.checkRegion(tapx,tapy)) {
+					//play next level?
+					app.playingLevel++;
+					if (app.playingLevel<=app.countOfLevels) {
+						initGame();
+					} else {
+						app.gotoAppState(Deflektor.APPSTATE_MENU);
+					}
+					app.playSound(Deflektor.SND_TAP);
+					
+				};
+				if (bRestart.checkRegion(tapx,tapy)) {
+					initGame();
+					app.playSound(Deflektor.SND_TAP);
+				};
+				if (bLevels.checkRegion(tapx,tapy)) {
+					app.gotoAppState(Deflektor.APPSTATE_SELECTLEVEL);
+					app.playSound(Deflektor.SND_TAP);
+				};
+				break;
+				
+			};
 			setCursor((int)x,(int)y);
 			x=x-app.winX;
 			y=y-app.winY;
@@ -173,8 +206,6 @@ public class GameState extends State {
 			}
 			break;
 		case WINSTATE_PAUSED:
-			int tapx=(int)(x-app.winX)/app.sprScale;
-			int tapy=(int)(y-app.winY)/app.sprScale;
 			if (bResume.checkRegion(tapx,tapy)) {
 				winStateId=WINSTATE_GAMING;
 				app.playSound(Deflektor.SND_TAP);
@@ -1280,6 +1311,9 @@ public class GameState extends State {
 			else overheat-=overheatSteps/128;
 			
 			if (beamState==BEAMSTATE_CONNECTED) {
+				if (app.playingLevel<app.countOfLevels) {
+					app.unlockLevel(app.playingLevel+1);
+				};
 				gameStateId = GAMESTATE_LEVELCOMPLETED;
 				app.playSound(Deflektor.SND_LEVELCOMPLETED);
 			}
@@ -1337,6 +1371,8 @@ public class GameState extends State {
 		case GAMESTATE_OVERHEAT:
 			break;
 		case GAMESTATE_LEVELCOMPLETED:
+			/*
+			 * TODO: перенести в переход по кнопке
 			app.playingLevel++;
 			if (app.playingLevel<=app.countOfLevels) {
 				app.unlockLevel(app.playingLevel);
@@ -1346,6 +1382,7 @@ public class GameState extends State {
 				//
 				app.gotoAppState(Deflektor.APPSTATE_MENU);
 			}
+			*/
 			break;
 		};
 		
