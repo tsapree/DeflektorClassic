@@ -10,7 +10,8 @@ public class GameState extends State {
 	Button bResume;
 	Button bRestart;
 	Button bLevels;
-	Button bSound;
+	Button bSoundOn;
+	Button bSoundOff;
 	
 	GameState(Deflektor defl) {
 		super(defl);
@@ -18,11 +19,12 @@ public class GameState extends State {
 		//bResume = new Button(32, 40,0,0,false,"RESUME");
 		//bRestart = new Button(32+16+8+8*6, 40,0,0,false,"RESTART");
 		//bLevels = new Button(32, 72,0,0,false,"LEVELS");
-		bSound = new Button(32, 104,0,0,false,"SOUND OFF");
-		bResume = new Button(32, 40,64,176);
-		bRestart = new Button(32+16+8+8*6, 40,96,176);
-		bLevels = new Button(32, 72,48,176);
 		//bSound = new Button(32, 104,0,0,false,"SOUND OFF");
+		bResume = new Button(32+16+8+8*6+16-24-8, 56,64,176);
+		bRestart = new Button(32+16+8+8*6+16, 56,96,176);
+		bLevels = new Button(32, 104,48,176);
+		bSoundOn = new Button(184, 104,112,176);
+		bSoundOff = new Button(184, 104,112,160);
 
 		
 	}
@@ -98,14 +100,14 @@ public class GameState extends State {
 		
 		if (winStateId==WINSTATE_PAUSED) {
 			app.drawBox(24, 8, 240-48, 160-32, 0,176);
-			app.showString(32, 24, "GAME PAUSED");
+			app.showString(32+3*8+4, 24, String.format("LEVEL %02d PAUSED",app.playingLevel));
 			
 			app.drawButton(bResume);
 			app.drawButton(bRestart);
 			app.drawButton(bLevels);
 			
-			if (app.soundEnabled) app.drawButton(bSound);
-			else app.drawButton(bSound, "SOUND ON");
+			if (app.soundEnabled) app.drawButton(bSoundOn);
+			else app.drawButton(bSoundOff);
 		};
 		
 		batch.end();
@@ -166,7 +168,7 @@ public class GameState extends State {
 				app.gotoAppState(Deflektor.APPSTATE_SELECTLEVEL);
 				app.playSound(Deflektor.SND_TAP);
 			};
-			if (bSound.checkRegion(tapx,tapy)) {
+			if (bSoundOn.checkRegion(tapx,tapy)) {
 				app.soundEnabled=!app.soundEnabled;
 				app.playSound(Deflektor.SND_TAP);
 			}
