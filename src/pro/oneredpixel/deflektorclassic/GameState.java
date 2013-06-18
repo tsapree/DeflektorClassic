@@ -12,21 +12,17 @@ public class GameState extends State {
 	Button bLevels;
 	Button bSoundOn;
 	Button bSoundOff;
+	Button bNext;
 	
 	GameState(Deflektor defl) {
 		super(defl);
 		
-		//bResume = new Button(32, 40,0,0,false,"RESUME");
-		//bRestart = new Button(32+16+8+8*6, 40,0,0,false,"RESTART");
-		//bLevels = new Button(32, 72,0,0,false,"LEVELS");
-		//bSound = new Button(32, 104,0,0,false,"SOUND OFF");
-		bResume = new Button(32+16+8+8*6+16-24-8, 56,64,176);
-		bRestart = new Button(32+16+8+8*6+16, 56,96,176);
+		bResume = new Button(108, 56,64,176);
+		bRestart = new Button(64, 104,96,176);
 		bLevels = new Button(32, 104,48,176);
 		bSoundOn = new Button(184, 104,112,176);
 		bSoundOff = new Button(184, 104,112,160);
-
-		
+		bNext = new Button(184, 104,80, 160);
 	}
 	
 	final int desiredFPS = 20;
@@ -66,7 +62,7 @@ public class GameState extends State {
 	int cursorX = 0;
 	int cursorY = 0;
 	
-	//счетчик фреймов, 0..15, обновляется в процедуре animateField, используется для мигания
+	//счетчик фреймов, 0..63, обновляется в процедуре animateField, используется для мигания
 	int flash;
 	
 	void create() {
@@ -125,9 +121,9 @@ public class GameState extends State {
 				app.drawBox(24, 8, 240-48, 160-32, 0,176);
 				app.showString(32+8+8, 24, String.format("LEVEL %02d COMPLETED",app.playingLevel));
 				
-				app.drawButton(bResume);
-				app.drawButton(bRestart);
 				app.drawButton(bLevels);
+				app.drawButton(bNext);
+				app.drawButton(bRestart);
 
 				break;
 			case GAMESTATE_CALCULATING_ENERGY:
@@ -171,7 +167,7 @@ public class GameState extends State {
 		switch (winStateId) {
 		case WINSTATE_GAMING:
 			if (gameStateId==GAMESTATE_LEVELCOMPLETED) {
-				if (bResume.checkRegion(tapx,tapy)) {
+				if (bNext.checkRegion(tapx,tapy)) {
 					//play next level?
 					app.playingLevel++;
 					if (app.playingLevel<=app.countOfLevels) {
@@ -281,8 +277,12 @@ public class GameState extends State {
 		if (k==Keys.BACK) {
 		//if(Gdx.input.isKeyPressed(Keys.BACK)) {
 			if (winStateId==WINSTATE_GAMING) {
-				app.stopContinuousSound();
-				winStateId=WINSTATE_PAUSED;
+				if (gameStateId==GAMESTATE_LEVELCOMPLETED) {
+					app.gotoAppState(Deflektor.APPSTATE_SELECTLEVEL);
+				} else {
+					app.stopContinuousSound();
+					winStateId=WINSTATE_PAUSED;
+				};
 			} else winStateId=WINSTATE_GAMING;//app.gotoAppState(Deflektor.APPSTATE_MENU);
 			app.playSound(Deflektor.SND_TAP);
 			return true;
@@ -1271,7 +1271,7 @@ public class GameState extends State {
 		boolean needToExplodeBarrier=true;
 		boolean barrierFound = false;
 
-		flash=(flash+1)&15;
+		flash=(flash+1)&63;
     
 		if (++cursorPhase>=cursorPhases) cursorPhase=0;
 		if (touched) cursorPhase=cursorPhases/2-1;
