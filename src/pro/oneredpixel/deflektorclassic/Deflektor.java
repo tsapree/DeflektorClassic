@@ -137,6 +137,8 @@ public class Deflektor implements ApplicationListener {
 			laserReadySound = Gdx.audio.newSound(Gdx.files.internal("zx-laser-ready.wav"));
 			levelCompletedSound = Gdx.audio.newSound(Gdx.files.internal("zx-level-completed.wav"));
 			transferEnergySound = Gdx.audio.newSound(Gdx.files.internal("zx-transfer-energy.wav"));
+			gremlinDeadSound=Gdx.audio.newSound(Gdx.files.internal("zx-gremlin-dead.wav"));
+			tapSound=Gdx.audio.newSound(Gdx.files.internal("zx-tap.wav"));
 			
 			break;
 		case APPGFX_AMIGA:
