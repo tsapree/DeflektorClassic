@@ -427,6 +427,16 @@ public class Deflektor implements ApplicationListener {
 		spr_putRegion(x+width-8,y+height-8,8,8,srcx+16,srcy+16);
 	};
 	
+	void showMessage(int x, int y, String text, boolean centered) {
+		int width=text.length()*8+16;
+		if (centered) {
+			x=x-width/2;
+			y=y-24/2;
+		};
+		drawBox(x,y,width,24,0,176);
+		showString(x+8,y+8,text);
+	};
+	
 	void drawButton (int x, int y, String text, boolean centered) {
 		int width=text.length()*8+16;
 		if (centered) {

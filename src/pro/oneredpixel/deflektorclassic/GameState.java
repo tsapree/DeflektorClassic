@@ -66,6 +66,9 @@ public class GameState extends State {
 	int cursorX = 0;
 	int cursorY = 0;
 	
+	//счетчик фреймов, 0..15, обновляется в процедуре animateField, используется для мигания
+	int flash;
+	
 	void create() {
 		grm=new Gremlin[8];
 		for (int i=0;i<8;i++) {
@@ -98,6 +101,8 @@ public class GameState extends State {
 		drawField();
 		drawGameInfo();
 		
+
+		
 		if (winStateId==WINSTATE_PAUSED) {
 			app.drawBox(24, 8, 240-48, 160-32, 0,176);
 			app.showString(32+3*8+4, 24, String.format("LEVEL %02d PAUSED",app.playingLevel));
@@ -108,7 +113,21 @@ public class GameState extends State {
 			
 			if (app.soundEnabled) app.drawButton(bSoundOn);
 			else app.drawButton(bSoundOff);
-		};
+		} else {
+			//show message
+			switch (gameStateId) {
+			case GAMESTATE_ACCUMULATING_ENERGY:
+				if ((flash&4)==0) {
+					app.showMessage(240/2, 160/2, "CHARGING LASER", true);
+				};
+				break;
+			case GAMESTATE_CALCULATING_ENERGY:
+			case GAMESTATE_OVERHEAT:
+			case GAMESTATE_LEVELCOMPLETED:
+			case GAMESTATE_GAMING:
+				break;
+			};
+		}
 		
 		batch.end();
 		
@@ -1220,6 +1239,8 @@ public class GameState extends State {
 		int f=0;
 		boolean needToExplodeBarrier=true;
 		boolean barrierFound = false;
+
+		flash=(flash+1)&15;
     
 		if (++cursorPhase>=cursorPhases) cursorPhase=0;
 		if (touched) cursorPhase=cursorPhases/2-1;
@@ -1530,7 +1551,6 @@ public class GameState extends State {
 		if (cursorEnabled && cursorPhase<cursorDisplayPhases) {
 			app.spr_putRegion( cursorX*16, cursorY*16, 16, 16, 6*16, 6*16);
 		};
-
 	};
 	
 	void putWallA(int x, int y, int type) {
