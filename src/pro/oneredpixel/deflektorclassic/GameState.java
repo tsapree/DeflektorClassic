@@ -97,8 +97,6 @@ public class GameState extends State {
 		drawField();
 		drawGameInfo();
 		
-
-		
 		if (winStateId==WINSTATE_PAUSED) {
 			app.drawBox(24, 8, 240-48, 160-32, 0,176);
 			app.showString(32+3*8+4, 24, String.format("LEVEL %02d PAUSED",app.playingLevel));
@@ -115,6 +113,16 @@ public class GameState extends State {
 			case GAMESTATE_ACCUMULATING_ENERGY:
 				if ((flash&4)==0) {
 					app.showMessage(240/2, 160/2, "CHARGING LASER", true);
+				};
+				break;
+			case GAMESTATE_GAMEOVER_NOENERGY:
+				if ((flash&2)==0) {
+					app.showMessage(240/2, 160/2, "ENERGY DRAINED", true);
+				};
+				break;
+			case GAMESTATE_GAMEOVER_OVERHEAT:
+				if ((flash&2)==0) {
+					app.showMessage(240/2, 160/2, "BOOM BOOM BOOM", true);
 				};
 				break;
 			case GAMESTATE_LEVELCOMPLETED:
@@ -186,6 +194,8 @@ public class GameState extends State {
 				};
 				break;
 				
+			} else if ((gameStateId==GAMESTATE_GAMEOVER_OVERHEAT) || (gameStateId==GAMESTATE_GAMEOVER_NOENERGY)) {
+				break;
 			};
 			setCursor((int)x,(int)y);
 			x=x-app.winX;
@@ -255,7 +265,7 @@ public class GameState extends State {
 	public boolean pan(float x, float y, float deltaX, float deltaY) {
 		switch (winStateId) {
 		case WINSTATE_GAMING:
-			if (cursorEnabled && beamState!=BEAMSTATE_CONNECTED && (app.controlsTapThenDrag || app.controlsTouchAndDrag)) {
+			if (cursorEnabled && beamState!=BEAMSTATE_CONNECTED && (app.controlsTapThenDrag || app.controlsTouchAndDrag) && (gameStateId==GAMESTATE_GAMING || gameStateId == GAMESTATE_ACCUMULATING_ENERGY)) {
 				int delta=(int)Math.sqrt((deltaX)*(deltaX)+(deltaY)*(deltaY));
 				if (deltaX<(-deltaY)) delta=-delta;
 				delta = delta + restDelta;
@@ -275,7 +285,7 @@ public class GameState extends State {
 		if (k==Keys.BACK) {
 		//if(Gdx.input.isKeyPressed(Keys.BACK)) {
 			if (winStateId==WINSTATE_GAMING) {
-				if (gameStateId==GAMESTATE_LEVELCOMPLETED) {
+				if ((gameStateId==GAMESTATE_LEVELCOMPLETED) || (gameStateId==GAMESTATE_GAMEOVER_OVERHEAT) || (gameStateId==GAMESTATE_GAMEOVER_NOENERGY)) {
 					app.gotoAppState(Deflektor.APPSTATE_SELECTLEVEL);
 				} else {
 					app.stopContinuousSound();
@@ -1299,10 +1309,20 @@ public class GameState extends State {
 			}
 
 			break;
+		case GAMESTATE_GAMEOVER_NOENERGY:
+		case GAMESTATE_GAMEOVER_OVERHEAT:
+			if (flash>32) initGame();
+			break;
 		case GAMESTATE_GAMING:
 			if (app.cheat) energy++;	//TODO: ”¡–¿“‹ - ◊»“ :)
 			energy--;
-			if (energy<=0) app.gotoAppState(Deflektor.APPSTATE_MENU);
+			if (energy<=0) {
+				//app.gotoAppState(Deflektor.APPSTATE_MENU);
+				gameStateId=GAMESTATE_GAMEOVER_NOENERGY;
+				app.stopContinuousSound();
+				flash=0;
+				break;
+			}
 			
 			if (beamState==BEAMSTATE_OVERHEAT) overheat+=overheatSteps/64;
 			else if (beamState==BEAMSTATE_BOMB) overheat+=overheatSteps/16;
@@ -1311,7 +1331,13 @@ public class GameState extends State {
 			if (overheat <=0) overheat =0;
 			if (overheat>=overheatSteps) {
 				if (app.cheat) overheat=0; //TODO: ”¡–¿“‹ - ◊»“ :)
-				else app.gotoAppState(Deflektor.APPSTATE_MENU);  
+				else {
+					//app.gotoAppState(Deflektor.APPSTATE_MENU);
+					gameStateId=GAMESTATE_GAMEOVER_OVERHEAT;
+					app.stopContinuousSound();
+					flash=0;
+					break;
+				}
 			}
 			
 			if (beamState==BEAMSTATE_CONNECTED) {
@@ -1435,8 +1461,6 @@ public class GameState extends State {
 			};
 		
 		switch (gameStateId) {
-		case GAMESTATE_ACCUMULATING_ENERGY:
-			break;
 		case GAMESTATE_LEVELCOMPLETED:
 		case GAMESTATE_GAMING:
 			drawBeam(beam_x,beam_y,beam_angle);
@@ -1525,8 +1549,6 @@ public class GameState extends State {
 				};
 			
 			switch (gameStateId) {
-			case GAMESTATE_ACCUMULATING_ENERGY:
-				break;
 			case GAMESTATE_LEVELCOMPLETED:
 			case GAMESTATE_GAMING:
 				drawBeam(beam_x,beam_y,beam_angle);
@@ -1565,7 +1587,7 @@ public class GameState extends State {
 		if (countOfGremlins>0)
 			for (int i=0;i<countOfGremlins;i++) grm[i].draw();
 		
-		if (cursorEnabled && cursorPhase<cursorDisplayPhases) {
+		if (cursorEnabled && cursorPhase<cursorDisplayPhases && gameStateId!=GAMESTATE_GAMEOVER_NOENERGY && gameStateId!=GAMESTATE_GAMEOVER_OVERHEAT) {
 			app.spr_putRegion( cursorX*16, cursorY*16, 16, 16, 6*16, 6*16);
 		};
 	};
