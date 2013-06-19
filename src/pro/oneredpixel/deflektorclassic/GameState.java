@@ -1304,9 +1304,9 @@ public class GameState extends State {
 			energy--;
 			if (energy<=0) app.gotoAppState(Deflektor.APPSTATE_MENU);
 			
-			if (beamState==BEAMSTATE_OVERHEAT) overheat+=overheatSteps/128;
-			else if (beamState==BEAMSTATE_BOMB) overheat+=overheatSteps/20;
-			else overheat-=overheatSteps/128;
+			if (beamState==BEAMSTATE_OVERHEAT) overheat+=overheatSteps/64;
+			else if (beamState==BEAMSTATE_BOMB) overheat+=overheatSteps/16;
+			else overheat-=overheatSteps/64;
 
 			if (overheat <=0) overheat =0;
 			if (overheat>=overheatSteps) {
