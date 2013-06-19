@@ -1772,22 +1772,14 @@ public class GameState extends State {
 					}
 				} else {
 
-				//	1,0,x,x0x0	не изменять траекторию
-				//	1,0,x,x0x1	4
-				//	1,0,x,x1x0	4
-				//	1,0,x,x1x1	остановить прорисовку	
 				if ((beamX&1)==1) switch (wallsAround&0x5) {
 					case 1: case 4: wall_angle=4; break;
 					case 5: endBeam=0; 
 					};
 					
-				//0,1,x,xx00	не изменять траекторию
-				//0,1,x,xx01	0
-				//0,1,x,xx10	0
-				//0,1,x,xx11	остановить прорисовку
 				if ((beamY&1)==1) switch (wallsAround&0x3) {
 					case 1: case 2: wall_angle=0; break;
-					case 3: endBeam=0; 
+					case 3: endBeam=0; break;
 					};
 					
 				};
@@ -1804,17 +1796,11 @@ public class GameState extends State {
 				if ((crd==1) && ((f1&4)!=0)) {	endBeam=0;	continue; };
 				if ((crd==2) && ((f1&2)!=0)) {	endBeam=0;	continue; };
 				if ((crd==3) && ((f1&1)!=0)) {	endBeam=0;	continue; };
-				//(mp_beam_x>1)&1 - координата внутри квадрата 0..1
-				//(mp_beam_y)&2 - координата внутри квадрата 0..1
-				//0,0 && 8
-				//0,1 && 4
-				//1,0 && 2
-				//1,1 && 1
 				break;
 			case SL_A:
 				if ((f1&7)!=(beamAngle&7)) {
-					if ((beamX&3)==0)	beamAngle=(0-beamAngle)&0xf;
-					if ((beamY&3)==0)	beamAngle=(4*2-beamAngle)&0xf;
+					if ((beamX&3)==0 && !getMirrorableWall(beamX-(mp_beam_x-beamX), mp_beam_y,beamAngle))	beamAngle=(0-beamAngle)&0xf;
+					if ((beamY&3)==0 && !getMirrorableWall(mp_beam_x, beamY-(mp_beam_y-beamY),beamAngle))	beamAngle=(4*2-beamAngle)&0xf;
 					break;
 				};
 				break;
@@ -1833,6 +1819,28 @@ public class GameState extends State {
 		}
 		
 		
+	};
+	
+	int getField(int x, int y) {
+		if (x<0 || x>=field_width || y<0 || y>=field_height) return NULL;
+		return field[x+y*field_width];
+	};
+	
+	boolean getMirrorableWall(int x, int y, int angle) {
+		int f=getField(x/4,y/4);
+		switch (f&0xf00) { 
+		case SL_A:
+			if ((angle&7)!=(f&7)) return true;
+			break;
+		case WL_A:
+			int crd=((x>>1)&1)+(y&2);
+			if ((crd==0) && ((f&8)!=0)) return true;
+			if ((crd==1) && ((f&4)!=0)) return true;
+			if ((crd==2) && ((f&2)!=0)) return true;
+			if ((crd==3) && ((f&1)!=0)) return true;
+			break;
+		};
+		return false;
 	};
 	
 	void drawSpriteLine(int x0, int y0, int x1, int y1) {
