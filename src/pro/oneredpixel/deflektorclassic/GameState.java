@@ -1811,6 +1811,12 @@ public class GameState extends State {
 				break;
 			}
 			
+			//≈сли луч проходит между двум€ стенами - погасить его
+			if (((beamX&3)==0) && ((beamY&3)==0)) {
+				if (getReduceWall(beamX,beamY,beamAngle) && getReduceWall(beamX-1,beamY-1,beamAngle)) endBeam=0;
+				if (getReduceWall(beamX-1,beamY,beamAngle) && getReduceWall(beamX,beamY-1,beamAngle)) endBeam=0;
+			}
+			
 			
 			//≈сли отражение пошло в обратную сторону
 			if (Math.abs(beamAngle-oldBeamAngle)==8) {
@@ -1844,6 +1850,23 @@ public class GameState extends State {
 		};
 		return false;
 	};
+	
+	boolean getReduceWall(int x, int y, int angle) {
+		int f=getField(x/4,y/4);
+		switch (f&0xf00) { 
+		case SL_B:
+			if ((angle&7)!=(f&7)) return true;
+			break;
+		case WL_B:
+			int crd=((x>>1)&1)+(y&2);
+			if ((crd==0) && ((f&8)!=0)) return true;
+			if ((crd==1) && ((f&4)!=0)) return true;
+			if ((crd==2) && ((f&2)!=0)) return true;
+			if ((crd==3) && ((f&1)!=0)) return true;
+			break;
+		};
+		return false;
+	}
 	
 	void drawSpriteLine(int x0, int y0, int x1, int y1) {
 		int lx0, lx1, ly0, ly1;
