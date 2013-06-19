@@ -5,13 +5,22 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 public class LevelsState extends State {
 
-	int page=1;
+	int page=-1;
+	int savedUnlockedLevel = -1;
 	
 	LevelsState(Deflektor defl) {
 		super(defl);
 		// TODO Auto-generated constructor stub
 	}
-	
+	//init state for showing
+	void start() {
+		if (savedUnlockedLevel!=app.unlockedLevel) {
+			savedUnlockedLevel=app.unlockedLevel;
+			page = app.unlockedLevel/20+1;
+			if (page>3) page=3;	
+		}
+		
+	};
 	public boolean tap(float x, float y, int tapCount, int button) {
 		//app.gotoAppState(Deflektor.APPSTATE_GAME);
 		int ix=(int)((x-app.winX)/app.sprScale);
