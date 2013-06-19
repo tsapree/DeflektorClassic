@@ -34,8 +34,8 @@ public class GameState extends State {
 
 	final int GAMESTATE_ACCUMULATING_ENERGY =0;
 	final int GAMESTATE_GAMING = 1;
-	final int GAMESTATE_CALCULATING_ENERGY = 2;
-	final int GAMESTATE_OVERHEAT = 3;
+	final int GAMESTATE_GAMEOVER_OVERHEAT = 2;
+	final int GAMESTATE_GAMEOVER_NOENERGY = 3;
 	final int GAMESTATE_LEVELCOMPLETED = 4;
 	int gameStateId = GAMESTATE_ACCUMULATING_ENERGY;
 	
@@ -126,8 +126,6 @@ public class GameState extends State {
 				app.drawButton(bRestart);
 
 				break;
-			case GAMESTATE_CALCULATING_ENERGY:
-			case GAMESTATE_OVERHEAT:
 			case GAMESTATE_GAMING:
 				break;
 			};
@@ -1309,6 +1307,12 @@ public class GameState extends State {
 			if (beamState==BEAMSTATE_OVERHEAT) overheat+=overheatSteps/128;
 			else if (beamState==BEAMSTATE_BOMB) overheat+=overheatSteps/20;
 			else overheat-=overheatSteps/128;
+
+			if (overheat <=0) overheat =0;
+			if (overheat>=overheatSteps) {
+				if (app.cheat) overheat=0; //TODO: ”¡–¿“‹ - ◊»“ :)
+				else app.gotoAppState(Deflektor.APPSTATE_MENU);  
+			}
 			
 			if (beamState==BEAMSTATE_CONNECTED) {
 				if (app.playingLevel<app.countOfLevels) {
@@ -1316,39 +1320,35 @@ public class GameState extends State {
 				};
 				gameStateId = GAMESTATE_LEVELCOMPLETED;
 				app.playSound(Deflektor.SND_LEVELCOMPLETED);
-			}
-			
-			if (overheat <=0) overheat =0;
-			if (overheat>=overheatSteps) {
-				if (app.cheat) overheat=0; //TODO: ”¡–¿“‹ - ◊»“ :)
-				else app.gotoAppState(Deflektor.APPSTATE_MENU);  
-			}
+			} else {
+				for (int i=0;i<field_width;i++) 
+					for (int j=0;j<field_height;j++) {
+						f=field[j*field_width+i];
+						if ((f&ROTATING)!=0) {
+							if (!(((f&0xf00)==MIRR) && (i==cursorX) && (j==cursorY) && touched))
+								rotateThing(i,j);
+						};
+						if ((f&EXPLODE)!=0) barrierFound = true;
+						if ((f&0xf00)==_EXPL) {
+							f++;
+							if ((f&0xf)>4) f=NULL;
+							else needToExplodeBarrier = false;
+							field[j*field_width+i]=f;
+						};
+						if ((f&0xF00)==CELL) needToExplodeBarrier = false;
+						if ((f&0xF00)==PRSM) field[j*field_width+i]=(f&0xF00)|((int)((8*Math.random())+0.5));
+					};
+				if (needToExplodeBarrier && barrierFound) {
+					app.playSound(Deflektor.SND_EXITOPEN);
+					for (int i=0;i<field_width*field_height;i++)
+						if ((field[i]&EXPLODE)!=0) field[i]=_EXPL;
+				};
+			};
+				
 			if (countOfGremlins>0)
 				for (int i=0;i<countOfGremlins;i++) {
 					if (grm[i].animate()) app.playSound(Deflektor.SND_GREMLINAPPEAR);
 				}
-			for (int i=0;i<field_width;i++) 
-				for (int j=0;j<field_height;j++) {
-					f=field[j*field_width+i];
-					if ((f&ROTATING)!=0) {
-						if (!(((f&0xf00)==MIRR) && (i==cursorX) && (j==cursorY) && touched))
-							rotateThing(i,j);
-					};
-					if ((f&EXPLODE)!=0) barrierFound = true;
-					if ((f&0xf00)==_EXPL) {
-						f++;
-						if ((f&0xf)>4) f=NULL;
-						else needToExplodeBarrier = false;
-						field[j*field_width+i]=f;
-					};
-					if ((f&0xF00)==CELL) needToExplodeBarrier = false;
-					if ((f&0xF00)==PRSM) field[j*field_width+i]=(f&0xF00)|((int)((8*Math.random())+0.5));
-				};
-			if (needToExplodeBarrier && barrierFound) {
-				app.playSound(Deflektor.SND_EXITOPEN);
-				for (int i=0;i<field_width*field_height;i++)
-					if ((field[i]&EXPLODE)!=0) field[i]=_EXPL;
-			};
 			
 			if (winStateId==WINSTATE_GAMING) {
 				switch (beamState) {
@@ -1366,23 +1366,7 @@ public class GameState extends State {
 			};
 			
 			break;
-		case GAMESTATE_CALCULATING_ENERGY:
-			break;
-		case GAMESTATE_OVERHEAT:
-			break;
 		case GAMESTATE_LEVELCOMPLETED:
-			/*
-			 * TODO: ÔÂÂÌÂÒÚË ‚ ÔÂÂıÓ‰ ÔÓ ÍÌÓÔÍÂ
-			app.playingLevel++;
-			if (app.playingLevel<=app.countOfLevels) {
-				app.unlockLevel(app.playingLevel);
-				initGame();
-			} else {
-				//TODO: GAME COMPLETED!
-				//
-				app.gotoAppState(Deflektor.APPSTATE_MENU);
-			}
-			*/
 			break;
 		};
 		
@@ -1453,8 +1437,6 @@ public class GameState extends State {
 		switch (gameStateId) {
 		case GAMESTATE_ACCUMULATING_ENERGY:
 			break;
-		case GAMESTATE_CALCULATING_ENERGY:
-		case GAMESTATE_OVERHEAT:
 		case GAMESTATE_LEVELCOMPLETED:
 		case GAMESTATE_GAMING:
 			drawBeam(beam_x,beam_y,beam_angle);
@@ -1545,8 +1527,6 @@ public class GameState extends State {
 			switch (gameStateId) {
 			case GAMESTATE_ACCUMULATING_ENERGY:
 				break;
-			case GAMESTATE_CALCULATING_ENERGY:
-			case GAMESTATE_OVERHEAT:
 			case GAMESTATE_LEVELCOMPLETED:
 			case GAMESTATE_GAMING:
 				drawBeam(beam_x,beam_y,beam_angle);
