@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 public class LevelsState extends State {
 
 	int page=-1;
+	int maxpage = -1;
 	int savedUnlockedLevel = -1;
 	
 	LevelsState(Deflektor defl) {
@@ -14,12 +15,14 @@ public class LevelsState extends State {
 	}
 	//init state for showing
 	void start() {
+		maxpage = app.unlockedLevel/20+1;
+		if (maxpage>3) maxpage=3;
+		
 		if (savedUnlockedLevel!=app.unlockedLevel) {
 			savedUnlockedLevel=app.unlockedLevel;
 			page = app.unlockedLevel/20+1;
 			if (page>3) page=3;	
-		}
-		
+		};
 	};
 	public boolean tap(float x, float y, int tapCount, int button) {
 		//app.gotoAppState(Deflektor.APPSTATE_GAME);
@@ -30,7 +33,7 @@ public class LevelsState extends State {
 				page--;
 				app.playSound(Deflektor.SND_TAP);
 			};
-			if ((page<3) && checkInBox(ix,iy,240-16-8-8-8, 160/2-8,32,32)) {
+			if ((page<maxpage) && checkInBox(ix,iy,240-16-8-8-8, 160/2-8,32,32)) {
 				page++;
 				app.playSound(Deflektor.SND_TAP);
 			}
@@ -82,7 +85,7 @@ public class LevelsState extends State {
 		};
 
 		if (page>1) app.spr_putRegion(8, 160/2-8, 16, 16, 64,160);
-		if (page<3) app.spr_putRegion(240-8-16, 160/2-8, 16, 16, 80, 160);
+		if (page<maxpage) app.spr_putRegion(240-8-16, 160/2-8, 16, 16, 80, 160);
 		
 		app.spr_putRegion(8, 160-8-16, 16, 16, 96, 160);
 		
