@@ -1375,6 +1375,8 @@ public class GameState extends State {
 				for (int i=0;i<countOfGremlins;i++) {
 					if (grm[i].animate()) app.playSound(Deflektor.SND_GREMLINAPPEAR);
 				}
+			if (touched && cursorEnabled && cursorX>=0 && cursorY>=0)
+				killGremlins((cursorX*2+1)*app.sprSize, (cursorY*2+1)*app.sprSize);
 			
 			if (winStateId==WINSTATE_GAMING) {
 				switch (beamState) {
