@@ -88,6 +88,16 @@ public class GameState extends State {
 		
 	};
 	
+	void pause() {
+		if (winStateId==WINSTATE_GAMING && (gameStateId==GAMESTATE_ACCUMULATING_ENERGY || gameStateId==GAMESTATE_GAMING))
+			winStateId=WINSTATE_PAUSED;
+		app.stopContinuousSound();
+	};
+	
+	void resume () {
+
+	};
+	
 	public void render(SpriteBatch batch) {
 		//game
 		prevBeamState = beamState;

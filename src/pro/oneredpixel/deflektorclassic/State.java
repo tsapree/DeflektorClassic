@@ -31,6 +31,14 @@ public class State {
 		
 	};
 	
+	void pause() {
+		
+	};
+	
+	void resume() {
+		
+	};
+	
 	public void render(SpriteBatch batch) {
 		
 	};

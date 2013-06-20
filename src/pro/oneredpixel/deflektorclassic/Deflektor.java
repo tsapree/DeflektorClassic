@@ -82,6 +82,25 @@ public class Deflektor implements ApplicationListener {
 		
 		loadSettings();
 		
+		loadMedia();
+		
+		initGfx();
+		
+		batch = new SpriteBatch();
+		
+		//GestureDetector(float halfTapSquareSize, float tapCountInterval, float longPressDuration, float maxFlingDelay, GestureDetector.GestureListener listener) 
+		//GestureDetector(GestureDetector.GestureListener listener)
+		//Creates a new GestureDetector with default values: halfTapSquareSize=20, tapCountInterval=0.4f, longPressDuration=1.1f, maxFlingDelay=0.15f.
+
+		InputMultiplexer multiplexer = new InputMultiplexer();
+		multiplexer.addProcessor(new GestureDetector(sprSize*sprScale, 0.4f, 1.1f, 0.15f, new MyGestureListener()));
+		multiplexer.addProcessor(new MyInputProcessor());
+		Gdx.input.setInputProcessor(multiplexer);
+		gotoAppState(APPSTATE_MENU);
+
+	   }
+	
+	void initGfx() {
 		screenWidth = Gdx.graphics.getWidth();
 		screenHeight = Gdx.graphics.getHeight();
 		
@@ -99,26 +118,9 @@ public class Deflektor implements ApplicationListener {
 		winY = (screenHeight-winHeight)/2;		
 		
 		panScale=sprSize*sprScale/1;
-		
-		loadMedia();
-		
 		camera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-		
-		batch = new SpriteBatch();
-		
-		//GestureDetector(float halfTapSquareSize, float tapCountInterval, float longPressDuration, float maxFlingDelay, GestureDetector.GestureListener listener) 
-		//GestureDetector(GestureDetector.GestureListener listener)
-		//Creates a new GestureDetector with default values: halfTapSquareSize=20, tapCountInterval=0.4f, longPressDuration=1.1f, maxFlingDelay=0.15f.
-
-		InputMultiplexer multiplexer = new InputMultiplexer();
-		multiplexer.addProcessor(new GestureDetector(sprSize*sprScale, 0.4f, 1.1f, 0.15f, new MyGestureListener()));
-		multiplexer.addProcessor(new MyInputProcessor());
-		Gdx.input.setInputProcessor(multiplexer);
-		
-		gotoAppState(APPSTATE_MENU);
-
-	   }
+	}
 	
 	void loadMedia() {
 		freeMedia();
@@ -209,7 +211,7 @@ public class Deflektor implements ApplicationListener {
 	@Override
 	public void pause() {
 		// TODO Auto-generated method stub
-		
+		appState.pause();
 	}
 	
 	public class MyGestureListener implements GestureListener {
@@ -368,7 +370,7 @@ public class Deflektor implements ApplicationListener {
 	@Override
 	public void resize(int arg0, int arg1) {
 		// TODO Auto-generated method stub
-		
+		initGfx();
 	}
 
 	@Override
