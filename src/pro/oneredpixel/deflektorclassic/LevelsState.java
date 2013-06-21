@@ -39,7 +39,7 @@ public class LevelsState extends State {
 			}
 			int lx=(ix-44)/8;
 			int ly=(iy-20)/8;
-			if ( ((lx&3)!=3) && ((ly&3)!=3) ) {
+			if ( ((lx&3)!=3) && ((ly&3)!=3) && (ix>=44) && (iy>=20)) {
 				lx=lx/4; ly=ly/4;
 				int lev=ly*5+lx+(page-1)*20+1;
 				if ((lx>=0) && (lx<5) && (ly>=0) && (ly<4) && (lev<=app.unlockedLevel)) {
