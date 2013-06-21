@@ -1710,7 +1710,7 @@ public class GameState extends State {
 					break;
 				case WARP:
 					for (int i=0;i<field.length;i++) {
-						if ( (field[i]==f) && (i!=(fx+fy*field_width))) {
+						if ( ((field[i]&0xFFF)==(f&0xfff)) && (i!=(fx+fy*field_width))) {
 							beamY=(i/field_width)*4+2;
 							beamX=(i-(((int)(beamY/4))*field_width))*4+2;
 							break;
