@@ -72,10 +72,11 @@ public class Deflektor implements ApplicationListener {
 	//settings
 	boolean soundEnabled = true;
 	boolean controlsTapToRotate = true; //коснуться и отпустить зеркало для поворота на 1 угол
-	boolean controlsTouchAndDrag = true; //коснуться зеркала и не отпуская потянуть для поворота
+	boolean controlsTouchAndDrag = false; //коснуться зеркала и не отпуская потянуть для поворота
 	boolean controlsTapThenDrag = true; //коснуться зеркала для выбора, потом отпустить и провести по экрану для поворота
 	int unlockedLevel = 60;
 	int appGfxId = APPGFX_AMIGA;
+	boolean difficultyClassic = true; //повышенная, классическая сложность
 	
 	@Override
 	public void create() {
@@ -188,6 +189,7 @@ public class Deflektor implements ApplicationListener {
 		soundEnabled = prefs.getBoolean("Sound", true);
 		unlockedLevel = prefs.getInteger("UnlockedLevel", 1);
 		appGfxId = prefs.getInteger("GfxType",APPGFX_AMIGA);
+		difficultyClassic = prefs.getBoolean("DifficultyClassic", true);
 	}
 	
 	void saveSettings() {
@@ -195,6 +197,7 @@ public class Deflektor implements ApplicationListener {
 		prefs.putBoolean("Sound", soundEnabled);
 		prefs.putInteger("UnlockedLevel", unlockedLevel);
 		prefs.putInteger("GfxType", appGfxId);
+		prefs.putBoolean("DifficultyClassic", difficultyClassic);
 		prefs.flush();
 	}
 
