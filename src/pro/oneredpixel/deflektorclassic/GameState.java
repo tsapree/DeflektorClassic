@@ -1813,8 +1813,8 @@ public class GameState extends State {
 				break;
 			case SL_A:
 				if ((f1&7)!=(beamAngle&7)) {
-					if ((beamX&3)==0 && !getMirrorableWall(beamX-(mp_beam_x-beamX), mp_beam_y,beamAngle))	beamAngle=(0-beamAngle)&0xf;
-					if ((beamY&3)==0 && !getMirrorableWall(mp_beam_x, beamY-(mp_beam_y-beamY),beamAngle))	beamAngle=(4*2-beamAngle)&0xf;
+					if ((beamX&3)==0 && (((beamY&3)!=0) || !getMirrorableWall(beamX-(mp_beam_x-beamX), mp_beam_y,beamAngle))) beamAngle=(0-beamAngle)&0xf;
+					if ((beamY&3)==0 && (((beamX&3)!=0) || !getMirrorableWall(mp_beam_x, beamY-(mp_beam_y-beamY),beamAngle))) beamAngle=(4*2-beamAngle)&0xf;
 					break;
 				};
 				break;

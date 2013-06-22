@@ -75,19 +75,37 @@ public class LevelsState extends State {
 		
 		app.showString((240-8*14)/2, 8, "SELECT A LEVEL");
 		
-		int s=(page-1)*20+1;
-		for (int i=0;i<4;i++) {
-			for (int j=0;j<5;j++) {
-				drawLevelBox(44+j*32,20+i*32,s++);
+		if (page<=3) {
+			int s=(page-1)*20+1;
+			for (int i=0;i<4;i++) {
+				for (int j=0;j<5;j++) {
+					drawLevelBox(44+j*32,20+i*32,s++);
+					if (s>app.countOfLevels) break;
+				};
 				if (s>app.countOfLevels) break;
 			};
-			if (s>app.countOfLevels) break;
-		};
-
-		if (page>1) app.spr_putRegion(8, 160/2-8, 16, 16, 64,160);
-		if (page<maxpage) app.spr_putRegion(240-8-16, 160/2-8, 16, 16, 80, 160);
+	
+			if (page>1) app.spr_putRegion(8, 160/2-8, 16, 16, 64,160);
+			if (page<maxpage) app.spr_putRegion(240-8-16, 160/2-8, 16, 16, 80, 160);
+			
+			app.spr_putRegion(8, 160-8-16, 16, 16, 96, 160);
+		} else {
+			//final cut
+			app.spr_putRegion(8, 160-8-16, 16, 16, 96, 160);
+		}
 		
-		app.spr_putRegion(8, 160-8-16, 16, 16, 96, 160);
+		//CONGRATULATIONS
+		//YOU ARE TRULY
+		//A
+		//MASTER DEFLEKTOR
+		//
+		//THE CIRCUIT IS NOW COMPLETE
+		//LASER----TEAPOT
+		//
+		//THE TEA WILL BE READY
+		//IN FIVE MINUTES!
+		//
+		//PRESS ANY KEY
 		
 		batch.end();
 	};
