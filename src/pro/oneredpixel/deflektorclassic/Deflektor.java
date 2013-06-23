@@ -46,6 +46,7 @@ public class Deflektor implements ApplicationListener {
 	
 	int playingLevel = 1;
 	final int countOfLevels = 60;
+	boolean timeToShowFinalCut = false;	
 	
 	final static int APPGFX_ZX = 0;
 	final static int APPGFX_AMIGA = 1;

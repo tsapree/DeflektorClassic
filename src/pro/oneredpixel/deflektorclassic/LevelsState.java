@@ -8,51 +8,66 @@ public class LevelsState extends State {
 	int page=-1;
 	int maxpage = -1;
 	int savedUnlockedLevel = -1;
+	boolean showingFinalCutAnimation;
 	
 	LevelsState(Deflektor defl) {
 		super(defl);
-		// TODO Auto-generated constructor stub
 	}
-	//init state for showing
+	
 	void start() {
-		maxpage = app.unlockedLevel/20+1;
-		if (maxpage>3) maxpage=3;
-		
+		maxpage = (app.unlockedLevel-1)/20+1;
+		if (maxpage>4) maxpage=4;
 		if (savedUnlockedLevel!=app.unlockedLevel) {
 			savedUnlockedLevel=app.unlockedLevel;
 			page = app.unlockedLevel/20+1;
-			if (page>3) page=3;	
+
 		};
+		if (page>3) page=1;
+		if (app.timeToShowFinalCut) {
+			page=4;
+			showingFinalCutAnimation=true;
+			app.timeToShowFinalCut=false;
+		} else showingFinalCutAnimation=false;
 	};
+	
 	public boolean tap(float x, float y, int tapCount, int button) {
-		//app.gotoAppState(Deflektor.APPSTATE_GAME);
 		int ix=(int)((x-app.winX)/app.sprScale);
 		int iy=(int)((y-app.winY)/app.sprScale);
-		if ((ix>=0) && (ix<240) && (iy>=0) && (iy<160)) {
-			if ((page>1) && checkInBox(ix,iy,0,160/2-8-8,32,32)) {
-				page--;
-				app.playSound(Deflektor.SND_TAP);
-			};
-			if ((page<maxpage) && checkInBox(ix,iy,240-16-8-8-8, 160/2-8,32,32)) {
-				page++;
-				app.playSound(Deflektor.SND_TAP);
-			}
-			int lx=(ix-44)/8;
-			int ly=(iy-20)/8;
-			if ( ((lx&3)!=3) && ((ly&3)!=3) && (ix>=44) && (iy>=20)) {
-				lx=lx/4; ly=ly/4;
-				int lev=ly*5+lx+(page-1)*20+1;
-				if ((lx>=0) && (lx<5) && (ly>=0) && (ly<4) && (lev<=app.unlockedLevel)) {
-					app.playingLevel = lev;
-					app.gotoAppState(Deflektor.APPSTATE_GAME);
+		if (page<=3) {
+			if ((ix>=0) && (ix<240) && (iy>=0) && (iy<160)) {
+				if ((page>1) && checkInBox(ix,iy,0,160/2-8-8,32,32)) {
+					page--;
 					app.playSound(Deflektor.SND_TAP);
 				};
+				if ((page<maxpage) && checkInBox(ix,iy,240-16-8-8-8, 160/2-8,32,32)) {
+					page++;
+					app.playSound(Deflektor.SND_TAP);
+				}
+				int lx=(ix-44)/8;
+				int ly=(iy-20)/8;
+				if ( ((lx&3)!=3) && ((ly&3)!=3) && (ix>=44) && (iy>=20)) {
+					lx=lx/4; ly=ly/4;
+					int lev=ly*5+lx+(page-1)*20+1;
+					if ((lx>=0) && (lx<5) && (ly>=0) && (ly<4) && (lev<=app.unlockedLevel)) {
+						app.playingLevel = lev;
+						app.gotoAppState(Deflektor.APPSTATE_GAME);
+						app.playSound(Deflektor.SND_TAP);
+					};
+				}
+				if (checkInBox(ix,iy,8, 160-8-16,16,16)) {
+					app.gotoAppState(Deflektor.APPSTATE_MENU);
+					app.playSound(Deflektor.SND_TAP);
+				}
 			}
+		} else {
+			//in final cut
 			if (checkInBox(ix,iy,8, 160-8-16,16,16)) {
-				app.gotoAppState(Deflektor.APPSTATE_MENU);
+				if (showingFinalCutAnimation) app.gotoAppState(Deflektor.APPSTATE_MENU);
+				else page--;
 				app.playSound(Deflektor.SND_TAP);
 			}
-		}		
+			
+		}
 		return false;
 	}
 	
@@ -73,9 +88,8 @@ public class LevelsState extends State {
 		batch.setProjectionMatrix(app.camera.combined);
 		batch.begin();
 		
-		app.showString((240-8*14)/2, 8, "SELECT A LEVEL");
-		
 		if (page<=3) {
+			app.showString((240-8*14)/2, 8, "SELECT A LEVEL");
 			int s=(page-1)*20+1;
 			for (int i=0;i<4;i++) {
 				for (int j=0;j<5;j++) {
@@ -91,6 +105,18 @@ public class LevelsState extends State {
 			app.spr_putRegion(8, 160-8-16, 16, 16, 96, 160);
 		} else {
 			//final cut
+			app.showString((240-8*15)/2, 8,  "CONGRATULATIONS");
+			app.showString((240-8*13)/2, 32, "YOU ARE TRULY");
+			app.showString((240-8*1 )/2, 40, "A");
+			app.showString((240-8*16)/2, 48, "MASTER DEFLEKTOR");
+			app.showString((240-8*27)/2, 72, "THE CIRCUIT IS NOW COMPLETE");
+			app.showString((240-8*21)/2, 130, "THE TEA WILL BE READY");
+			app.showString((240-8*16)/2, 138,"IN FIVE MINUTES!");
+			app.spr_putRegion(28, 80+50/2-8, 16, 16, 16, 64);
+			app.spr_putRegion(188, 80+50/2-12, 24, 24, 104, 232);
+			for (int i=28+16;i<188;i+=8) {
+				app.spr_putRegion(i, 80+50/2-4, 8, 8, 56, 112);
+			};
 			app.spr_putRegion(8, 160-8-16, 16, 16, 96, 160);
 		}
 		

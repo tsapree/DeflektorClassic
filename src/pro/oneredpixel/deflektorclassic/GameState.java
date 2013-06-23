@@ -189,7 +189,8 @@ public class GameState extends State {
 					if (app.playingLevel<=app.countOfLevels) {
 						initGame();
 					} else {
-						app.gotoAppState(Deflektor.APPSTATE_MENU);
+						app.timeToShowFinalCut=true;
+						app.gotoAppState(Deflektor.APPSTATE_SELECTLEVEL);
 					}
 					app.playSound(Deflektor.SND_TAP);
 					
@@ -1351,9 +1352,9 @@ public class GameState extends State {
 			}
 			
 			if (beamState==BEAMSTATE_CONNECTED) {
-				if (app.playingLevel<app.countOfLevels) {
+//				if (app.playingLevel<app.countOfLevels) {
 					app.unlockLevel(app.playingLevel+1);
-				};
+//				};
 				gameStateId = GAMESTATE_LEVELCOMPLETED;
 				app.playSound(Deflektor.SND_LEVELCOMPLETED);
 			} else {
