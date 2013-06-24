@@ -15,8 +15,8 @@ public class Button {
 		bwidth=width;
 		bheight=height;
 		btxt=txt;
-		bimgx=0;
-		bimgy=0;
+		bimgx=-1;
+		bimgy=-1;
 		correctXYWidthHeight(centered);
 	};
 	
@@ -25,8 +25,8 @@ public class Button {
 		by=y;
 		bwidth=width;
 		bheight=height;
-		bimgx=0;
-		bimgy=0;
+		bimgx=-1;
+		bimgy=-1;
 		correctXYWidthHeight(centered);
 	};
 	

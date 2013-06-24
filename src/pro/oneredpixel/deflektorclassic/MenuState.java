@@ -17,8 +17,8 @@ public class MenuState extends State {
 		bPlay = new Button(120-12,80-16,64,176);
 		//bSettings = new Button(16, 160-32,0,0,false,"SETTINGS");
 		bSettings = new Button(240-24-8, 160-32,80,176);
-		bAchievements = new Button(8, 160-32,0,0,false,"A");
-		bAbout = new Button(8+8+24, 160-32,0,0,false,"I");
+		bAchievements = new Button(8, 160-32,16,240);
+		bAbout = new Button(8+8+24, 160-32,0,240);
 		bSoundOn = new Button(240-24-8-24-8, 160-32,112,176);
 		bSoundOff = new Button(240-24-8-24-8, 160-32,112,160);
 	}
