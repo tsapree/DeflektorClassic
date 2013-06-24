@@ -398,8 +398,8 @@ public class Deflektor implements ApplicationListener {
 	void showBigNumber(int x, int y, int num) {
 		int up=num/10;
 		int lo=num-up*10;
-		spr_putRegion(x, y, 8, 8, up*8,96+144);
-		spr_putRegion(x+8, y, 8, 8, lo*8,96+144);
+		spr_putRegion(x, y, 8, 8, up*8,72+144);
+		spr_putRegion(x+8, y, 8, 8, lo*8,72+144);
 	}
 	
 	void showChar(int x, int y, char c) {
