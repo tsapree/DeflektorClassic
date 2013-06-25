@@ -220,7 +220,7 @@ public class Deflektor implements ApplicationListener {
 
 	@Override
 	public void pause() {
-		// TODO Auto-generated method stub
+		saveSettings();
 		appState.pause();
 	}
 	
