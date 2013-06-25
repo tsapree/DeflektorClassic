@@ -73,7 +73,7 @@ public class Deflektor implements ApplicationListener {
 	//settings
 	boolean soundEnabled = true;
 	boolean controlsTapToRotate = true; //коснутьс€ и отпустить зеркало дл€ поворота на 1 угол
-	boolean controlsTouchAndDrag = true; //коснутьс€ зеркала и не отпуска€ пот€нуть дл€ поворота
+	boolean controlsTouchAndDrag = false; //коснутьс€ зеркала и не отпуска€ пот€нуть дл€ поворота
 	boolean controlsTapThenDrag = true; //коснутьс€ зеркала дл€ выбора, потом отпустить и провести по экрану дл€ поворота
 	int unlockedLevel = 60;
 	int appGfxId = APPGFX_AMIGA;

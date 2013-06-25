@@ -49,10 +49,17 @@ public class GameState extends State {
 	
 	final int MAXIMUM_REFLECTIONS = 100;
 	
+	//current energy (timer)
 	int energy=0;
+	//start energy
 	int energySteps = 1024;
+	//current overheat
 	int overheat=0;
-	final int overheatSteps = 1024;
+	//maximum overheat
+	int overheatSteps = 1024;
+	int overheatReflectionStep = 0;
+	int overheatBombStep = 0;
+		
 	int countOfGremlins = 0;
 	
 	boolean cursorEnabled = false;
@@ -1225,6 +1232,7 @@ public class GameState extends State {
 		gameStateId = GAMESTATE_ACCUMULATING_ENERGY;
 		energy=0;
 		overheat=0;
+		
 		cursorEnabled = false;		
 		
 		field=new int[field_width*field_height];
@@ -1237,8 +1245,16 @@ public class GameState extends State {
 		int fieldIndex=0;
 		levelNumber--;
 		if (levelNumber>=packedLevels.length) return;
+
+		overheatReflectionStep = overheatSteps/64;
+		overheatBombStep = overheatSteps/16;
 		
 		energySteps = packedLevels[levelNumber][0];
+		if (!app.difficultyClassic) {
+			energySteps*=2;
+			overheatReflectionStep/=2;
+			overheatBombStep/=overheatReflectionStep;
+		}
 		
 		for (int i=2;i<packedLevels[levelNumber].length;i++) {
 			if (fieldIndex>=field_width*field_height) break;
@@ -1335,9 +1351,9 @@ public class GameState extends State {
 				break;
 			}
 			
-			if (beamState==BEAMSTATE_OVERHEAT) overheat+=overheatSteps/64;
-			else if (beamState==BEAMSTATE_BOMB) overheat+=overheatSteps/16;
-			else overheat-=overheatSteps/64;
+			if (beamState==BEAMSTATE_OVERHEAT) overheat+=overheatReflectionStep;
+			else if (beamState==BEAMSTATE_BOMB) overheat+=overheatBombStep;
+			else overheat-=overheatReflectionStep;
 
 			if (overheat <=0) overheat =0;
 			if (overheat>=overheatSteps) {
