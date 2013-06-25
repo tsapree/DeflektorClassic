@@ -15,6 +15,9 @@ public class SettingsState extends State {
 	Button bUnlockLevels;
 	Button bCheat;
 	
+	Button bMinusSensitivity;
+	Button bPlusSensitivity;
+	
 	Button bDifficultyEasy;
 	Button bDifficultyClassic;
 	
@@ -30,6 +33,9 @@ public class SettingsState extends State {
 		
 		bDifficultyEasy = new Button(16+12*6+8+8+8, 64,0,0,false,"EASY");
 		bDifficultyClassic = new Button(16+4*8+8+12*6+8+16+8, 64,0,0,false,"CLASSIC");
+		
+		bMinusSensitivity = new Button(8+8*12+7*8,96, 64,160);
+		bPlusSensitivity = new Button(8+24+24+8*12+7*8,96, 80,160);
 		
 		bResetProgress = new Button(16+24+8, 160-24-8,0,0,false,"RESET PROGRESS");
 		bUnlockLevels = new  Button(16+24+8, 160-24-8,0,0,false,"UNLOCK  LEVELS");
@@ -61,6 +67,16 @@ public class SettingsState extends State {
 			app.playMelody();
 		};
 		//todo: modern
+		
+		if (bMinusSensitivity.checkRegion(tapx, tapy) && app.controlsSensitivity>1) {
+			app.controlsSensitivity--;
+			app.playSound(Deflektor.SND_TAP);
+		}
+		if (bPlusSensitivity.checkRegion(tapx, tapy) && app.controlsSensitivity<8) {
+			app.controlsSensitivity++;
+			app.playSound(Deflektor.SND_TAP);
+		}
+
 		
 		if (app.difficultyClassic && bDifficultyEasy.checkRegion(tapx, tapy)) {
 			app.playSound(Deflektor.SND_TAP);
@@ -118,6 +134,11 @@ public class SettingsState extends State {
 		app.showString(8, 72, "DIFFICULTY");
 		if (app.difficultyClassic)  app.drawButton(bDifficultyEasy);    else app.drawButton(bDifficultyEasy, 24, 176);
 		if (!app.difficultyClassic) app.drawButton(bDifficultyClassic); else app.drawButton(bDifficultyClassic, 24, 176);
+
+		app.showString(8, 104, "SENSITIVITY");
+		if (app.controlsSensitivity>1) app.drawButton(bMinusSensitivity); else app.drawButton(bMinusSensitivity, 24, 176); 
+		app.showString(8+24+8+8*12+7*8,96+8, String.format("%d", app.controlsSensitivity));
+		if (app.controlsSensitivity<8) app.drawButton(bPlusSensitivity); else app.drawButton(bPlusSensitivity, 24, 176);
 		
 		if (app.unlockedLevel==60) app.drawButton(bResetProgress);
 		else app.drawButton(bUnlockLevels);

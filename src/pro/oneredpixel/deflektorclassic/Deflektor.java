@@ -75,6 +75,7 @@ public class Deflektor implements ApplicationListener {
 	boolean controlsTapToRotate = true; //коснуться и отпустить зеркало для поворота на 1 угол
 	boolean controlsTouchAndDrag = false; //коснуться зеркала и не отпуская потянуть для поворота
 	boolean controlsTapThenDrag = true; //коснуться зеркала для выбора, потом отпустить и провести по экрану для поворота
+	int controlsSensitivity = 4;
 	int unlockedLevel = 60;
 	int appGfxId = APPGFX_AMIGA;
 	boolean difficultyClassic = true; //повышенная, классическая сложность
@@ -189,8 +190,12 @@ public class Deflektor implements ApplicationListener {
 		
 		soundEnabled = prefs.getBoolean("Sound", true);
 		unlockedLevel = prefs.getInteger("UnlockedLevel", 1);
+		if (unlockedLevel>61 || unlockedLevel<1) unlockedLevel=1;
 		appGfxId = prefs.getInteger("GfxType",APPGFX_AMIGA);
+		if ((appGfxId>APPGFX_MODERN) || (appGfxId<APPGFX_ZX)) appGfxId=APPGFX_AMIGA;
 		difficultyClassic = prefs.getBoolean("DifficultyClassic", true);
+		controlsSensitivity = prefs.getInteger("Sensitivity",4);
+		if ((controlsSensitivity<1) || (controlsSensitivity>8)) controlsSensitivity=4;
 	}
 	
 	void saveSettings() {
@@ -199,6 +204,7 @@ public class Deflektor implements ApplicationListener {
 		prefs.putInteger("UnlockedLevel", unlockedLevel);
 		prefs.putInteger("GfxType", appGfxId);
 		prefs.putBoolean("DifficultyClassic", difficultyClassic);
+		prefs.putInteger("Sensitivity",controlsSensitivity);
 		prefs.flush();
 	}
 
@@ -462,6 +468,7 @@ public class Deflektor implements ApplicationListener {
 	void drawButton (Button b, int boxx, int boxy) {
 		drawBox(b.bx,b.by,b.bwidth,b.bheight,boxx,boxy);
 		if (b.btxt!=null) showString(b.bx+8,b.by+8,b.btxt);
+		if (b.bimgx>=0 && b.bimgy>=0) spr_putRegion(b.bx+4, b.by+4, 16,16, b.bimgx, b.bimgy);
 	}
 	
 	void drawButton (Button b, String text) {
