@@ -287,8 +287,8 @@ public class GameState extends State {
 				int delta=(int)Math.sqrt((deltaX)*(deltaX)+(deltaY)*(deltaY));
 				if (deltaX<(-deltaY)) delta=-delta;
 				delta = delta + restDelta;
-				rotateMirror( cursorX, cursorY, (delta/app.panScale)&0x1f);
-				restDelta=delta-((int)(delta/app.panScale))*app.panScale;
+				rotateMirror( cursorX, cursorY, ((int)(delta/app.panScale))&0x1f);
+				restDelta=(int)(delta-((int)(delta/app.panScale))*app.panScale);
 			};
 			break;
 		};

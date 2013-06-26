@@ -71,10 +71,12 @@ public class SettingsState extends State {
 		if (bMinusSensitivity.checkRegion(tapx, tapy) && app.controlsSensitivity>1) {
 			app.controlsSensitivity--;
 			app.playSound(Deflektor.SND_TAP);
+			app.initInput();
 		}
 		if (bPlusSensitivity.checkRegion(tapx, tapy) && app.controlsSensitivity<8) {
 			app.controlsSensitivity++;
 			app.playSound(Deflektor.SND_TAP);
+			app.initInput();
 		}
 
 		

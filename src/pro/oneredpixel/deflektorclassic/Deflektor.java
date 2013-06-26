@@ -42,7 +42,7 @@ public class Deflektor implements ApplicationListener {
 	int winY;
 	int winWidth;
 	int winHeight;
-	int panScale;
+	float panScale;
 	
 	int playingLevel = 1;
 	final int countOfLevels = 60;
@@ -90,18 +90,32 @@ public class Deflektor implements ApplicationListener {
 		initGfx();
 		
 		batch = new SpriteBatch();
-		
-		//GestureDetector(float halfTapSquareSize, float tapCountInterval, float longPressDuration, float maxFlingDelay, GestureDetector.GestureListener listener) 
-		//GestureDetector(GestureDetector.GestureListener listener)
-		//Creates a new GestureDetector with default values: halfTapSquareSize=20, tapCountInterval=0.4f, longPressDuration=1.1f, maxFlingDelay=0.15f.
 
-		InputMultiplexer multiplexer = new InputMultiplexer();
-		multiplexer.addProcessor(new GestureDetector(sprSize*sprScale, 0.4f, 1.1f, 0.15f, new MyGestureListener()));
-		multiplexer.addProcessor(new MyInputProcessor());
-		Gdx.input.setInputProcessor(multiplexer);
 		gotoAppState(APPSTATE_MENU);
 
 	   }
+	
+	float sensitivityScale[]={
+			1,    //0
+			(float)(16/8.0), //1 16
+			(float)(13/8.0), //2 13
+			(float)(10/8.0), //3 10
+			(float)(8/8.0),  //4 8
+			(float)(7/8.0),  //5 7
+			(float)(6/8.0),  //6 6
+			(float)(5/8.0),  //7 5
+			(float)(4/8.0),  //8 4
+	};
+	void initInput() {
+		//GestureDetector(float halfTapSquareSize, float tapCountInterval, float longPressDuration, float maxFlingDelay, GestureDetector.GestureListener listener) 
+		//GestureDetector(GestureDetector.GestureListener listener)
+		//Creates a new GestureDetector with default values: halfTapSquareSize=20, tapCountInterval=0.4f, longPressDuration=1.1f, maxFlingDelay=0.15f.
+		InputMultiplexer multiplexer = new InputMultiplexer();
+		multiplexer.addProcessor(new GestureDetector(panScale, 0.4f, 1.1f, 0.15f, new MyGestureListener()));
+		multiplexer.addProcessor(new MyInputProcessor());
+		Gdx.input.setInputProcessor(multiplexer);
+		panScale=sprSize*sprScale*sensitivityScale[controlsSensitivity];
+	}
 	
 	void initGfx() {
 		screenWidth = Gdx.graphics.getWidth();
@@ -120,9 +134,10 @@ public class Deflektor implements ApplicationListener {
 		winX = (screenWidth-winWidth)/2;
 		winY = (screenHeight-winHeight)/2;		
 		
-		panScale=sprSize*sprScale/1;
 		camera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		
+		initInput();
 	}
 	
 	void loadMedia() {
