@@ -1446,6 +1446,7 @@ public class GameState extends State {
 	}
 	
 	void drawGameInfo () {
+		/*
 		int nrg = (energy *64) /energySteps;
 		int ovh = (overheat * 64) / overheatSteps;
 		if (nrg>63) nrg=63;
@@ -1463,9 +1464,59 @@ public class GameState extends State {
 		
 		//level
 		app.showBigNumber(6, field_height*16+4, app.playingLevel);
+		*/
+		
+		if (!(gameStateId==GAMESTATE_GAMING && winStateId==WINSTATE_GAMING && (energy*8/energySteps)<1 && (flash&2)==0)) 
+			app.spr_putRegion( 0, field_height*16, 64-8, 8, 0, 8+144);
+		drawStripe(56, field_height*16, 240-56-16,energy*(240-56-16)/energySteps,true);
+		if (!(gameStateId==GAMESTATE_GAMING && winStateId==WINSTATE_GAMING && (overheat*4/overheatSteps)>=3 && (flash&1)==0))
+			app.spr_putRegion( 0, field_height*16+8, 64-8, 8, 64, 8+144);
+		drawStripe(56, field_height*16+8, 240-56-16,overheat*(240-56-16)/overheatSteps,false);
+		
+		
 		//pause button
 		app.spr_putRegion( (field_width-1)*16, field_height*16, 16, 16, 48, 16+144);
 	}
+	
+	void drawStripe(int x, int y, int width, int filledWidth, boolean emptyIsBad) {
+		int sx_filled=16;
+		int sx_empty=80;
+		int color=filledWidth*4/width;
+		if (!emptyIsBad) color=3-color;
+		switch (color) {
+		case -1:
+		case 0:
+			sx_filled=8; sx_empty=72;
+			break;
+		case 1:
+		case 2:
+			sx_filled=48; sx_empty=112;
+			break;
+		case 3:
+		case 4:
+			sx_filled=16; sx_empty=80;
+			break;
+		}
+		while (filledWidth>=8) {
+			app.spr_putRegion( x, y, 8, 8, sx_filled, 144);
+			filledWidth-=8;
+			width-=8;
+			x+=8;
+		};
+		if (filledWidth>0) {
+			app.spr_putRegion( x, y, filledWidth, 8, sx_filled, 144);
+			app.spr_putRegion( x+filledWidth, y, 8-filledWidth, 8, sx_empty+filledWidth, 144);
+			width-=8;
+			x+=8;
+		};
+		while (width>=8) {
+			app.spr_putRegion( x, y, 8, 8, sx_empty, 144);
+			width-=8;
+			x+=8;
+		};
+		
+		
+	};
 	
 	void drawField() {
 		int f_angle;
