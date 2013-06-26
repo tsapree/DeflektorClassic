@@ -2,13 +2,17 @@ package pro.oneredpixel.deflektorclassic;
 
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.utils.TimeUtils;
 
 public class LevelsState extends State {
 
 	int page=-1;
 	int maxpage = -1;
 	int savedUnlockedLevel = -1;
+	int currentFrame = 0;
 	boolean showingFinalCutAnimation;
+	
+	final int desiredFPS = 20;
 	
 	LevelsState(Deflektor defl) {
 		super(defl);
@@ -27,7 +31,11 @@ public class LevelsState extends State {
 			page=4;
 			showingFinalCutAnimation=true;
 			app.timeToShowFinalCut=false;
-		} else showingFinalCutAnimation=false;
+			currentFrame=0;
+		} else {
+			showingFinalCutAnimation=false;
+			currentFrame=10000;
+		}
 	};
 	
 	public boolean tap(float x, float y, int tapCount, int button) {
@@ -61,11 +69,13 @@ public class LevelsState extends State {
 			}
 		} else {
 			//in final cut
-			if (checkInBox(ix,iy,8, 160-8-16,16,16)) {
-				if (showingFinalCutAnimation) app.gotoAppState(Deflektor.APPSTATE_MENU);
-				else page--;
-				app.playSound(Deflektor.SND_TAP);
-			}
+			if (currentFrame>desiredFPS*10) {
+				if (checkInBox(ix,iy,8, 160-8-16,16,16)) {
+					if (showingFinalCutAnimation) app.gotoAppState(Deflektor.APPSTATE_MENU);
+					else page--;
+					app.playSound(Deflektor.SND_TAP);
+				}
+			};
 			
 		}
 		return false;
@@ -105,35 +115,39 @@ public class LevelsState extends State {
 			app.spr_putRegion(8, 160-8-16, 16, 16, 96, 160);
 		} else {
 			//final cut
-			app.showString((240-8*15)/2, 8,  "CONGRATULATIONS");
-			app.showString((240-8*13)/2, 32, "YOU ARE TRULY");
-			app.showString((240-8*1 )/2, 40, "A");
-			app.showString((240-8*16)/2, 48, "MASTER DEFLEKTOR");
-			app.showString((240-8*27)/2, 72, "THE CIRCUIT IS NOW COMPLETE");
-			app.showString((240-8*21)/2, 130, "THE TEA WILL BE READY");
-			app.showString((240-8*16)/2, 138,"IN FIVE MINUTES!");
-			app.spr_putRegion(28, 80+50/2-8, 16, 16, 16, 64);
-			app.spr_putRegion(188, 80+50/2-12, 24, 24, 104, 232);
-			for (int i=28+16;i<188;i+=8) {
-				app.spr_putRegion(i, 80+50/2-4, 8, 8, 56, 112);
+			if (!((currentFrame<desiredFPS*4) && (((currentFrame&3)>>1)==1)))app.showString((240-8*15)/2, 8,  "CONGRATULATIONS");
+			if (currentFrame>desiredFPS*4) {
+				app.showString((240-8*13)/2, 32, "YOU ARE TRULY");
+				app.showString((240-8*1 )/2, 40, "A");
+				app.showString((240-8*16)/2, 48, "MASTER DEFLEKTOR");
 			};
-			app.spr_putRegion(8, 160-8-16, 16, 16, 96, 160);
+			if (currentFrame>desiredFPS*6) {
+				app.showString((240-8*27)/2, 72, "THE CIRCUIT IS NOW COMPLETE");
+				app.spr_putRegion(28, 80+50/2-8, 16, 16, 16, 64);
+				app.spr_putRegion(188, 80+50/2-12, 24, 24, 104, 232);
+			};
+			if (currentFrame>=desiredFPS*7) {
+				
+				for (int i=28+16;i<188;i+=8) {
+					app.spr_putRegion(i, 80+50/2-4, 8, 8, 56, 112);
+				};
+			};
+			if (currentFrame>desiredFPS*9) {
+				app.showString((240-8*21)/2, 130, "THE TEA WILL BE READY");
+				app.showString((240-8*16)/2, 138,"IN FIVE MINUTES!");
+			};
+			if (currentFrame>desiredFPS*10) {
+				app.spr_putRegion(8, 160-8-16, 16, 16, 96, 160);
+			};
 		}
-		
-		//CONGRATULATIONS
-		//YOU ARE TRULY
-		//A
-		//MASTER DEFLEKTOR
-		//
-		//THE CIRCUIT IS NOW COMPLETE
-		//LASER----TEAPOT
-		//
-		//THE TEA WILL BE READY
-		//IN FIVE MINUTES!
-		//
-		//PRESS ANY KEY
-		
+
 		batch.end();
+
+		if(TimeUtils.nanoTime() - app.lastFrameTime > (1000000000/desiredFPS)) {
+			currentFrame++;			
+			app.lastFrameTime = TimeUtils.nanoTime();
+		};
+		
 	};
 	
 	void drawLevelBox(int x, int y, int levelNumber) {
