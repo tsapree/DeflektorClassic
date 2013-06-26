@@ -72,7 +72,7 @@ public class Deflektor implements ApplicationListener {
 	
 	//settings
 	boolean soundEnabled = true;
-	boolean controlsTapToRotate = true; //коснуться и отпустить зеркало для поворота на 1 угол
+	boolean controlsTapToRotate = true; //коснуться и отпустить зеркало для поворота на 1 угол. если выбрано controlsTapThenDrag, то срабатывает на уже выбранном зеркале
 	boolean controlsTouchAndDrag = false; //коснуться зеркала и не отпуская потянуть для поворота
 	boolean controlsTapThenDrag = true; //коснуться зеркала для выбора, потом отпустить и провести по экрану для поворота
 	int controlsSensitivity = 4;

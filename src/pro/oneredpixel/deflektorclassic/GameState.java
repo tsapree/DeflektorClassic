@@ -215,11 +215,11 @@ public class GameState extends State {
 			} else if ((gameStateId==GAMESTATE_GAMEOVER_OVERHEAT) || (gameStateId==GAMESTATE_GAMEOVER_NOENERGY)) {
 				break;
 			};
-			setCursor((int)x,(int)y);
+			boolean changedCoordinates = setCursor((int)x,(int)y);
 			x=x-app.winX;
 			y=y-app.winY;
-			if (x>=0 && x<app.winWidth && y>=0 && y<app.winHeight && beamState!=BEAMSTATE_CONNECTED && app.controlsTapToRotate) {
-				touchField(((int)x)/(app.sprSize*2)/app.sprScale, ((int)y)/(app.sprSize*2)/app.sprScale);
+			if (x>=0 && x<app.winWidth && y>=0 && y<app.winHeight && beamState!=BEAMSTATE_CONNECTED) {
+				if ((!changedCoordinates || !app.controlsTapThenDrag) && app.controlsTapToRotate) touchField(((int)x)/(app.sprSize*2)/app.sprScale, ((int)y)/(app.sprSize*2)/app.sprScale);
 				killGremlins((int)(x/app.sprScale), (int)(y/app.sprScale));
 			};
 			if (checkInBox((int)(x/app.sprScale),(int)(y/app.sprScale),(field_width-1)*16, field_height*16,16,16)) {
@@ -1286,19 +1286,22 @@ public class GameState extends State {
 		cursorEnabled=false;
 	}
 	
-	void setCursor(int x, int y) {
+	boolean setCursor(int x, int y) {
 		int newCursorX=(x-app.winX)/(app.sprSize*2)/app.sprScale;
-		int newCursorY=(y-app.winY)/(app.sprSize*2)/app.sprScale;	
+		int newCursorY=(y-app.winY)/(app.sprSize*2)/app.sprScale;
+		boolean changedCoordinates = false;
 		
 		if (newCursorX>=0 && newCursorX<field_width && newCursorY>=0 && newCursorY<field_height) {
 			int f=field[newCursorX+newCursorY*field_width];
 			if ((f&0xF00)==MIRR) {
 				cursorEnabled=true;
 				cursorPhase=0;
+				if ((cursorX!=newCursorX) || (cursorY!=newCursorY)) changedCoordinates=true;
 				cursorX=newCursorX;
 				cursorY=newCursorY;
 			};
 		};
+		return changedCoordinates;
 	}
 	
 	void animateField() {
