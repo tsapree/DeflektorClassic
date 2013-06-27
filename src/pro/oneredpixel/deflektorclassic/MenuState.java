@@ -63,14 +63,18 @@ public class MenuState extends State {
 		
 		if (bPlay.checkRegion(tapx,tapy)) {
 			app.gotoAppState(Deflektor.APPSTATE_SELECTLEVEL);
+			bPlay.touched = false;
 		};
 		if (bSettings.checkRegion(tapx,tapy)) { 
 			app.gotoAppState(Deflektor.APPSTATE_SETTINGS);
+			bSettings.touched = false;
 		};
 		if (bSoundOn.checkRegion(tapx,tapy)) {
 			app.soundEnabled=!app.soundEnabled;
 			app.stopMelody();
 			app.playMelody();
+			bSoundOn.touched = false;
+			bSoundOff.touched = false;
 		}
 		return false;
 	}

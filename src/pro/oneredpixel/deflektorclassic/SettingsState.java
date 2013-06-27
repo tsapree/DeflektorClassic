@@ -9,7 +9,7 @@ public class SettingsState extends State {
 	
 	Button bZX;
 	Button bAmiga;
-	Button bModern;
+	//Button bModern;
 	//TODO: убрать для релизной версии
 	Button bResetProgress;
 	Button bUnlockLevels;
@@ -23,13 +23,11 @@ public class SettingsState extends State {
 	
 	SettingsState(Deflektor defl) {
 		super(defl);
-		// TODO Auto-generated constructor stub
-		
+	
 		bBack = new Button(8,160-8-24, 96,160);
 		
 		bZX = new Button(16+8*6+8+8, 32,0,0,false,"ZX");
 		bAmiga = new Button(16+16+8*2+8*6+8+8, 32,0,0,false,"AMIGA");
-		bModern = new Button(16+16+8*2+16+8*5+8*6+8+8, 32,0,0,false,"MODERN");
 		
 		bDifficultyEasy = new Button(16+12*6+8+8+8, 64,0,0,false,"EASY");
 		bDifficultyClassic = new Button(16+4*8+8+12*6+8+16+8, 64,0,0,false,"CLASSIC");
@@ -41,71 +39,137 @@ public class SettingsState extends State {
 		bUnlockLevels = new  Button(16+24+8, 160-24-8,0,0,false,"UNLOCK  LEVELS");
 		bCheat = new Button(16+8+8+15*8+16+8,160-24-8,0,0,false,"CHEAT");
 		
-		
-		
 	}
+	
+	public boolean touchDown(int x, int y, int pointer, int button) {
+		int touchx=(int)(x-app.winX)/app.sprScale;
+		int touchy=(int)(y-app.winY)/app.sprScale;
+		if (bBack.checkRegion(touchx,touchy)) {
+			bBack.touched=true;
+			app.playSound(Deflektor.SND_TAP);
+		};
+		if (bZX.checkRegion(touchx,touchy)&& app.appGfxId!=Deflektor.APPGFX_ZX) {
+			bZX.touched=true;
+			app.playSound(Deflektor.SND_TAP);
+		};
+		if (bAmiga.checkRegion(touchx,touchy)&& app.appGfxId!=Deflektor.APPGFX_AMIGA) {
+			bAmiga.touched=true;
+			app.playSound(Deflektor.SND_TAP);
+		};
+		
+		if (bDifficultyEasy.checkRegion(touchx,touchy) && app.difficultyClassic) {
+			bDifficultyEasy.touched=true;
+			app.playSound(Deflektor.SND_TAP);
+		};
+		if (bDifficultyClassic.checkRegion(touchx,touchy) && !app.difficultyClassic) {
+			bDifficultyClassic.touched=true;
+			app.playSound(Deflektor.SND_TAP);
+		};
+		if (bMinusSensitivity.checkRegion(touchx,touchy) && app.controlsSensitivity>1) {
+			bMinusSensitivity.touched=true;
+			app.playSound(Deflektor.SND_TAP);
+		};
+		if (bPlusSensitivity.checkRegion(touchx,touchy) && app.controlsSensitivity<8) {
+			bPlusSensitivity.touched=true;
+			app.playSound(Deflektor.SND_TAP);
+		};
+		if (bResetProgress.checkRegion(touchx,touchy)) {
+			bResetProgress.touched=true;
+			app.playSound(Deflektor.SND_TAP);
+		};
+		if (bUnlockLevels.checkRegion(touchx,touchy)) {
+			bUnlockLevels.touched=true;
+			app.playSound(Deflektor.SND_TAP);
+		};
+		if (bCheat.checkRegion(touchx,touchy)) {
+			bCheat.touched=true;
+			app.playSound(Deflektor.SND_TAP);
+		};
+		
+		return false;
+	}
+	
+	public boolean touchUp (int x, int y, int pointer, int button) {
+		untouchButtons();
+		return false;
+	};
+	
+	void untouchButtons() {
+		if (bBack.touched || bZX.touched || bAmiga.touched ||
+				bDifficultyEasy.touched || bDifficultyClassic.touched || bMinusSensitivity.touched || bPlusSensitivity.touched ||
+				bResetProgress.touched || bUnlockLevels.touched || bCheat.touched)  app.playSound(Deflektor.SND_UNTAP);
+		bBack.touched=false;
+		bZX.touched=false;
+		bAmiga.touched=false;
+		bDifficultyEasy.touched=false;
+		bDifficultyClassic.touched=false;
+		bMinusSensitivity.touched=false;
+		bPlusSensitivity.touched=false;
+		bResetProgress.touched=false;
+		bUnlockLevels.touched=false;
+		bCheat.touched=false;
+	};
 	
 	public boolean tap(float x, float y, int tapCount, int button) {
 		int tapx=(int)(x-app.winX)/app.sprScale;
 		int tapy=(int)(y-app.winY)/app.sprScale;
 		
 		if (bBack.checkRegion(tapx,  tapy)) {
-			app.playSound(Deflektor.SND_UNTAP);
 			app.gotoAppState(Deflektor.APPSTATE_MENU);
+			bBack.touched = false;
 		}
 		
 		if (bZX.checkRegion(tapx,  tapy) && app.appGfxId!=Deflektor.APPGFX_ZX) {
-			app.playSound(Deflektor.SND_UNTAP);
 			app.appGfxId=Deflektor.APPGFX_ZX;
 			app.loadMedia();
 			app.playMelody();
+			bZX.touched=false;
 		};
 		if (bAmiga.checkRegion(tapx,  tapy) && app.appGfxId!=Deflektor.APPGFX_AMIGA) {
-			app.playSound(Deflektor.SND_UNTAP);
 			app.appGfxId=Deflektor.APPGFX_AMIGA;
 			app.loadMedia();
 			app.playMelody();
+			bAmiga.touched = false;
 		};
-		//todo: modern
 		
 		if (bMinusSensitivity.checkRegion(tapx, tapy) && app.controlsSensitivity>1) {
 			app.controlsSensitivity--;
-			app.playSound(Deflektor.SND_UNTAP);
 			app.initInput();
+			bMinusSensitivity.touched=false;
 		}
 		if (bPlusSensitivity.checkRegion(tapx, tapy) && app.controlsSensitivity<8) {
 			app.controlsSensitivity++;
-			app.playSound(Deflektor.SND_UNTAP);
 			app.initInput();
+			bPlusSensitivity.touched=false;
 		}
 
 		
 		if (app.difficultyClassic && bDifficultyEasy.checkRegion(tapx, tapy)) {
-			app.playSound(Deflektor.SND_UNTAP);
 			app.difficultyClassic=false;
+			bDifficultyEasy.touched = false;
 		};
 		if (!app.difficultyClassic && bDifficultyClassic.checkRegion(tapx, tapy)) {
-			app.playSound(Deflektor.SND_UNTAP);
 			app.difficultyClassic=true;
+			bDifficultyClassic.touched = false;
 		};
 		
 		if (!app.cheat && bCheat.checkRegion(tapx,  tapy)) {
 			app.cheat=true;
-			app.playSound(Deflektor.SND_UNTAP);
 			app.gotoAppState(Deflektor.APPSTATE_MENU);
+			bCheat.touched=false;
 		};
 		
 		if (app.unlockedLevel==60) {
 			if (bResetProgress.checkRegion(tapx,  tapy)) {
 				app.unlockedLevel=1;
-				app.playSound(Deflektor.SND_UNTAP);
 				app.gotoAppState(Deflektor.APPSTATE_MENU);
+				bResetProgress.touched=false;
 			}
 		} else {
 			if (bUnlockLevels.checkRegion(tapx,  tapy)) {
 				app.unlockedLevel=60;
-				app.playSound(Deflektor.SND_UNTAP);
 				app.gotoAppState(Deflektor.APPSTATE_MENU);
+				bUnlockLevels.touched=false;
 			}
 		}
 		
@@ -115,7 +179,7 @@ public class SettingsState extends State {
 	public boolean keyUp(int k) {
 		if (k==Keys.BACK) {
 			app.gotoAppState(Deflektor.APPSTATE_MENU);
-			app.playSound(Deflektor.SND_UNTAP);
+			app.playSound(Deflektor.SND_TAP);
 			return true;
 		};
 		return false;
@@ -131,7 +195,6 @@ public class SettingsState extends State {
 		app.showString(8, 40, "DESIGN");
 		if (app.appGfxId!=Deflektor.APPGFX_ZX) app.drawButton(bZX); else app.drawButton(bZX, 24, 176); 
 		if (app.appGfxId!=Deflektor.APPGFX_AMIGA) app.drawButton(bAmiga); else app.drawButton(bAmiga, 24, 176);
-		app.drawButton(bModern);
 		
 		app.showString(8, 72, "DIFFICULTY");
 		if (app.difficultyClassic)  app.drawButton(bDifficultyEasy);    else app.drawButton(bDifficultyEasy, 24, 176);
@@ -148,8 +211,4 @@ public class SettingsState extends State {
 		
 		batch.end();
 	};
-	
-
-
-
 }
