@@ -175,8 +175,9 @@ public class GameState extends State {
 				app.showString(32+8*3, 24+8+8+8, String.format("GREMLINS %d",countKilledGremlins));
 				app.showString(32+8*5, 24+8+8+8+8, String.format("ENERGY %d",countEnergy));
 				app.showString(32+8*6, 24+8+8+8+8+8+8, String.format("SCORE %d",countScore));
-				if (topScore<=countScore) app.showString(32+8+8+8*4, 24+8+8+8+8+8+8+8+8, "NEW RECORD");
-				else app.showString(32+8*8, 24+8+8+8+8+8+8+8+8, String.format("TOP %d",topScore));
+				if (topScore<=countScore) {
+					if ((flash&2)==0) app.showString(32+8+8+8*4, 24+8+8+8+8+8+8+8+8, "NEW RECORD");
+				} else app.showString(32+8*8, 24+8+8+8+8+8+8+8+8, String.format("TOP %d",topScore));
 				
 				
 				
@@ -194,6 +195,7 @@ public class GameState extends State {
 		batch.end();
 		
 		if(TimeUtils.nanoTime() - app.lastFrameTime > (1000000000/desiredFPS)) {
+			flash=(flash+1)&63;
 			if (winStateId==WINSTATE_GAMING && gameStateId!=GAMESTATE_LEVELCOMPLETED) animateField();			
 		} else return;
 		app.lastFrameTime = TimeUtils.nanoTime();
@@ -1412,8 +1414,6 @@ public class GameState extends State {
 		boolean needToExplodeBarrier=true;
 		boolean barrierFound = false;
 
-		flash=(flash+1)&63;
-    
 		if (++cursorPhase>=cursorPhases) cursorPhase=0;
 		if (touched) cursorPhase=cursorPhases/2-1;
 		
