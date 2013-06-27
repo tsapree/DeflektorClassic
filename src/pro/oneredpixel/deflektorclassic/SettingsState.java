@@ -26,8 +26,8 @@ public class SettingsState extends State {
 	
 		bBack = new Button(8,160-8-24, 96,160);
 		
-		bZX = new Button(16+8*6+8+8, 32,0,0,false,"ZX");
-		bAmiga = new Button(16+16+8*2+8*6+8+8, 32,0,0,false,"AMIGA");
+		bZX = new Button(16+8*6+8+8+8*8, 32,0,0,false,"ZX");
+		bAmiga = new Button(16+16+8*2+8*6+8+8+8*8, 32,0,0,false,"AMIGA");
 		
 		bDifficultyEasy = new Button(16+12*6+8+8+8, 64,0,0,false,"EASY");
 		bDifficultyClassic = new Button(16+4*8+8+12*6+8+16+8, 64,0,0,false,"CLASSIC");
@@ -177,7 +177,7 @@ public class SettingsState extends State {
 	}
 	
 	public boolean keyUp(int k) {
-		if (k==Keys.BACK) {
+		if (k==Keys.BACK || k==Keys.MENU) {
 			app.gotoAppState(Deflektor.APPSTATE_MENU);
 			app.playSound(Deflektor.SND_TAP);
 			return true;

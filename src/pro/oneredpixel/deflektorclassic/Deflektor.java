@@ -349,6 +349,7 @@ public class Deflektor implements ApplicationListener {
 			};
 			appState = menuState;
 			Gdx.input.setCatchBackKey(false);
+			Gdx.input.setCatchMenuKey(true);
 			playMelody();
 			break;
 		case APPSTATE_SELECTLEVEL:
@@ -358,6 +359,7 @@ public class Deflektor implements ApplicationListener {
 			};
 			appState = levelsState;
 			Gdx.input.setCatchBackKey(true);
+			Gdx.input.setCatchMenuKey(true);
 			playMelody();
 			break;
 			

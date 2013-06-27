@@ -127,7 +127,7 @@ public class LevelsState extends State {
 	};
 	
 	public boolean keyUp(int k) {
-		if (k==Keys.BACK) {
+		if (k==Keys.BACK || k==Keys.MENU) {
 			app.gotoAppState(Deflektor.APPSTATE_MENU);
 			app.playSound(Deflektor.SND_TAP);
 			return true;
