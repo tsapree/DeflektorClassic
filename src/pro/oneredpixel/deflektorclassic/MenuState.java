@@ -36,6 +36,10 @@ public class MenuState extends State {
 			bSettings.touched = true;
 			app.playSound(Deflektor.SND_TAP);
 		}
+		if (bAbout.checkRegion(touchx,touchy)) {
+			bAbout.touched = true;
+			app.playSound(Deflektor.SND_TAP);
+		}
 		if (bSoundOn.checkRegion(touchx,touchy)) {
 			bSoundOn.touched = true;
 			bSoundOff.touched = true;
@@ -50,11 +54,12 @@ public class MenuState extends State {
 	};
 	
 	void untouchButtons() {
-		if (bPlay.touched||bSettings.touched||bSoundOn.touched) app.playSound(Deflektor.SND_UNTAP);
+		if (bPlay.touched||bSettings.touched||bSoundOn.touched||bAbout.touched) app.playSound(Deflektor.SND_UNTAP);
 		bPlay.touched = false;
 		bSettings.touched = false;
 		bSoundOn.touched = false;
 		bSoundOff.touched = false;
+		bAbout.touched = false;
 	};
 	
 	public boolean tap(float x, float y, int tapCount, int button) {
@@ -69,6 +74,10 @@ public class MenuState extends State {
 			app.gotoAppState(Deflektor.APPSTATE_SETTINGS);
 			bSettings.touched = false;
 		};
+		if (bAbout.checkRegion(tapx,tapy)) {
+			app.gotoAppState(Deflektor.APPSTATE_ABOUT);
+			bAbout.touched = false;
+		}
 		if (bSoundOn.checkRegion(tapx,tapy)) {
 			app.soundEnabled=!app.soundEnabled;
 			app.stopMelody();

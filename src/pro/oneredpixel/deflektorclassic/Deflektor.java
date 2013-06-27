@@ -59,6 +59,7 @@ public class Deflektor implements ApplicationListener {
 	final static int APPSTATE_SELECTLEVEL = 3;
 	final static int APPSTATE_GAME = 4;
 	final static int APPSTATE_SETTINGS = 5;
+	final static int APPSTATE_ABOUT = 6;
 	int appStateId = 0;
 	State appState;
 	
@@ -66,6 +67,7 @@ public class Deflektor implements ApplicationListener {
 	MenuState menuState;
 	LevelsState levelsState;
 	SettingsState settingsState;
+	AboutState aboutState;
 	
 	public long lastFrameTime = 0;
 	
@@ -381,7 +383,15 @@ public class Deflektor implements ApplicationListener {
 			appState = settingsState;
 			Gdx.input.setCatchBackKey(true);
 			break;
-		
+		case APPSTATE_ABOUT:
+			if (aboutState==null) {
+				aboutState = new AboutState(this);
+				aboutState.create();
+			};
+			appState = aboutState;
+			Gdx.input.setCatchBackKey(true);
+			break;
+			
 		};
 		appStateId = newState;
 		appState.start();
