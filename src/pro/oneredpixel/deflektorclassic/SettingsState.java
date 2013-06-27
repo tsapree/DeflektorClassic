@@ -50,18 +50,18 @@ public class SettingsState extends State {
 		int tapy=(int)(y-app.winY)/app.sprScale;
 		
 		if (bBack.checkRegion(tapx,  tapy)) {
-			app.playSound(Deflektor.SND_TAP);
+			app.playSound(Deflektor.SND_UNTAP);
 			app.gotoAppState(Deflektor.APPSTATE_MENU);
 		}
 		
 		if (bZX.checkRegion(tapx,  tapy) && app.appGfxId!=Deflektor.APPGFX_ZX) {
-			app.playSound(Deflektor.SND_TAP);
+			app.playSound(Deflektor.SND_UNTAP);
 			app.appGfxId=Deflektor.APPGFX_ZX;
 			app.loadMedia();
 			app.playMelody();
 		};
 		if (bAmiga.checkRegion(tapx,  tapy) && app.appGfxId!=Deflektor.APPGFX_AMIGA) {
-			app.playSound(Deflektor.SND_TAP);
+			app.playSound(Deflektor.SND_UNTAP);
 			app.appGfxId=Deflektor.APPGFX_AMIGA;
 			app.loadMedia();
 			app.playMelody();
@@ -70,41 +70,41 @@ public class SettingsState extends State {
 		
 		if (bMinusSensitivity.checkRegion(tapx, tapy) && app.controlsSensitivity>1) {
 			app.controlsSensitivity--;
-			app.playSound(Deflektor.SND_TAP);
+			app.playSound(Deflektor.SND_UNTAP);
 			app.initInput();
 		}
 		if (bPlusSensitivity.checkRegion(tapx, tapy) && app.controlsSensitivity<8) {
 			app.controlsSensitivity++;
-			app.playSound(Deflektor.SND_TAP);
+			app.playSound(Deflektor.SND_UNTAP);
 			app.initInput();
 		}
 
 		
 		if (app.difficultyClassic && bDifficultyEasy.checkRegion(tapx, tapy)) {
-			app.playSound(Deflektor.SND_TAP);
+			app.playSound(Deflektor.SND_UNTAP);
 			app.difficultyClassic=false;
 		};
 		if (!app.difficultyClassic && bDifficultyClassic.checkRegion(tapx, tapy)) {
-			app.playSound(Deflektor.SND_TAP);
+			app.playSound(Deflektor.SND_UNTAP);
 			app.difficultyClassic=true;
 		};
 		
 		if (!app.cheat && bCheat.checkRegion(tapx,  tapy)) {
 			app.cheat=true;
-			app.playSound(Deflektor.SND_TAP);
+			app.playSound(Deflektor.SND_UNTAP);
 			app.gotoAppState(Deflektor.APPSTATE_MENU);
 		};
 		
 		if (app.unlockedLevel==60) {
 			if (bResetProgress.checkRegion(tapx,  tapy)) {
 				app.unlockedLevel=1;
-				app.playSound(Deflektor.SND_TAP);
+				app.playSound(Deflektor.SND_UNTAP);
 				app.gotoAppState(Deflektor.APPSTATE_MENU);
 			}
 		} else {
 			if (bUnlockLevels.checkRegion(tapx,  tapy)) {
 				app.unlockedLevel=60;
-				app.playSound(Deflektor.SND_TAP);
+				app.playSound(Deflektor.SND_UNTAP);
 				app.gotoAppState(Deflektor.APPSTATE_MENU);
 			}
 		}
@@ -115,7 +115,7 @@ public class SettingsState extends State {
 	public boolean keyUp(int k) {
 		if (k==Keys.BACK) {
 			app.gotoAppState(Deflektor.APPSTATE_MENU);
-			app.playSound(Deflektor.SND_TAP);
+			app.playSound(Deflektor.SND_UNTAP);
 			return true;
 		};
 		return false;

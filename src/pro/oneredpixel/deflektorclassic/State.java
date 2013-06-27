@@ -62,10 +62,6 @@ public class State {
 		return false;
 	}
 
-	public boolean touchDown(float x, float y, int pointer, int button) {
-		return false;
-	}
-
 	public boolean pan(float x, float y, float deltaX, float deltaY) {
 		return false;
 	}
@@ -80,7 +76,14 @@ public class State {
 	public boolean touchUp(int x, int y, int pointer, int button) {
 		return false;
 	}
+
+	public boolean touchDown(float x, float y, int pointer, int button) {
+		return false;
+	}
 	
+	public boolean touchDown(int x, int y, int pointer, int button) {
+		return false;
+	}
 	//
 	//--- controlling - Keys
 	//

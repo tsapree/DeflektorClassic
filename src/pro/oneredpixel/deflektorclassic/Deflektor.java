@@ -28,6 +28,7 @@ public class Deflektor implements ApplicationListener {
 	private Sound transferEnergySound;
 	private Sound gremlinAppearSound;
 	private Sound gremlinDeadSound;
+	private Sound untapSound;
 	private Sound tapSound;
 	Music music;
 	
@@ -111,7 +112,7 @@ public class Deflektor implements ApplicationListener {
 		//GestureDetector(GestureDetector.GestureListener listener)
 		//Creates a new GestureDetector with default values: halfTapSquareSize=20, tapCountInterval=0.4f, longPressDuration=1.1f, maxFlingDelay=0.15f.
 		InputMultiplexer multiplexer = new InputMultiplexer();
-		multiplexer.addProcessor(new GestureDetector(panScale, 0.4f, 1.1f, 0.15f, new MyGestureListener()));
+		multiplexer.addProcessor(new GestureDetector(panScale, 0.4f, 1.1f, 0.01f, new MyGestureListener()));
 		multiplexer.addProcessor(new MyInputProcessor());
 		Gdx.input.setInputProcessor(multiplexer);
 		panScale=sprSize*sprScale*sensitivityScale[controlsSensitivity];
@@ -124,9 +125,6 @@ public class Deflektor implements ApplicationListener {
 		sprSize = Math.min(screenWidth/GameState.field_width, screenHeight/(GameState.field_height+1));
 		sprScale = sprSize/8/2;
 		sprSize = 8;
-		
-		//sprScale =1;
-		//sprSize=8;
 		
 		winWidth = GameState.field_width*sprSize*2*sprScale;
 		winHeight = (GameState.field_height+1)*sprSize*2*sprScale;
@@ -158,7 +156,8 @@ public class Deflektor implements ApplicationListener {
 			levelCompletedSound = Gdx.audio.newSound(Gdx.files.internal("zx-level-completed.wav"));
 			transferEnergySound = Gdx.audio.newSound(Gdx.files.internal("zx-transfer-energy.wav"));
 			gremlinDeadSound=Gdx.audio.newSound(Gdx.files.internal("zx-gremlin-dead.wav"));
-			tapSound=Gdx.audio.newSound(Gdx.files.internal("zx-tap.wav"));
+			untapSound=Gdx.audio.newSound(Gdx.files.internal("untap8.wav"));
+			tapSound=Gdx.audio.newSound(Gdx.files.internal("tap8.wav"));
 			
 			break;
 		case APPGFX_AMIGA:
@@ -173,7 +172,8 @@ public class Deflektor implements ApplicationListener {
 			laserOverheatSound = Gdx.audio.newSound(Gdx.files.internal("amiga-burn-bomb.wav"));
 			gremlinAppearSound=Gdx.audio.newSound(Gdx.files.internal("amiga-gremlin-appear.wav"));
 			gremlinDeadSound=Gdx.audio.newSound(Gdx.files.internal("amiga-gremlin-dead.wav"));
-			tapSound=Gdx.audio.newSound(Gdx.files.internal("amiga-tap.wav"));
+			untapSound=Gdx.audio.newSound(Gdx.files.internal("untap8.wav"));
+			tapSound=Gdx.audio.newSound(Gdx.files.internal("tap8.wav"));
 			
 			break;
 		};
@@ -197,6 +197,7 @@ public class Deflektor implements ApplicationListener {
 		if (transferEnergySound!=null)  transferEnergySound.dispose();
 		if (gremlinAppearSound!=null)  gremlinAppearSound.dispose();
 		if (gremlinDeadSound!=null)  gremlinDeadSound.dispose();
+		if (untapSound!=null)  untapSound.dispose();
 		if (tapSound!=null)  tapSound.dispose();
 	}
 	
@@ -311,9 +312,9 @@ public class Deflektor implements ApplicationListener {
 		}
 
 		@Override
-		public boolean touchDown(int arg0, int arg1, int arg2, int arg3) {
-			// TODO Auto-generated method stub
-			return false;
+		public boolean touchDown(int x, int y, int pointer, int button) {
+			return appState.touchDown(x,y,pointer,button);
+			//return appState.touchDown(x, y, pointer, button);
 		}
 
 		@Override
@@ -412,6 +413,10 @@ public class Deflektor implements ApplicationListener {
 		batch.draw(spritesImage, winX+x*sprScale, screenHeight-winY-y*sprScale-srcHeight*sprScale, srcWidth*sprScale,srcHeight*sprScale, srcX, srcY, srcWidth,srcHeight,false,false);
 	};
 	
+	void spr_putRegionZoom(int x, int y, int srcWidth, int srcHeight, int srcX, int srcY, float zoom) {
+		batch.draw(spritesImage, winX+x*sprScale-srcWidth*sprScale*(zoom-1)/2, screenHeight-winY-y*sprScale-srcHeight*sprScale+srcWidth*sprScale*(zoom-1)/2, srcWidth*sprScale*zoom,srcHeight*sprScale*zoom, srcX, srcY, srcWidth, srcHeight, false, false);
+	};
+	
 	void spr_putRegionSafe(int x, int y, int srcWidth, int srcHeight, int srcX, int srcY) {
 		batch.draw(spritesImage, winX+x*sprScale, screenHeight-winY-y*sprScale-srcHeight*sprScale, srcWidth*sprScale,srcHeight*sprScale, srcX, srcY, srcWidth,srcHeight,false,false);
 	};
@@ -475,7 +480,8 @@ public class Deflektor implements ApplicationListener {
 	};
 	
 	void drawButton (Button b) {
-		drawBox(b.bx,b.by,b.bwidth,b.bheight,0,176);
+		if (b.touched) drawBox(b.bx,b.by,b.bwidth,b.bheight, 24, 176);
+		else drawBox(b.bx,b.by,b.bwidth,b.bheight,0,176);
 		if (b.btxt!=null) showString(b.bx+8,b.by+8,b.btxt);
 		if (b.bimgx>=0 && b.bimgy>=0) spr_putRegion(b.bx+4, b.by+4, 16,16, b.bimgx, b.bimgy);
 	}
@@ -506,7 +512,8 @@ public class Deflektor implements ApplicationListener {
 	final static int SND_TRANSFERNRG_LOOP=8;
 	final static int SND_GREMLINAPPEAR=9;
 	final static int SND_GREMLINDEAD=10;
-	final static int SND_TAP=11;
+	final static int SND_UNTAP=11;
+	final static int SND_TAP=12;
 	
 	int playing_LOOP_id = 0;
 	
@@ -537,6 +544,9 @@ public class Deflektor implements ApplicationListener {
 				break;
 			case SND_TAP:
 				if (tapSound!=null) tapSound.play();
+				break;
+			case SND_UNTAP:
+				if (untapSound!=null) untapSound.play();
 				break;
 				
 			case SND_LASERFILLIN_LOOP:
@@ -574,6 +584,7 @@ public class Deflektor implements ApplicationListener {
 		case SND_GREMLINAPPEAR:
 		case SND_GREMLINDEAD:
 		case SND_TAP:
+		case SND_UNTAP:
 			
 			break;
 		case SND_LASEROVERHEAT_LOOP:

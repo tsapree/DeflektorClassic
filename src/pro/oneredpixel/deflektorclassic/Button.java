@@ -7,6 +7,7 @@ public class Button {
 	int bheight;
 	int bimgx;
 	int bimgy;
+	boolean touched;
 	String btxt;
 	
 	Button(int x, int y, int width, int height, boolean centered, String txt) {
@@ -17,6 +18,7 @@ public class Button {
 		btxt=txt;
 		bimgx=-1;
 		bimgy=-1;
+		touched=false;
 		correctXYWidthHeight(centered);
 	};
 	
@@ -27,6 +29,7 @@ public class Button {
 		bheight=height;
 		bimgx=-1;
 		bimgy=-1;
+		touched=false;
 		correctXYWidthHeight(centered);
 	};
 	
@@ -38,6 +41,7 @@ public class Button {
 		bimgx=imgx;
 		bimgy=imgy;
 		btxt=null;
+		touched=false;
 	};
 	
 	void correctXYWidthHeight(boolean centered) {

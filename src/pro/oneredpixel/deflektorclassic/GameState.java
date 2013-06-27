@@ -59,8 +59,17 @@ public class GameState extends State {
 	int overheatSteps = 1024;
 	int overheatReflectionStep = 0;
 	int overheatBombStep = 0;
-		
+	
 	int countOfGremlins = 0;
+	
+	//for score
+	int killedGremlins;
+	int burnedCells;
+	int countScore;
+	int countKilledGremlins;
+	int countBurnedCells;
+	int countEnergy;
+	int topScore;
 	
 	boolean cursorEnabled = false;
 	int cursorPhase = 0;
@@ -146,6 +155,32 @@ public class GameState extends State {
 				app.drawBox(24, 8, 240-48, 160-32, 0,176);
 				app.showString(32+8+8, 24, String.format("LEVEL %02d COMPLETED",app.playingLevel));
 				
+				if (countBurnedCells<burnedCells) {
+					countBurnedCells++;
+					countScore+=app.difficultyClassic?30:15;
+				};
+				if (countKilledGremlins<killedGremlins) {
+					countKilledGremlins++;
+					countScore+=app.difficultyClassic?160:80;
+				};
+				if (energy>0) {
+					energy-=energySteps/64;
+					if (energy<0) energy=0;
+					countEnergy++;
+					countScore+=app.difficultyClassic?10:2;
+				};
+				if (topScore<countScore) topScore=countScore;
+				
+				app.showString(32+8*6, 24+8+8, String.format("CELLS %d",countBurnedCells));
+				app.showString(32+8*3, 24+8+8+8, String.format("GREMLINS %d",countKilledGremlins));
+				app.showString(32+8*5, 24+8+8+8+8, String.format("ENERGY %d",countEnergy));
+				app.showString(32+8*6, 24+8+8+8+8+8+8, String.format("SCORE %d",countScore));
+				if (topScore<=countScore) app.showString(32+8+8+8*4, 24+8+8+8+8+8+8+8+8, "NEW RECORD");
+				else app.showString(32+8*8, 24+8+8+8+8+8+8+8+8, String.format("TOP %d",topScore));
+				
+				
+				
+				
 				app.drawButton(bLevels);
 				app.drawButton(bNext);
 				app.drawButton(bRestart);
@@ -199,16 +234,16 @@ public class GameState extends State {
 						app.timeToShowFinalCut=true;
 						app.gotoAppState(Deflektor.APPSTATE_SELECTLEVEL);
 					}
-					app.playSound(Deflektor.SND_TAP);
+					app.playSound(Deflektor.SND_UNTAP);
 					
 				};
 				if (bRestart.checkRegion(tapx,tapy)) {
 					initGame();
-					app.playSound(Deflektor.SND_TAP);
+					app.playSound(Deflektor.SND_UNTAP);
 				};
 				if (bLevels.checkRegion(tapx,tapy)) {
 					app.gotoAppState(Deflektor.APPSTATE_SELECTLEVEL);
-					app.playSound(Deflektor.SND_TAP);
+					app.playSound(Deflektor.SND_UNTAP);
 				};
 				break;
 				
@@ -224,25 +259,25 @@ public class GameState extends State {
 			};
 			if (checkInBox((int)(x/app.sprScale),(int)(y/app.sprScale),(field_width-1)*16, field_height*16,16,16)) {
 				winStateId=WINSTATE_PAUSED;
-				app.playSound(Deflektor.SND_TAP);
+				app.playSound(Deflektor.SND_UNTAP);
 			}
 			break;
 		case WINSTATE_PAUSED:
 			if (bResume.checkRegion(tapx,tapy)) {
 				winStateId=WINSTATE_GAMING;
-				app.playSound(Deflektor.SND_TAP);
+				app.playSound(Deflektor.SND_UNTAP);
 			};
 			if (bRestart.checkRegion(tapx,tapy)) {
 				initGame();
-				app.playSound(Deflektor.SND_TAP);
+				app.playSound(Deflektor.SND_UNTAP);
 			}
 			if (bLevels.checkRegion(tapx,tapy)) {
 				app.gotoAppState(Deflektor.APPSTATE_SELECTLEVEL);
-				app.playSound(Deflektor.SND_TAP);
+				app.playSound(Deflektor.SND_UNTAP);
 			};
 			if (bSoundOn.checkRegion(tapx,tapy)) {
 				app.soundEnabled=!app.soundEnabled;
-				app.playSound(Deflektor.SND_TAP);
+				app.playSound(Deflektor.SND_UNTAP);
 			}
 			break;
 		};
@@ -310,7 +345,7 @@ public class GameState extends State {
 					winStateId=WINSTATE_PAUSED;
 				};
 			} else winStateId=WINSTATE_GAMING;//app.gotoAppState(Deflektor.APPSTATE_MENU);
-			app.playSound(Deflektor.SND_TAP);
+			app.playSound(Deflektor.SND_UNTAP);
 			return true;
 		};
 		return false;
@@ -1225,6 +1260,7 @@ public class GameState extends State {
 		{-1,-2},//15
 	};
 	
+	
 	public void initGame() {
 		
 		winStateId=WINSTATE_GAMING;
@@ -1232,6 +1268,15 @@ public class GameState extends State {
 		gameStateId = GAMESTATE_ACCUMULATING_ENERGY;
 		energy=0;
 		overheat=0;
+		
+		topScore=500;
+		countScore=0;
+		countKilledGremlins=0;
+		countBurnedCells=0;
+		countEnergy=0;
+		
+		killedGremlins=0;
+		burnedCells=0;
 		
 		cursorEnabled = false;		
 		
@@ -1791,6 +1836,7 @@ public class GameState extends State {
 				case CELL:
 					field[fx+fy*field_width]=_EXPL;
 					app.playSound(Deflektor.SND_BURNCELL);
+					burnedCells++;
 					endBeam=0;
 					continue;
 				case MINE:
@@ -1986,6 +2032,7 @@ public class GameState extends State {
 		if (countOfGremlins>0)
 			for (int i=0;i<countOfGremlins;i++)
 				if (grm[i].attemptToKill(x, y)) {
+					killedGremlins++;
 					//TODO:sound of killed gremlin
 					app.playSound(Deflektor.SND_GREMLINDEAD);
 				};
