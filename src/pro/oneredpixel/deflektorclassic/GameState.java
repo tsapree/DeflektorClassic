@@ -234,16 +234,19 @@ public class GameState extends State {
 						app.timeToShowFinalCut=true;
 						app.gotoAppState(Deflektor.APPSTATE_SELECTLEVEL);
 					}
-					app.playSound(Deflektor.SND_UNTAP);
+					//app.playSound(Deflektor.SND_UNTAP);
+					bNext.touched=false;
 					
 				};
 				if (bRestart.checkRegion(tapx,tapy)) {
 					initGame();
-					app.playSound(Deflektor.SND_UNTAP);
+					//app.playSound(Deflektor.SND_UNTAP);
+					bRestart.touched=false;
 				};
 				if (bLevels.checkRegion(tapx,tapy)) {
 					app.gotoAppState(Deflektor.APPSTATE_SELECTLEVEL);
-					app.playSound(Deflektor.SND_UNTAP);
+					bLevels.touched=false;
+					//app.playSound(Deflektor.SND_UNTAP);
 				};
 				break;
 				
@@ -265,19 +268,19 @@ public class GameState extends State {
 		case WINSTATE_PAUSED:
 			if (bResume.checkRegion(tapx,tapy)) {
 				winStateId=WINSTATE_GAMING;
-				app.playSound(Deflektor.SND_UNTAP);
+				bResume.touched=false;
 			};
 			if (bRestart.checkRegion(tapx,tapy)) {
 				initGame();
-				app.playSound(Deflektor.SND_UNTAP);
+				bRestart.touched=false;
 			}
 			if (bLevels.checkRegion(tapx,tapy)) {
 				app.gotoAppState(Deflektor.APPSTATE_SELECTLEVEL);
-				app.playSound(Deflektor.SND_UNTAP);
+				bLevels.touched=false;
 			};
 			if (bSoundOn.checkRegion(tapx,tapy)) {
 				app.soundEnabled=!app.soundEnabled;
-				app.playSound(Deflektor.SND_UNTAP);
+				bSoundOn.touched=false;
 			}
 			break;
 		};
@@ -294,6 +297,11 @@ public class GameState extends State {
 	boolean touched = false;
 	
 	public boolean touchDown(float x, float y, int pointer, int button) {
+		
+		int touchx=(int)(x-app.winX)/app.sprScale;
+		int touchy=(int)(y-app.winY)/app.sprScale;
+
+		
 		touched=true;
 		switch (winStateId) {
 		case WINSTATE_GAMING:
@@ -301,8 +309,47 @@ public class GameState extends State {
 			touchY = y;
 			restDelta = 0;
 			if (app.controlsTouchAndDrag) setCursor((int)x,(int)y);
+			if (gameStateId==GAMESTATE_LEVELCOMPLETED) {
+				if (bNext.checkRegion(touchx,touchy)) {
+					bNext.touched=true;
+					app.playSound(Deflektor.SND_TAP);
+				};
+				if (bRestart.checkRegion(touchx,touchy)) {
+					bRestart.touched=true;
+					app.playSound(Deflektor.SND_TAP);
+				};
+				if (bLevels.checkRegion(touchx,touchy)) {
+					bLevels.touched=true;
+					app.playSound(Deflektor.SND_TAP);
+				};
+				break;
+				
+			}
+			break;
+		case WINSTATE_PAUSED:
+			if (bResume.checkRegion(touchx,touchy)) {
+				bResume.touched=true;
+				app.playSound(Deflektor.SND_TAP);
+			}
+			if (bRestart.checkRegion(touchx,touchy)) {
+				bRestart.touched=true;
+				app.playSound(Deflektor.SND_TAP);
+			}
+			if (bLevels.checkRegion(touchx,touchy)) {
+				bLevels.touched=true;
+				app.playSound(Deflektor.SND_TAP);
+			};
+			if (bSoundOn.checkRegion(touchx,touchy)) {
+				bSoundOn.touched=true;
+				app.playSound(Deflektor.SND_TAP);
+			}
+			
 			break;
 		};
+		
+		
+
+
 		return false;
 	}
 	
@@ -311,8 +358,19 @@ public class GameState extends State {
 		if (!app.controlsTapThenDrag) {
 			disableCursor();
 		};
+		untouchButtons();
 		return false;
 	}
+	
+	void untouchButtons() {
+		if (bResume.touched || bRestart.touched || bLevels.touched || bSoundOn.touched || bSoundOff.touched || bNext.touched) app.playSound(Deflektor.SND_UNTAP);
+		bResume.touched=false;
+		bRestart.touched=false;
+		bLevels.touched=false;
+		bSoundOn.touched=false;
+		bSoundOff.touched=false;
+		bNext.touched=false;
+	};
 	
 
 	public boolean pan(float x, float y, float deltaX, float deltaY) {
