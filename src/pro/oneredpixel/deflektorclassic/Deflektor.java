@@ -414,7 +414,7 @@ public class Deflektor implements ApplicationListener {
 	};
 	
 	void spr_putRegionZoom(int x, int y, int srcWidth, int srcHeight, int srcX, int srcY, float zoom) {
-		batch.draw(spritesImage, winX+x*sprScale-srcWidth*sprScale*(zoom-1)/2, screenHeight-winY-y*sprScale-srcHeight*sprScale+srcWidth*sprScale*(zoom-1)/2, srcWidth*sprScale*zoom,srcHeight*sprScale*zoom, srcX, srcY, srcWidth, srcHeight, false, false);
+		batch.draw(spritesImage, winX+x*sprScale-srcWidth*sprScale*(zoom-1)/2, screenHeight-winY-y*sprScale-srcHeight*sprScale-srcHeight*sprScale*(zoom-1)/2, srcWidth*sprScale*zoom,srcHeight*sprScale*zoom, srcX, srcY, srcWidth, srcHeight, false, false);
 	};
 	
 	void spr_putRegionSafe(int x, int y, int srcWidth, int srcHeight, int srcX, int srcY) {
@@ -480,10 +480,17 @@ public class Deflektor implements ApplicationListener {
 	};
 	
 	void drawButton (Button b) {
-		if (b.touched) drawBox(b.bx,b.by,b.bwidth,b.bheight, 24, 176);
-		else drawBox(b.bx,b.by,b.bwidth,b.bheight,0,176);
-		if (b.btxt!=null) showString(b.bx+8,b.by+8,b.btxt);
-		if (b.bimgx>=0 && b.bimgy>=0) spr_putRegion(b.bx+4, b.by+4, 16,16, b.bimgx, b.bimgy);
+		if (b.box) {
+			if (b.touched) drawBox(b.bx,b.by,b.bwidth,b.bheight, 24, 176);
+			else drawBox(b.bx,b.by,b.bwidth,b.bheight,0,176);
+			if (b.btxt!=null) showString(b.bx+8,b.by+8,b.btxt);
+			if (b.bimgx>=0 && b.bimgy>=0) spr_putRegion(b.bx+4, b.by+4, 16,16, b.bimgx, b.bimgy);
+		} else {
+			if (b.bimgx>=0 && b.bimgy>=0)
+				if (b.touched) spr_putRegionZoom(b.bx+4, b.by+4, 16,16, b.bimgx, b.bimgy, (float)0.8);
+				else spr_putRegion(b.bx+4, b.by+4, 16,16, b.bimgx, b.bimgy);
+			
+		}
 	}
 
 	void drawButton (Button b, int boxx, int boxy) {

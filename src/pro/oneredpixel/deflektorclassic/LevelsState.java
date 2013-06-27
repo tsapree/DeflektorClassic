@@ -6,6 +6,10 @@ import com.badlogic.gdx.utils.TimeUtils;
 
 public class LevelsState extends State {
 
+	Button bLeft;
+	Button bRight;
+	Button bBack;
+	
 	int page=-1;
 	int maxpage = -1;
 	int savedUnlockedLevel = -1;
@@ -16,6 +20,14 @@ public class LevelsState extends State {
 	
 	LevelsState(Deflektor defl) {
 		super(defl);
+		
+		bLeft = new Button(8-4, 160/2-8-4,64,160);
+		bLeft.box=false;
+		bRight = new Button(240-8-16-4, 160/2-8-4, 80, 160);
+		bRight.box=false;
+		bBack = new Button(8-4, 160-8-16-4,96, 160);
+		bBack.box=false;
+		
 	}
 	
 	void start() {
@@ -38,18 +50,39 @@ public class LevelsState extends State {
 		}
 	};
 	
+	public boolean touchDown(int x, int y, int pointer, int button) {
+		int touchx=(int)(x-app.winX)/app.sprScale;
+		int touchy=(int)(y-app.winY)/app.sprScale;
+		if (page<=3) {
+			if ((page>1) && bLeft.checkRegion(touchx,touchy)) {
+				bLeft.touched=true;
+				app.playSound(Deflektor.SND_TAP);
+			}
+			if ((page<maxpage) && bRight.checkRegion(touchx,touchy)) {
+				bRight.touched = true;
+				app.playSound(Deflektor.SND_TAP);
+			}
+		};
+		if (bBack.checkRegion(touchx,touchy)) {
+			bBack.touched = true;
+			bBack.touched = true;
+			app.playSound(Deflektor.SND_TAP);
+		}
+		return false;
+	}
+	
 	public boolean tap(float x, float y, int tapCount, int button) {
 		int ix=(int)((x-app.winX)/app.sprScale);
 		int iy=(int)((y-app.winY)/app.sprScale);
 		if (page<=3) {
 			if ((ix>=0) && (ix<240) && (iy>=0) && (iy<160)) {
-				if ((page>1) && checkInBox(ix,iy,0,160/2-8-8,32,32)) {
+				if ((page>1) && bLeft.checkRegion(ix,iy)) {
 					page--;
-					app.playSound(Deflektor.SND_UNTAP);
+					bLeft.touched=false;
 				};
-				if ((page<maxpage) && checkInBox(ix,iy,240-16-8-8-8, 160/2-8,32,32)) {
+				if ((page<maxpage) && bRight.checkRegion(ix,iy)) {
 					page++;
-					app.playSound(Deflektor.SND_UNTAP);
+					bRight.touched=false;
 				}
 				int lx=(ix-44)/8;
 				int ly=(iy-20)/8;
@@ -62,18 +95,18 @@ public class LevelsState extends State {
 						app.playSound(Deflektor.SND_UNTAP);
 					};
 				}
-				if (checkInBox(ix,iy,8, 160-8-16,16,16)) {
+				if (bBack.checkRegion(ix,iy)) {
 					app.gotoAppState(Deflektor.APPSTATE_MENU);
-					app.playSound(Deflektor.SND_UNTAP);
+					bBack.touched=false;
 				}
 			}
 		} else {
 			//in final cut
 			if (currentFrame>desiredFPS*10) {
-				if (checkInBox(ix,iy,8, 160-8-16,16,16)) {
+				if (bBack.checkRegion(ix,iy)) {
 					if (showingFinalCutAnimation) app.gotoAppState(Deflektor.APPSTATE_MENU);
 					else page--;
-					app.playSound(Deflektor.SND_UNTAP);
+					bBack.touched=false;
 				}
 			};
 			
@@ -81,10 +114,22 @@ public class LevelsState extends State {
 		return false;
 	}
 	
+	public boolean touchUp (int x, int y, int pointer, int button) {
+		untouchButtons();
+		return false;
+	};
+	
+	void untouchButtons() {
+		if (bLeft.touched||bRight.touched||bBack.touched) app.playSound(Deflektor.SND_UNTAP);
+		bLeft.touched = false;
+		bRight.touched = false;
+		bBack.touched = false;
+	};
+	
 	public boolean keyUp(int k) {
 		if (k==Keys.BACK) {
 			app.gotoAppState(Deflektor.APPSTATE_MENU);
-			app.playSound(Deflektor.SND_UNTAP);
+			app.playSound(Deflektor.SND_TAP);
 			return true;
 		};
 		return false;
@@ -109,10 +154,10 @@ public class LevelsState extends State {
 				if (s>app.countOfLevels) break;
 			};
 	
-			if (page>1) app.spr_putRegion(8, 160/2-8, 16, 16, 64,160);
-			if (page<maxpage) app.spr_putRegion(240-8-16, 160/2-8, 16, 16, 80, 160);
+			if (page>1) app.drawButton(bLeft);
+			if (page<maxpage) app.drawButton(bRight);			
+			app.drawButton(bBack);
 			
-			app.spr_putRegion(8, 160-8-16, 16, 16, 96, 160);
 		} else {
 			//final cut
 			if (!((currentFrame<desiredFPS*4) && (((currentFrame&3)>>1)==1)))app.showString((240-8*15)/2, 8,  "CONGRATULATIONS");
@@ -137,7 +182,7 @@ public class LevelsState extends State {
 				app.showString((240-8*16)/2, 138,"IN FIVE MINUTES!");
 			};
 			if (currentFrame>desiredFPS*10) {
-				app.spr_putRegion(8, 160-8-16, 16, 16, 96, 160);
+				app.drawButton(bBack);
 			};
 		}
 
