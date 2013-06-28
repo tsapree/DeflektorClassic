@@ -15,8 +15,8 @@ public class MenuState extends State {
 		super(defl);
 		bPlay = new Button(120-12,80-16,64,176);
 		bSettings = new Button(240-24-8, 160-32,80,176);
-		bAchievements = new Button(8, 160-32,16,240);
-		bAbout = new Button(8+8+24, 160-32,0,240);
+		bAbout = new Button(8, 160-32,0,240);
+		bAchievements = new Button(8+8+24, 160-32,16,240);
 		bSoundOn = new Button(240-24-8-24-8, 160-32,112,176);
 		bSoundOff = new Button(240-24-8-24-8, 160-32,112,160);
 	}
@@ -95,7 +95,7 @@ public class MenuState extends State {
 		
 		app.drawButton(bPlay);
 		app.drawButton(bSettings);
-		app.drawButton(bAchievements);
+		//app.drawButton(bAchievements);
 		app.drawButton(bAbout);
 		if (app.soundEnabled) app.drawButton(bSoundOn);
 		else app.drawButton(bSoundOff);
