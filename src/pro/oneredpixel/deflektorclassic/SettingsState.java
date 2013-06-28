@@ -26,6 +26,7 @@ public class SettingsState extends State {
 		super(defl);
 	
 		bBack = new Button(8,160-8-24, 96,160);
+		bBack.box=false;
 		
 		bZX = new Button(16+8*6+8+8+8*8, 32,0,0,false,"ZX");
 		bAmiga = new Button(16+16+8*2+8*6+8+8+8*8, 32,0,0,false,"AMIGA");

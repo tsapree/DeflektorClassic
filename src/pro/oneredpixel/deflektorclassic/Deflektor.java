@@ -212,7 +212,7 @@ public class Deflektor implements ApplicationListener {
 		if (unlockedLevel>61 || unlockedLevel<1) unlockedLevel=1;
 		appGfxId = prefs.getInteger("GfxType",APPGFX_AMIGA);
 		if ((appGfxId>APPGFX_MODERN) || (appGfxId<APPGFX_ZX)) appGfxId=APPGFX_AMIGA;
-		difficultyClassic = prefs.getBoolean("DifficultyClassic", true);
+		difficultyClassic = prefs.getBoolean("DifficultyClassic", false);
 		controlsSensitivity = prefs.getInteger("Sensitivity",4);
 		if ((controlsSensitivity<1) || (controlsSensitivity>8)) controlsSensitivity=4;
 	}
