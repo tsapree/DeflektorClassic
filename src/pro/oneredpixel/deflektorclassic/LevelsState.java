@@ -10,6 +10,8 @@ public class LevelsState extends State {
 	Button bRight;
 	Button bBack;
 	
+	int accumulated_code=0;
+	
 	int page=-1;
 	int maxpage = -1;
 	int savedUnlockedLevel = -1;
@@ -31,6 +33,7 @@ public class LevelsState extends State {
 	}
 	
 	void start() {
+		accumulated_code=0;
 		maxpage = (app.unlockedLevel-1)/20+1;
 		if (maxpage>4) maxpage=4;
 		if (savedUnlockedLevel!=app.unlockedLevel) {
@@ -86,14 +89,26 @@ public class LevelsState extends State {
 				}
 				int lx=(ix-44)/8;
 				int ly=(iy-20)/8;
-				if ( ((lx&3)!=3) && ((ly&3)!=3) && (ix>=44) && (iy>=20)) {
-					lx=lx/4; ly=ly/4;
-					int lev=ly*5+lx+(page-1)*20+1;
-					if ((lx>=0) && (lx<5) && (ly>=0) && (ly<4) && (lev<=app.unlockedLevel)) {
-						app.playingLevel = lev;
-						app.gotoAppState(Deflektor.APPSTATE_GAME);
-						app.playSound(Deflektor.SND_UNTAP);
-					};
+				if ( ((ly&3)!=3) && (ix>=44) && (iy>=20)) {
+					if ((lx&3)!=3) {
+						lx=lx/4; ly=ly/4;
+						int lev=ly*5+lx+(page-1)*20+1;
+						if ((lx>=0) && (lx<5) && (ly>=0) && (ly<4) && (lev<=app.unlockedLevel)) {
+							app.playingLevel = lev;
+							app.gotoAppState(Deflektor.APPSTATE_GAME);
+							app.playSound(Deflektor.SND_UNTAP);
+						};
+					} else {
+						lx=lx/4; ly=ly/4;
+						int code=ly*5+lx+1;
+						if (code<=9 && code>0) {
+							accumulated_code=accumulated_code*10+code;
+							if (accumulated_code==28111997) {
+								app.showingCheatControls=true;
+								app.playSound(Deflektor.SND_GREMLINDEAD);
+							}
+						};
+					}
 				}
 				if (bBack.checkRegion(ix,iy)) {
 					app.gotoAppState(Deflektor.APPSTATE_MENU);

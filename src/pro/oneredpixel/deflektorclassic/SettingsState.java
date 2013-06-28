@@ -14,6 +14,7 @@ public class SettingsState extends State {
 	Button bResetProgress;
 	Button bUnlockLevels;
 	Button bCheat;
+	Button bExitGame;
 	
 	Button bMinusSensitivity;
 	Button bPlusSensitivity;
@@ -38,6 +39,7 @@ public class SettingsState extends State {
 		bResetProgress = new Button(16+24+8, 160-24-8,0,0,false,"RESET PROGRESS");
 		bUnlockLevels = new  Button(16+24+8, 160-24-8,0,0,false,"UNLOCK  LEVELS");
 		bCheat = new Button(16+8+8+15*8+16+8,160-24-8,0,0,false,"CHEAT");
+		bExitGame = new  Button(240-12*8, 160-24-8,0,0,false,"QUIT GAME");
 		
 	}
 	
@@ -77,15 +79,21 @@ public class SettingsState extends State {
 			bResetProgress.touched=true;
 			app.playSound(Deflektor.SND_TAP);
 		};
-		if (bUnlockLevels.checkRegion(touchx,touchy)) {
-			bUnlockLevels.touched=true;
-			app.playSound(Deflektor.SND_TAP);
-		};
-		if (bCheat.checkRegion(touchx,touchy)) {
-			bCheat.touched=true;
-			app.playSound(Deflektor.SND_TAP);
-		};
-		
+		if (app.showingCheatControls) {
+			if (bUnlockLevels.checkRegion(touchx,touchy)) {
+				bUnlockLevels.touched=true;
+				app.playSound(Deflektor.SND_TAP);
+			};
+			if (bCheat.checkRegion(touchx,touchy)) {
+				bCheat.touched=true;
+				app.playSound(Deflektor.SND_TAP);
+			};
+		} else {
+			if (bExitGame.checkRegion(touchx,touchy)) {
+				bExitGame.touched=true;
+				app.playSound(Deflektor.SND_TAP);
+			};
+		}
 		return false;
 	}
 	
@@ -108,6 +116,7 @@ public class SettingsState extends State {
 		bResetProgress.touched=false;
 		bUnlockLevels.touched=false;
 		bCheat.touched=false;
+		bExitGame.touched=false;
 	};
 	
 	public boolean tap(float x, float y, int tapCount, int button) {
@@ -153,25 +162,33 @@ public class SettingsState extends State {
 			bDifficultyClassic.touched = false;
 		};
 		
-		if (!app.cheat && bCheat.checkRegion(tapx,  tapy)) {
-			app.cheat=true;
-			app.gotoAppState(Deflektor.APPSTATE_MENU);
-			bCheat.touched=false;
-		};
-		
-		if (app.unlockedLevel==60) {
-			if (bResetProgress.checkRegion(tapx,  tapy)) {
-				app.unlockedLevel=1;
+		if (app.showingCheatControls) {
+			if (!app.cheat && bCheat.checkRegion(tapx,  tapy)) {
+				app.cheat=true;
 				app.gotoAppState(Deflektor.APPSTATE_MENU);
-				bResetProgress.touched=false;
+				bCheat.touched=false;
+			};
+			
+			if (app.unlockedLevel==60) {
+				if (bResetProgress.checkRegion(tapx,  tapy)) {
+					app.unlockedLevel=1;
+					app.gotoAppState(Deflektor.APPSTATE_MENU);
+					bResetProgress.touched=false;
+				}
+			} else {
+				if (bUnlockLevels.checkRegion(tapx,  tapy)) {
+					app.unlockedLevel=60;
+					app.gotoAppState(Deflektor.APPSTATE_MENU);
+					bUnlockLevels.touched=false;
+				}
 			}
 		} else {
-			if (bUnlockLevels.checkRegion(tapx,  tapy)) {
-				app.unlockedLevel=60;
+			if (bExitGame.checkRegion(tapx,  tapy)) {
 				app.gotoAppState(Deflektor.APPSTATE_MENU);
-				bUnlockLevels.touched=false;
-			}
+				bExitGame.touched=false;
+			};
 		}
+
 		
 		return false;
 	}
@@ -205,9 +222,11 @@ public class SettingsState extends State {
 		app.showString(8+24+8+8*12+7*8,96+8, String.format("%d", app.controlsSensitivity));
 		if (app.controlsSensitivity<8) app.drawButton(bPlusSensitivity); else app.drawButton(bPlusSensitivity, 24, 176);
 		
-		if (app.unlockedLevel==60) app.drawButton(bResetProgress);
-		else app.drawButton(bUnlockLevels);
-		if (!app.cheat) app.drawButton(bCheat);
+		if (app.showingCheatControls) {
+			if (app.unlockedLevel==60) app.drawButton(bResetProgress);
+			else app.drawButton(bUnlockLevels);
+			if (!app.cheat) app.drawButton(bCheat);
+		} else app.drawButton(bExitGame);
 		
 		batch.end();
 	};

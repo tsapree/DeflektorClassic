@@ -72,6 +72,7 @@ public class Deflektor implements ApplicationListener {
 	public long lastFrameTime = 0;
 	
 	boolean cheat = false;
+	boolean showingCheatControls = false;
 	
 	//settings
 	boolean soundEnabled = true;
