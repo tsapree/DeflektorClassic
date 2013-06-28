@@ -1436,7 +1436,6 @@ public class GameState extends State {
 			
 			if (energy>=energySteps-1) {
 				energy=energySteps-1;
-				//app.stopSound(Deflektor.SND_LASERFILLIN_LOOP);
 				app.playSound(Deflektor.SND_LASERREADY);
 				gameStateId=GAMESTATE_GAMING;
 			}
@@ -1447,10 +1446,9 @@ public class GameState extends State {
 			if (flash>32) initGame();
 			break;
 		case GAMESTATE_GAMING:
-			if (app.cheat) energy++;	//TODO: ”¡–¿“‹ - ◊»“ :)
+			if (app.cheat) energy++;
 			energy--;
 			if (energy<=0) {
-				//app.gotoAppState(Deflektor.APPSTATE_MENU);
 				gameStateId=GAMESTATE_GAMEOVER_NOENERGY;
 				app.stopContinuousSound();
 				flash=0;
@@ -1463,9 +1461,8 @@ public class GameState extends State {
 
 			if (overheat <=0) overheat =0;
 			if (overheat>=overheatSteps) {
-				if (app.cheat) overheat=0; //TODO: ”¡–¿“‹ - ◊»“ :)
+				if (app.cheat) overheat=0;
 				else {
-					//app.gotoAppState(Deflektor.APPSTATE_MENU);
 					gameStateId=GAMESTATE_GAMEOVER_OVERHEAT;
 					app.stopContinuousSound();
 					flash=0;
@@ -1474,9 +1471,7 @@ public class GameState extends State {
 			}
 			
 			if (beamState==BEAMSTATE_CONNECTED) {
-//				if (app.playingLevel<app.countOfLevels) {
-					app.unlockLevel(app.playingLevel+1);
-//				};
+				app.unlockLevel(app.playingLevel+1);
 				gameStateId = GAMESTATE_LEVELCOMPLETED;
 				app.playSound(Deflektor.SND_LEVELCOMPLETED);
 			} else {
@@ -2091,7 +2086,6 @@ public class GameState extends State {
 			for (int i=0;i<countOfGremlins;i++)
 				if (grm[i].attemptToKill(x, y)) {
 					killedGremlins++;
-					//TODO:sound of killed gremlin
 					app.playSound(Deflektor.SND_GREMLINDEAD);
 				};
 	};

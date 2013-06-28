@@ -1,5 +1,6 @@
 package pro.oneredpixel.deflektorclassic;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
@@ -10,7 +11,6 @@ public class SettingsState extends State {
 	Button bZX;
 	Button bAmiga;
 	//Button bModern;
-	//TODO: убрать для релизной версии
 	Button bResetProgress;
 	Button bUnlockLevels;
 	Button bCheat;
@@ -186,6 +186,7 @@ public class SettingsState extends State {
 			if (bExitGame.checkRegion(tapx,  tapy)) {
 				app.gotoAppState(Deflektor.APPSTATE_MENU);
 				bExitGame.touched=false;
+				Gdx.app.exit();
 			};
 		}
 

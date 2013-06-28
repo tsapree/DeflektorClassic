@@ -230,11 +230,7 @@ public class Deflektor implements ApplicationListener {
 	
 	@Override
 	public void dispose() {
-		saveSettings();
 		freeMedia();
-		// TODO Auto-generated method stub
-		
-		
 	}
 
 	@Override
@@ -256,7 +252,6 @@ public class Deflektor implements ApplicationListener {
 
 		@Override
 		public boolean longPress(float arg0, float arg1) {
-			// TODO Auto-generated method stub
 			return false;
 		}
 
@@ -277,7 +272,6 @@ public class Deflektor implements ApplicationListener {
 		
 		@Override
 		public boolean zoom(float arg0, float arg1) {
-			// TODO Auto-generated method stub
 			return false;
 		}
 	}
@@ -286,43 +280,36 @@ public class Deflektor implements ApplicationListener {
 
 		@Override
 		public boolean keyDown(int arg0) {
-			// TODO Auto-generated method stub
 			return appState.keyDown(arg0);
 		}
 
 		@Override
 		public boolean keyTyped(char arg0) {
-			// TODO Auto-generated method stub
 			return false;
 		}
 
 		@Override
 		public boolean keyUp(int arg0) {
-			// TODO Auto-generated method stub
 			return appState.keyUp(arg0);
 		}
 
 		@Override
 		public boolean mouseMoved(int arg0, int arg1) {
-			// TODO Auto-generated method stub
 			return false;
 		}
 
 		@Override
 		public boolean scrolled(int arg0) {
-			// TODO Auto-generated method stub
 			return false;
 		}
 
 		@Override
 		public boolean touchDown(int x, int y, int pointer, int button) {
 			return appState.touchDown(x,y,pointer,button);
-			//return appState.touchDown(x, y, pointer, button);
 		}
 
 		@Override
 		public boolean touchDragged(int arg0, int arg1, int arg2) {
-			// TODO Auto-generated method stub
 			return false;
 		}
 
@@ -408,19 +395,13 @@ public class Deflektor implements ApplicationListener {
 
 	@Override
 	public void resize(int arg0, int arg1) {
-		// TODO Auto-generated method stub
 		initGfx();
 	}
 
 	@Override
 	public void resume() {
-		// TODO Auto-generated method stub
 		
 	}
-	
-//	void menu_putRegion(int x, int y, int srcWidth, int srcHeight, int srcX, int srcY) {
-//		batch.draw(menuImage, winX+x*sprScale, screenHeight-winY-y*sprScale-srcHeight*sprScale, srcWidth*sprScale,srcHeight*sprScale, srcX, srcY, srcWidth,srcHeight,false,false);
-//	};
 	
 	void spr_putRegion(int x, int y, int srcWidth, int srcHeight, int srcX, int srcY) {
 		batch.draw(spritesImage, winX+x*sprScale, screenHeight-winY-y*sprScale-srcHeight*sprScale, srcWidth*sprScale,srcHeight*sprScale, srcX, srcY, srcWidth,srcHeight,false,false);
