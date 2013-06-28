@@ -185,7 +185,6 @@ public class SettingsState extends State {
 			}
 		} else {
 			if (bExitGame.checkRegion(tapx,  tapy)) {
-				app.gotoAppState(Deflektor.APPSTATE_MENU);
 				bExitGame.touched=false;
 				Gdx.app.exit();
 			};
