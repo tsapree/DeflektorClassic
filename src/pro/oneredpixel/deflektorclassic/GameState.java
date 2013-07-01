@@ -70,6 +70,7 @@ public class GameState extends State {
 	int countBurnedCells;
 	int countEnergy;
 	int topScore;
+	boolean playedNewRecord;
 	
 	boolean cursorEnabled = false;
 	int cursorPhase = 0;
@@ -169,7 +170,11 @@ public class GameState extends State {
 					countEnergy++;
 					countScore+=app.difficultyClassic?10:2;
 				};
-				if (topScore<countScore) topScore=countScore;
+				if (topScore<countScore) {
+					topScore=countScore;
+					if (!playedNewRecord) app.playSound(Deflektor.SND_NEWRECORD);
+					playedNewRecord=true;
+				}
 				
 				app.showString(32+8*6, 24+8+8, String.format("CELLS %d",countBurnedCells));
 				app.showString(32+8*3, 24+8+8+8, String.format("GREMLINS %d",countKilledGremlins));
@@ -1336,6 +1341,7 @@ public class GameState extends State {
 		countKilledGremlins=0;
 		countBurnedCells=0;
 		countEnergy=0;
+		playedNewRecord=false;
 		
 		killedGremlins=0;
 		burnedCells=0;
@@ -1452,6 +1458,7 @@ public class GameState extends State {
 			energy--;
 			if (energy<=0) {
 				gameStateId=GAMESTATE_GAMEOVER_NOENERGY;
+				app.playSound(Deflektor.SND_GAMEOVER);
 				app.stopContinuousSound();
 				flash=0;
 				break;
@@ -1466,6 +1473,7 @@ public class GameState extends State {
 				if (app.cheat) overheat=0;
 				else {
 					gameStateId=GAMESTATE_GAMEOVER_OVERHEAT;
+					app.playSound(Deflektor.SND_GAMEOVER);
 					app.stopContinuousSound();
 					flash=0;
 					break;

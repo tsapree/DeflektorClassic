@@ -17,6 +17,7 @@ public class LevelsState extends State {
 	int savedUnlockedLevel = -1;
 	int currentFrame = 0;
 	boolean showingFinalCutAnimation;
+	boolean playedLaserShowing;
 	
 	final int desiredFPS = 20;
 	
@@ -45,10 +46,12 @@ public class LevelsState extends State {
 		if (app.timeToShowFinalCut) {
 			page=4;
 			showingFinalCutAnimation=true;
+			playedLaserShowing=false;
 			app.timeToShowFinalCut=false;
 			currentFrame=0;
 		} else {
 			showingFinalCutAnimation=false;
+			playedLaserShowing=true;
 			currentFrame=10000;
 		}
 	};
@@ -187,7 +190,8 @@ public class LevelsState extends State {
 				app.spr_putRegion(188, 80+50/2-12, 24, 24, 104, 232);
 			};
 			if (currentFrame>=desiredFPS*7) {
-				
+				if (!playedLaserShowing) app.playSound(Deflektor.SND_NEWRECORD);
+				playedLaserShowing=true;
 				for (int i=28+16;i<188;i+=8) {
 					app.spr_putRegion(i, 80+50/2-4, 8, 8, 56, 112);
 				};
