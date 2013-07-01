@@ -283,6 +283,7 @@ public class GameState extends State {
 			if (bSoundOn.checkRegion(tapx,tapy)) {
 				app.soundEnabled=!app.soundEnabled;
 				bSoundOn.touched=false;
+				bSoundOff.touched=false;
 			}
 			break;
 		};
@@ -343,6 +344,7 @@ public class GameState extends State {
 			};
 			if (bSoundOn.checkRegion(touchx,touchy)) {
 				bSoundOn.touched=true;
+				bSoundOff.touched=true;
 				app.playSound(Deflektor.SND_TAP);
 			}
 			
