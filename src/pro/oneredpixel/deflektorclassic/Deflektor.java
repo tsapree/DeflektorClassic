@@ -84,6 +84,7 @@ public class Deflektor implements ApplicationListener {
 	boolean controlsTapThenDrag = true; //коснуться зеркала для выбора, потом отпустить и провести по экрану для поворота
 	int controlsSensitivity = 4;
 	int unlockedLevel = 60;
+	int scores[]; //0..32767 - очки за уровень, &32768, &65536, &131072 - опции, звезды за прохождение
 	int appGfxId = APPGFX_AMIGA;
 	boolean difficultyClassic = true; //повышенная, классическая сложность
 	
@@ -221,6 +222,19 @@ public class Deflektor implements ApplicationListener {
 		soundEnabled = prefs.getBoolean("Sound", true);
 		unlockedLevel = prefs.getInteger("UnlockedLevel", 1);
 		if (unlockedLevel>61 || unlockedLevel<1) unlockedLevel=1;
+		
+		scores=new int[countOfLevels];
+		String packedScores=prefs.getString("Scores"," ");
+		int sum=0;
+		for (int i=0;i<packedScores.length()/3-1;i++) {
+			scores[i]=unserialize(packedScores,i);
+			sum+=scores[i];
+			sum&=0xFFFF;
+		};
+		if ((sum!=unserialize(packedScores,packedScores.length()/3-1)) || (sum==-1)) { 
+			for (int i=0;i<countOfLevels;i++) scores[i]=0;
+		}
+		
 		appGfxId = prefs.getInteger("GfxType",APPGFX_AMIGA);
 		if ((appGfxId>APPGFX_MODERN) || (appGfxId<APPGFX_ZX)) appGfxId=APPGFX_AMIGA;
 		difficultyClassic = prefs.getBoolean("DifficultyClassic", false);
@@ -232,10 +246,39 @@ public class Deflektor implements ApplicationListener {
 		Preferences prefs = Gdx.app.getPreferences("DeflektorPreferences");
 		prefs.putBoolean("Sound", soundEnabled);
 		prefs.putInteger("UnlockedLevel", unlockedLevel);
+		
+		String packedScores="";
+		int sum=0;
+		for (int i=0;i<countOfLevels;i++) {
+			packedScores+=serialize(scores[i]);
+			sum+=scores[i];
+			sum&=0xFFFF;
+		}
+		packedScores+=serialize(sum);
+		prefs.putString("Scores", packedScores);
+		
 		prefs.putInteger("GfxType", appGfxId);
 		prefs.putBoolean("DifficultyClassic", difficultyClassic);
 		prefs.putInteger("Sensitivity",controlsSensitivity);
 		prefs.flush();
+	}
+					//   0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF
+	final String serkey="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_%";
+
+	int unserialize(String s, int n) {
+		int rez=0;
+		int r;
+		if (((n*3+2)>=s.length()) || (n<0)) return -1;
+		for (int i=0;i<3;i++) {
+			r=serkey.indexOf(s.charAt(i+n*3));
+			if (r<0) return -1;
+			rez=rez*64+r;
+		};
+		return rez;
+	}
+	
+	String serialize(int i) {
+		return ""+serkey.charAt((i>>12)&0x3F)+serkey.charAt((i>>6)&0x3F)+serkey.charAt(i&0x3F);
 	}
 
 	

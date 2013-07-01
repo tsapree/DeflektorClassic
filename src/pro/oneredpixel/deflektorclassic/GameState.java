@@ -172,6 +172,7 @@ public class GameState extends State {
 				};
 				if (topScore<countScore) {
 					topScore=countScore;
+					app.scores[app.playingLevel-1]=topScore;
 					if (!playedNewRecord) app.playSound(Deflektor.SND_NEWRECORD);
 					playedNewRecord=true;
 				}
@@ -1336,7 +1337,7 @@ public class GameState extends State {
 		energy=0;
 		overheat=0;
 		
-		topScore=500;
+		topScore=app.scores[app.playingLevel-1];
 		countScore=0;
 		countKilledGremlins=0;
 		countBurnedCells=0;
