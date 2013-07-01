@@ -424,6 +424,8 @@ public class Deflektor implements ApplicationListener {
 	
 	void showChar(int x, int y, char c) {
 		if (c>='0' && c<='9') spr_putRegion(x, y, 8, 8, (c-'0')*8,72+144);
+		if (c=='(') spr_putRegion(x, y, 8, 8, 10*8,72+144);
+		if (c==')') spr_putRegion(x, y, 8, 8, 11*8,72+144);
 		if (c>='A' && c<='P') spr_putRegion(x, y, 8, 8, (c-'A')*8,80+144);
 		if (c>='Q' && c<='Z') spr_putRegion(x, y, 8, 8, (c-'Q')*8,88+144);
 	}
