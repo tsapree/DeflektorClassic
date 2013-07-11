@@ -78,6 +78,12 @@ public class MenuState extends State {
 			app.gotoAppState(Deflektor.APPSTATE_ABOUT);
 			bAbout.touched = false;
 		}
+		if (bAchievements.checkRegion(tapx,tapy)) {
+			if (app.act.getSignedIn()) {
+				app.act.getAchievements();
+			} else app.act.Login();
+			bAchievements.touched = false;
+		}
 		if (bSoundOn.checkRegion(tapx,tapy)) {
 			app.soundEnabled=!app.soundEnabled;
 			app.stopMelody();
@@ -95,7 +101,7 @@ public class MenuState extends State {
 		
 		app.drawButton(bPlay);
 		app.drawButton(bSettings);
-		//app.drawButton(bAchievements);
+		app.drawButton(bAchievements);
 		app.drawButton(bAbout);
 		if (app.soundEnabled) app.drawButton(bSoundOn);
 		else app.drawButton(bSoundOff);

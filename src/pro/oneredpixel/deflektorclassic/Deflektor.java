@@ -88,6 +88,12 @@ public class Deflektor implements ApplicationListener {
 	int appGfxId = APPGFX_AMIGA;
 	boolean difficultyClassic = true; //повышенная, классическая сложность
 	
+	public DeflektorActivity act;
+	
+	Deflektor(DeflektorActivity a) {
+		act=a;
+	}
+	
 	@Override
 	public void create() {
 		

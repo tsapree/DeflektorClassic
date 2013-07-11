@@ -28,7 +28,7 @@ public class DeflektorActivity extends AndroidApplication implements GameHelperL
 	      cfg.useWakelock = true;
 	      
 	      gHelper.setup(this);
-	      initialize(new Deflektor(), cfg);
+	      initialize(new Deflektor(this), cfg);
 	   }
 
 	@Override
