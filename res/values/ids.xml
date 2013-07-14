@@ -5,4 +5,7 @@
     <string name="app_id">700266844417</string>
 
     <string name="achievement_begins">CgkIgaKg2bAUEAIQAw</string>
+    <string name="achievement_outofenergy">CgkIgaKg2bAUEAIQDQ</string>
+    <string name="achievement_burns">CgkIgaKg2bAUEAIQDg</string>
+    <string name="achievement_kill100gremlins">CgkIgaKg2bAUEAIQBA</string>
 </resources>

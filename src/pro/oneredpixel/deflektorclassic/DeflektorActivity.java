@@ -91,4 +91,17 @@ public class DeflektorActivity extends AndroidApplication implements GameHelperL
 		startActivityForResult(gHelper.getGamesClient().getAchievementsIntent(), 105);
 	}
 	
+	public void unlockAchievement(int id) {
+		//TODO: если связи нет, то неплохо бы созранять ачивки до момента появления связи 
+		if (getSignedIn()) 
+			gHelper.getGamesClient().unlockAchievement(getString(id));
+	}
+	
+	public void incrementAchievement(int id) {
+		//TODO: если связи нет, то неплохо бы созранять ачивки до момента появления связи
+		if (getSignedIn())
+			gHelper.getGamesClient().incrementAchievement(getString(id),1);
+	}
+
+	
 }

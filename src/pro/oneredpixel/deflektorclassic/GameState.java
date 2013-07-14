@@ -1459,6 +1459,7 @@ public class GameState extends State {
 			energy--;
 			if (energy<=0) {
 				gameStateId=GAMESTATE_GAMEOVER_NOENERGY;
+				app.act.incrementAchievement(R.string.achievement_outofenergy);
 				app.playSound(Deflektor.SND_GAMEOVER);
 				app.stopContinuousSound();
 				flash=0;
@@ -1474,6 +1475,7 @@ public class GameState extends State {
 				if (app.cheat) overheat=0;
 				else {
 					gameStateId=GAMESTATE_GAMEOVER_OVERHEAT;
+					app.act.incrementAchievement(R.string.achievement_burns);
 					app.playSound(Deflektor.SND_GAMEOVER);
 					app.stopContinuousSound();
 					flash=0;
@@ -1483,6 +1485,7 @@ public class GameState extends State {
 			
 			if (beamState==BEAMSTATE_CONNECTED) {
 				app.unlockLevel(app.playingLevel+1);
+				if (app.playingLevel==1) app.act.unlockAchievement(R.string.achievement_begins);
 				gameStateId = GAMESTATE_LEVELCOMPLETED;
 				app.playSound(Deflektor.SND_LEVELCOMPLETED);
 			} else {
@@ -2098,6 +2101,7 @@ public class GameState extends State {
 				if (grm[i].attemptToKill(x, y)) {
 					killedGremlins++;
 					app.playSound(Deflektor.SND_GREMLINDEAD);
+					app.act.incrementAchievement(R.string.achievement_kill100gremlins);
 				};
 	};
 	
