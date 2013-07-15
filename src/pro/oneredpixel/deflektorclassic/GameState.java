@@ -72,6 +72,9 @@ public class GameState extends State {
 	int topScore;
 	boolean playedNewRecord;
 	
+	//for achievements
+	int failsOnCurrentLevel;
+	
 	boolean cursorEnabled = false;
 	int cursorPhase = 0;
 	final int cursorPhases = 6;
@@ -95,6 +98,7 @@ public class GameState extends State {
 	
 	//init state for showing
 	void start() {
+		failsOnCurrentLevel=0;
 		initGame();
 	};
 	
@@ -237,6 +241,7 @@ public class GameState extends State {
 					//play next level?
 					app.playingLevel++;
 					if (app.playingLevel<=app.countOfLevels) {
+						failsOnCurrentLevel=0;
 						initGame();
 					} else {
 						app.timeToShowFinalCut=true;
@@ -1453,6 +1458,7 @@ public class GameState extends State {
 		case GAMESTATE_GAMEOVER_NOENERGY:
 		case GAMESTATE_GAMEOVER_OVERHEAT:
 			if (flash>32) initGame();
+			failsOnCurrentLevel++;
 			break;
 		case GAMESTATE_GAMING:
 			if (app.cheat) energy++;
@@ -1486,6 +1492,14 @@ public class GameState extends State {
 			if (beamState==BEAMSTATE_CONNECTED) {
 				app.unlockLevel(app.playingLevel+1);
 				if (app.playingLevel==1) app.act.unlockAchievement(R.string.achievement_begins);
+				if (app.playingLevel==10) app.act.unlockAchievement(R.string.achievement_10levels);
+				if (app.playingLevel==20) app.act.unlockAchievement(R.string.achievement_20levels);
+				if (app.playingLevel==30) app.act.unlockAchievement(R.string.achievement_30levels);
+				if (app.playingLevel==40) app.act.unlockAchievement(R.string.achievement_40levels);
+				if (app.playingLevel==50) app.act.unlockAchievement(R.string.achievement_50levels);
+				if (app.playingLevel==60) app.act.unlockAchievement(R.string.achievement_60levels);
+				if (app.playingLevel==30 && app.difficultyClassic) app.act.unlockAchievement(R.string.achievement_30levelclassic);
+				if (failsOnCurrentLevel>=10) app.act.unlockAchievement(R.string.achievement_persistence);
 				gameStateId = GAMESTATE_LEVELCOMPLETED;
 				app.playSound(Deflektor.SND_LEVELCOMPLETED);
 			} else {

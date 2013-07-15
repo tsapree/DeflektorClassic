@@ -5,6 +5,14 @@
     <string name="app_id">700266844417</string>
 
     <string name="achievement_begins">CgkIgaKg2bAUEAIQAw</string>
+    <string name="achievement_10levels">CgkIgaKg2bAUEAIQBg</string>
+    <string name="achievement_20levels">CgkIgaKg2bAUEAIQBw</string>
+    <string name="achievement_30levels">CgkIgaKg2bAUEAIQCA</string>
+    <string name="achievement_40levels">CgkIgaKg2bAUEAIQCQ</string>
+    <string name="achievement_50levels">CgkIgaKg2bAUEAIQCg</string>
+    <string name="achievement_60levels">CgkIgaKg2bAUEAIQAQ</string>
+    <string name="achievement_30levelclassic">CgkIgaKg2bAUEAIQCw</string>
+    <string name="achievement_persistence">CgkIgaKg2bAUEAIQDA</string>
     <string name="achievement_outofenergy">CgkIgaKg2bAUEAIQDQ</string>
     <string name="achievement_burns">CgkIgaKg2bAUEAIQDg</string>
     <string name="achievement_kill100gremlins">CgkIgaKg2bAUEAIQBA</string>
