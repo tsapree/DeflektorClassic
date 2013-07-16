@@ -218,6 +218,9 @@ public class LevelsState extends State {
 		app.spr_putRegion(x, y, 24, 24, 0,32+144);
 		app.showBigNumber(x+4,y+8,levelNumber);
 		if (app.unlockedLevel<levelNumber) app.spr_putRegion(x+15, y+15, 8, 8, 48,192);
+		//TODO: убрать или изменить спрайт
+		if ((app.scores[levelNumber-1]&app.COMPLETED_ON_CLASSIC_DIFFICULTY)!=0) app.spr_putRegion(x+1, y+15, 8, 8, 48,192);
+		if ((app.scores[levelNumber-1]&app.COMPLETED_WITH_ZX_SKIN)!=0) app.spr_putRegion(x+9, y+15, 8, 8, 48,192);
 	};
 	
 

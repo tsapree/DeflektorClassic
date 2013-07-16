@@ -75,6 +75,7 @@ public class GameState extends State {
 	//for achievements
 	int failsOnCurrentLevel;
 	boolean rotatedMirrors;
+	int completedWithoutFails;
 	
 	boolean cursorEnabled = false;
 	int cursorPhase = 0;
@@ -100,6 +101,7 @@ public class GameState extends State {
 	//init state for showing
 	void start() {
 		failsOnCurrentLevel=0;
+		completedWithoutFails=0;
 		initGame();
 	};
 	
@@ -177,7 +179,7 @@ public class GameState extends State {
 				};
 				if (topScore<countScore) {
 					topScore=countScore;
-					app.scores[app.playingLevel-1]=topScore;
+					app.scores[app.playingLevel-1]=(app.scores[app.playingLevel-1]&0x38000) | (topScore&0x7fff);
 					if (!playedNewRecord) app.playSound(Deflektor.SND_NEWRECORD);
 					playedNewRecord=true;
 				}
@@ -243,6 +245,7 @@ public class GameState extends State {
 					app.playingLevel++;
 					if (app.playingLevel<=app.countOfLevels) {
 						failsOnCurrentLevel=0;
+						completedWithoutFails++;
 						initGame();
 					} else {
 						app.timeToShowFinalCut=true;
@@ -253,6 +256,7 @@ public class GameState extends State {
 					
 				};
 				if (bRestart.checkRegion(tapx,tapy)) {
+					completedWithoutFails=0;
 					initGame();
 					//app.playSound(Deflektor.SND_UNTAP);
 					bRestart.touched=false;
@@ -1462,6 +1466,7 @@ public class GameState extends State {
 		case GAMESTATE_GAMEOVER_OVERHEAT:
 			if (flash>32) initGame();
 			failsOnCurrentLevel++;
+			completedWithoutFails=0;
 			break;
 		case GAMESTATE_GAMING:
 			if (app.cheat) energy++;
@@ -1504,6 +1509,20 @@ public class GameState extends State {
 				if (app.playingLevel==30 && app.difficultyClassic) app.act.unlockAchievement(R.string.achievement_30levelclassic);
 				if (failsOnCurrentLevel>=10) app.act.unlockAchievement(R.string.achievement_persistence);
 				if (!rotatedMirrors) app.act.unlockAchievement(R.string.achievement_itsnotme);
+				if (completedWithoutFails>=5) app.act.unlockAchievement(R.string.achievement_5wofails);
+				if (completedWithoutFails>=10) app.act.unlockAchievement(R.string.achievement_10wofails);
+				
+				if (app.difficultyClassic) app.scores[app.playingLevel-1]|=app.COMPLETED_ON_CLASSIC_DIFFICULTY;
+				if (app.appGfxId==Deflektor.APPGFX_ZX) app.scores[app.playingLevel-1]|=app.COMPLETED_WITH_ZX_SKIN;
+				int completedFlags=app.COMPLETED_ON_CLASSIC_DIFFICULTY | app.COMPLETED_WITH_ZX_SKIN | app.RESERVED;
+				for (int i=0;i<app.countOfLevels;i++) {
+					completedFlags&=app.scores[i];
+				};
+				if ((completedFlags&app.COMPLETED_ON_CLASSIC_DIFFICULTY)!=0) app.act.unlockAchievement(R.string.achievement_complexity);
+				if ((completedFlags&app.COMPLETED_WITH_ZX_SKIN         )!=0) app.act.unlockAchievement(R.string.achievement_zx);
+				
+				//app.scores[app.playingLevel-1]=(app.scores[app.playingLevel-1]&0x38000) | (topScore&0x7fff);
+				
 				gameStateId = GAMESTATE_LEVELCOMPLETED;
 				app.playSound(Deflektor.SND_LEVELCOMPLETED);
 			} else {

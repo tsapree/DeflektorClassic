@@ -17,4 +17,8 @@
     <string name="achievement_burns">CgkIgaKg2bAUEAIQDg</string>
     <string name="achievement_kill100gremlins">CgkIgaKg2bAUEAIQBA</string>
     <string name="achievement_itsnotme">CgkIgaKg2bAUEAIQDw</string>
+    <string name="achievement_5wofails">CgkIgaKg2bAUEAIQEQ</string>
+    <string name="achievement_10wofails">CgkIgaKg2bAUEAIQEA</string>
+    <string name="achievement_zx">CgkIgaKg2bAUEAIQEg</string>
+    <string name="achievement_complexity">CgkIgaKg2bAUEAIQAg</string>
 </resources>

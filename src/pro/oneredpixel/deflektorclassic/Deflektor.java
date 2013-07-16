@@ -85,6 +85,9 @@ public class Deflektor implements ApplicationListener {
 	int controlsSensitivity = 4;
 	int unlockedLevel = 60;
 	int scores[]; //0..32767 - очки за уровень, &32768, &65536, &131072 - опции, звезды за прохождение
+	final int COMPLETED_ON_CLASSIC_DIFFICULTY=0x8000;
+	final int COMPLETED_WITH_ZX_SKIN=0x10000;
+	final int RESERVED=0x20000;
 	int appGfxId = APPGFX_AMIGA;
 	boolean difficultyClassic = true; //повышенная, классическая сложность
 	
