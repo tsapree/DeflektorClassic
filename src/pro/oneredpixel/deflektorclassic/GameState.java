@@ -74,6 +74,7 @@ public class GameState extends State {
 	
 	//for achievements
 	int failsOnCurrentLevel;
+	boolean rotatedMirrors;
 	
 	boolean cursorEnabled = false;
 	int cursorPhase = 0;
@@ -396,6 +397,7 @@ public class GameState extends State {
 				if (deltaX<(-deltaY)) delta=-delta;
 				delta = delta + restDelta;
 				rotateMirror( cursorX, cursorY, ((int)(delta/app.panScale))&0x1f);
+				if ((((int)(delta/app.panScale))&0x1f)!=0) rotatedMirrors=true;
 				restDelta=(int)(delta-((int)(delta/app.panScale))*app.panScale);
 			};
 			break;
@@ -1351,6 +1353,7 @@ public class GameState extends State {
 		
 		killedGremlins=0;
 		burnedCells=0;
+		rotatedMirrors=false;
 		
 		cursorEnabled = false;		
 		
@@ -1500,6 +1503,7 @@ public class GameState extends State {
 				if (app.playingLevel==60) app.act.unlockAchievement(R.string.achievement_60levels);
 				if (app.playingLevel==30 && app.difficultyClassic) app.act.unlockAchievement(R.string.achievement_30levelclassic);
 				if (failsOnCurrentLevel>=10) app.act.unlockAchievement(R.string.achievement_persistence);
+				if (!rotatedMirrors) app.act.unlockAchievement(R.string.achievement_itsnotme);
 				gameStateId = GAMESTATE_LEVELCOMPLETED;
 				app.playSound(Deflektor.SND_LEVELCOMPLETED);
 			} else {
@@ -2106,6 +2110,7 @@ public class GameState extends State {
 		int f=field[y*field_width+x];
 		if ((f&0xFF00)==MIRR) {
 			rotateThing(x,y);
+			rotatedMirrors=true;
 		};
 	};
 		
