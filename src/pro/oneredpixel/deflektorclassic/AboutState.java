@@ -62,12 +62,12 @@ public class AboutState extends State{
 										 //12345678901234567890123456789012
 		app.showString((240-8*16)/2, 8*1, "GREAT ZX VERSION");
 		app.showString((240-8*23)/2, 8*3-4, "WRITTEN BY COSTA PANAYI");
-		app.showString((240-8*22)/2, 8*4-2, "MUSIC BY BENN DANGLISH"); 
+		app.showString((240-8*20)/2, 8*4-2, "MUSIC BY BEN DAGLISH"); 
 		app.showString((240-8*23)/2, 8*5, "(C)1987 VORTEX SOFTWARE");
 
 		app.showString((240-8*20)/2, 8*8, "BEAUTY AMIGA VERSION");
 		app.showString((240-8*23)/2, 8*10-4, "GRAPHICS BY STEVE KERRY");
-		app.showString((240-8*21)/2, 8*11-2,"MUSIC BY BENN DAGLISH");
+		app.showString((240-8*20)/2, 8*11-2,"MUSIC BY BEN DAGLISH");
 		app.showString((240-8*24)/2, 8*12,"(C)1988 GREMLIN GRAPHICS");
 
 		app.showString((240-8*20)/2, 8*15,"THIS ANDROID VERSION");

@@ -134,6 +134,7 @@ public class GameState extends State {
 		if (winStateId==WINSTATE_PAUSED) {
 			app.drawBox(24, 8, 240-48, 160-32, 0,176);
 			app.showString(32+3*8+4, 24, String.format("LEVEL %02d PAUSED",app.playingLevel));
+			app.showString(104, 112, String.format("TOP %d",topScore));
 			
 			app.drawButton(bResume);
 			app.drawButton(bRestart);
@@ -163,26 +164,7 @@ public class GameState extends State {
 				app.drawBox(24, 8, 240-48, 160-32, 0,176);
 				app.showString(32+8+8, 24, String.format("LEVEL %02d COMPLETED",app.playingLevel));
 				
-				if (countBurnedCells<burnedCells) {
-					countBurnedCells++;
-					countScore+=app.difficultyClassic?30:15;
-				};
-				if (countKilledGremlins<killedGremlins) {
-					countKilledGremlins++;
-					countScore+=app.difficultyClassic?160:80;
-				};
-				if (energy>0) {
-					energy-=energySteps/64;
-					if (energy<0) energy=0;
-					countEnergy++;
-					countScore+=app.difficultyClassic?10:2;
-				};
-				if (topScore<countScore) {
-					topScore=countScore;
-					app.scores[app.playingLevel-1]=(app.scores[app.playingLevel-1]&0x38000) | (topScore&0x7fff);
-					if (!playedNewRecord) app.playSound(Deflektor.SND_NEWRECORD);
-					playedNewRecord=true;
-				}
+				countScoreStep();
 				
 				app.showString(32+8*6, 24+8+8, String.format("CELLS %d",countBurnedCells));
 				app.showString(32+8*3, 24+8+8+8, String.format("GREMLINS %d",countKilledGremlins));
@@ -191,9 +173,6 @@ public class GameState extends State {
 				if (topScore<=countScore) {
 					if ((flash&2)==0) app.showString(32+8+8+8*4, 24+8+8+8+8+8+8+8+8, "NEW RECORD");
 				} else app.showString(32+8*8, 24+8+8+8+8+8+8+8+8, String.format("TOP %d",topScore));
-				
-				
-				
 				
 				app.drawButton(bLevels);
 				app.drawButton(bNext);
@@ -214,6 +193,35 @@ public class GameState extends State {
 		app.lastFrameTime = TimeUtils.nanoTime();
 		
 	};
+	
+	boolean countScoreStep() {
+		boolean noMoreSteps=true;
+		if (countBurnedCells<burnedCells) {
+			countBurnedCells++;
+			countScore+=app.difficultyClassic?30:15;
+			noMoreSteps=false;
+		};
+		if (countKilledGremlins<killedGremlins) {
+			countKilledGremlins++;
+			countScore+=app.difficultyClassic?160:80;
+			noMoreSteps=false;
+		};
+		if (energy>0) {
+			energy-=energySteps/64;
+			if (energy<0) energy=0;
+			countEnergy++;
+			countScore+=app.difficultyClassic?10:2;
+			noMoreSteps=false;
+		};
+		if (topScore<countScore) {
+			topScore=countScore;
+			app.scores[app.playingLevel-1]=(app.scores[app.playingLevel-1]&0x38000) | (topScore&0x7fff);
+			if (!playedNewRecord) app.playSound(Deflektor.SND_NEWRECORD);
+			playedNewRecord=true;
+			noMoreSteps=false;
+		}
+		return noMoreSteps;
+	}
 	
 	//------
 	//--- controlling
@@ -241,6 +249,9 @@ public class GameState extends State {
 		case WINSTATE_GAMING:
 			if (gameStateId==GAMESTATE_LEVELCOMPLETED) {
 				if (bNext.checkRegion(tapx,tapy)) {
+					
+					while (!countScoreStep());
+					
 					//play next level?
 					app.playingLevel++;
 					if (app.playingLevel<=app.countOfLevels) {
@@ -1348,7 +1359,7 @@ public class GameState extends State {
 		energy=0;
 		overheat=0;
 		
-		topScore=app.scores[app.playingLevel-1];
+		topScore=app.scores[app.playingLevel-1]&0x7fff;
 		countScore=0;
 		countKilledGremlins=0;
 		countBurnedCells=0;
