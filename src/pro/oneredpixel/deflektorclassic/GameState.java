@@ -1475,9 +1475,11 @@ public class GameState extends State {
 			break;
 		case GAMESTATE_GAMEOVER_NOENERGY:
 		case GAMESTATE_GAMEOVER_OVERHEAT:
-			if (flash>32) initGame();
-			failsOnCurrentLevel++;
-			completedWithoutFails=0;
+			if (flash>32) {
+				initGame();
+				failsOnCurrentLevel++;
+				completedWithoutFails=0;
+			}
 			break;
 		case GAMESTATE_GAMING:
 			if (app.cheat) energy++;
