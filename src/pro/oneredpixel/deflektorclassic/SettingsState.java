@@ -31,8 +31,8 @@ public class SettingsState extends State {
 		bZX = new Button(16+8*6+8+8+8*8, 32,0,0,false,"ZX");
 		bAmiga = new Button(16+16+8*2+8*6+8+8+8*8, 32,0,0,false,"AMIGA");
 		
-		bDifficultyEasy = new Button(16+12*6+8+8+8, 64,0,0,false,"EASY");
-		bDifficultyClassic = new Button(16+4*8+8+12*6+8+16+8, 64,0,0,false,"CLASSIC");
+		bDifficultyEasy = new Button(16+12*6+8+8, 64,0,0,false,"EASY");
+		bDifficultyClassic = new Button(16+4*8+8+12*6+8+16+8-8, 64,8*10,0,false,"CLASSIC");
 		
 		bMinusSensitivity = new Button(8+8*12+7*8,96, 64,160);
 		bPlusSensitivity = new Button(8+24+24+8*12+7*8,96, 80,160);
@@ -217,7 +217,8 @@ public class SettingsState extends State {
 		app.showString(8, 72, "DIFFICULTY");
 		if (app.difficultyClassic)  app.drawButton(bDifficultyEasy);    else app.drawButton(bDifficultyEasy, 24, 176);
 		if (!app.difficultyClassic) app.drawButton(bDifficultyClassic); else app.drawButton(bDifficultyClassic, 24, 176);
-
+		app.spr_putRegion(16+4*8+8+12*6+8+16+8-8+8*8+2, 64+8, 8, 8, 56,192);
+		
 		app.showString(8, 104, "SENSITIVITY");
 		if (app.controlsSensitivity>1) app.drawButton(bMinusSensitivity); else app.drawButton(bMinusSensitivity, 24, 176); 
 		app.showString(8+24+8+8*12+7*8,96+8, String.format("%d", app.controlsSensitivity));
